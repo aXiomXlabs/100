@@ -157,8 +157,8 @@ export default function CopyTradingSection() {
             >
               <div className="aspect-video rounded-lg overflow-hidden border border-gray-700 bg-background-secondary relative">
                 <img
-                  src="/images/Dashboard.png"
-                  alt="Solana copy trading dashboard preview showing wallet performance metrics"
+                  src="/images/dashboard-preview.png"
+                  alt="Solana trading dashboard with advanced metrics and performance analytics"
                   className="w-full h-auto object-cover opacity-100 transition-opacity"
                   loading="eager"
                 />

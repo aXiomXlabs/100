@@ -56,6 +56,70 @@ export default function SolanaSniperBotClientPage() {
     pointer-events: none;
     border-radius: 0.75rem;
   }
+
+  /* Neue Animationen für Bilder */
+  @keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+  }
+
+  @keyframes subtle-zoom {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes subtle-glow {
+    0% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.1) saturate(1.1); }
+    100% { filter: brightness(1) saturate(1); }
+  }
+
+  @keyframes subtle-rotate {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(0.5deg); }
+    75% { transform: rotate(-0.5deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-subtle-zoom {
+    animation: subtle-zoom 8s ease-in-out infinite;
+  }
+
+  .animate-subtle-glow {
+    animation: subtle-glow 4s ease-in-out infinite;
+  }
+
+  .animate-subtle-rotate {
+    animation: subtle-rotate 10s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  .animate-delay-1 {
+    animation-delay: 1s;
+  }
+
+  .animate-delay-2 {
+    animation-delay: 2s;
+  }
+
+  .animate-delay-3 {
+    animation-delay: 3s;
+  }
+
+  /* Hover-Effekte für Bilder */
+  .hover-scale {
+    transition: transform 0.3s ease;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.03);
+  }
 `
     document.head.appendChild(style)
     return () => {
@@ -114,15 +178,17 @@ export default function SolanaSniperBotClientPage() {
 
           <div className="mt-16 relative w-full max-w-4xl">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 rounded-xl blur-xl"></div>
-            <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow">
-              <Image
-                src="/images/solana-trading-interface.png"
-                alt="Solana Sniper Bot Advanced Trading Interface"
-                width={1200}
-                height={675}
-                className="w-full h-auto rounded-xl"
-                priority
-              />
+            <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow hover-scale">
+              <div className="animate-subtle-zoom">
+                <Image
+                  src="/images/dashboard-preview.png"
+                  alt="Solana Sniper Bot Advanced Trading Dashboard"
+                  width={1200}
+                  height={675}
+                  className="w-full h-auto rounded-xl"
+                  priority
+                />
+              </div>
               <div className="gradient-overlay"></div>
             </div>
           </div>
@@ -333,14 +399,16 @@ export default function SolanaSniperBotClientPage() {
                 </div>
                 <div className="relative">
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 rounded-xl blur-xl"></div>
-                  <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow">
-                    <Image
-                      src="/images/solana-sniper-execution.png"
-                      alt="Solana Sniper Bot Execution Technology"
-                      width={600}
-                      height={400}
-                      className="w-full h-auto rounded-xl"
-                    />
+                  <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow hover-scale">
+                    <div className="animate-subtle-glow">
+                      <Image
+                        src="/images/solana-sniper-execution.png"
+                        alt="Solana Sniper Bot Execution Technology"
+                        width={600}
+                        height={400}
+                        className="w-full h-auto rounded-xl"
+                      />
+                    </div>
                     <div className="gradient-overlay"></div>
                   </div>
                 </div>
@@ -351,14 +419,16 @@ export default function SolanaSniperBotClientPage() {
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="order-2 md:order-1 relative">
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 rounded-xl blur-xl"></div>
-                  <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow">
-                    <Image
-                      src="/images/solana-copy-trading-dashboard.png"
-                      alt="Solana Copy Trading Dashboard"
-                      width={600}
-                      height={400}
-                      className="w-full h-auto rounded-xl"
-                    />
+                  <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow hover-scale">
+                    <div className="animate-float animate-delay-1">
+                      <Image
+                        src="/images/solana-copy-trading-dashboard.png"
+                        alt="Solana Copy Trading Dashboard"
+                        width={600}
+                        height={400}
+                        className="w-full h-auto rounded-xl"
+                      />
+                    </div>
                     <div className="gradient-overlay"></div>
                   </div>
                 </div>
@@ -411,14 +481,16 @@ export default function SolanaSniperBotClientPage() {
                 </div>
                 <div className="relative">
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 rounded-xl blur-xl"></div>
-                  <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow">
-                    <Image
-                      src="/images/solana-bdn-network.png"
-                      alt="Solana BDN Network Visualization"
-                      width={600}
-                      height={400}
-                      className="w-full h-auto rounded-xl"
-                    />
+                  <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow hover-scale">
+                    <div className="animate-subtle-rotate animate-delay-2">
+                      <Image
+                        src="/images/solana-bdn-network.png"
+                        alt="Solana BDN Network Visualization"
+                        width={600}
+                        height={400}
+                        className="w-full h-auto rounded-xl"
+                      />
+                    </div>
                     <div className="gradient-overlay"></div>
                   </div>
                 </div>
@@ -465,14 +537,16 @@ export default function SolanaSniperBotClientPage() {
 
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 rounded-xl blur-xl"></div>
-              <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow">
-                <Image
-                  src="/images/solana-telegram-bot.png"
-                  alt="Solana Telegram Bot Interface"
-                  width={600}
-                  height={800}
-                  className="w-full h-auto rounded-xl"
-                />
+              <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow hover-scale">
+                <div className="animate-float animate-delay-3">
+                  <Image
+                    src="/images/solana-telegram-bot.png"
+                    alt="Solana Telegram Bot Interface"
+                    width={600}
+                    height={800}
+                    className="w-full h-auto rounded-xl"
+                  />
+                </div>
                 <div className="gradient-overlay"></div>
               </div>
             </div>
