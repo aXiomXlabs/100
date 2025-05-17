@@ -146,33 +146,33 @@ export default function RootLayout({
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              // Check if user has given consent for analytics cookies
-              function hasAnalyticsConsent() {
-                try {
-                  const consents = localStorage.getItem('cookieConsents');
-                  return consents ? JSON.parse(consents).analytics === true : false;
-                } catch (e) {
-                  return false;
-                }
+            // Check if user has given consent for analytics cookies
+            function hasAnalyticsConsent() {
+              try {
+                const consents = localStorage.getItem('cookieConsents');
+                return consents ? JSON.parse(consents).analytics === true : false;
+              } catch (e) {
+                return false;
               }
+            }
 
-              // Only load GA if consent is given
-              if (hasAnalyticsConsent()) {
-                // Load GA script
-                const gaScript = document.createElement('script');
-                gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-6GRKXCYXWW";
-                gaScript.async = true;
-                document.head.appendChild(gaScript);
+            // Only load GA if consent is given
+            if (hasAnalyticsConsent()) {
+              // Load GA script
+              const gaScript = document.createElement('script');
+              gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-6GRKXCYXWW";
+              gaScript.async = true;
+              document.head.appendChild(gaScript);
 
-                // Initialize GA
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'G-6GRKXCYXWW', {
-                  page_path: window.location.pathname,
-                });
-              }
-            `,
+              // Initialize GA
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-6GRKXCYXWW', {
+                page_path: window.location.pathname,
+              });
+            }
+          `,
           }}
         />
 
@@ -460,6 +460,60 @@ export default function RootLayout({
                 bestRating: "5",
                 worstRating: "1",
               },
+            }),
+          }}
+        />
+
+        {/* JSON-LD Schema for FAQ */}
+        <Script
+          id="schema-faq"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "What is a Solana sniper bot?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "A Solana sniper bot is an automated trading tool that executes trades on the Solana blockchain with extremely low latency. Rust Rocket's sniper bot achieves 25 ms execution time and same-block execution, allowing you to get into new token launches on platforms like Pump.fun before price surges.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "How does Rust Rocket's copy-trading feature work?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rust Rocket's intelligent copy-trading feature automatically identifies and mirrors successful Solana traders' strategies. You can set custom parameters like stop-loss and auto-sell conditions to protect your investments and maximize profits while the bot handles the execution with 25 ms latency.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What makes Rust Rocket faster than other Solana bots?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rust Rocket achieves superior speed through our network of 15 private BDN (Block Distribution Network) gateways that provide direct, low-latency connections to the Solana blockchain. While standard bots rely on public RPCs with 400+ ms latency, our infrastructure delivers 25 ms execution time and same-block execution capabilities.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Does Rust Rocket work with Pump.fun?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Yes, Rust Rocket is specifically optimized for Pump.fun and Raydium, the most popular Solana meme coin launchpads. Our 25 ms execution time ensures you can participate in new token launches at the earliest possible moment, often in the same block as the launch transaction.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "How does Rust Rocket protect against rug pulls?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rust Rocket includes built-in rug-pull protection that analyzes token contracts and liquidity patterns in real-time. The bot can automatically set stop-loss levels and execute emergency sells if suspicious activity is detected, helping to safeguard your investments in the volatile meme coin market.",
+                  },
+                },
+              ],
             }),
           }}
         />

@@ -121,6 +121,15 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          <Link
+            href="/solana-sniper-bot"
+            className="nav-link text-sm font-medium transition-colors text-text-primary after:scale-x-0"
+            id="nav-solana-sniper-bot"
+            data-tracking-id="nav_solana_sniper_bot_click"
+            onClick={() => trackNavClick("Solana Sniper Bot")}
+          >
+            Solana Sniper Bot
+          </Link>
         </motion.nav>
 
         {/* CTA Button */}
@@ -194,6 +203,15 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              <Link
+                href="/solana-sniper-bot"
+                id="mobile-nav-solana-sniper-bot"
+                data-tracking-id="mobile_nav_solana_sniper_bot_click"
+                onClick={() => trackNavClick("mobile_Solana Sniper Bot")}
+                className="block text-base font-medium py-2 px-3 rounded-md text-text-primary hover:text-primary hover:bg-background-tertiary transition-colors"
+              >
+                Solana Sniper Bot
+              </Link>
               <div className="pt-2 border-t border-gray-800 mt-4"></div>
               <div className="pt-2 border-t border-gray-800 mt-2">
                 <a

@@ -122,13 +122,8 @@ export default function FAQSection() {
                 aria-controls={`faq-answer-${index}`}
                 id={`faq-question-${index}`}
                 data-tracking-id={`faq_question_${index + 1}`}
-                itemScope
-                itemProp="mainEntity"
-                itemType="https://schema.org/Question"
               >
-                <span className="font-medium text-text-primary" itemProp="name">
-                  {faq.question}
-                </span>
+                <span className="font-medium text-text-primary">{faq.question}</span>
                 <ChevronDown
                   className={`h-5 w-5 text-primary transition-transform duration-300 ${
                     activeIndex === index ? "transform rotate-180" : ""
@@ -147,14 +142,9 @@ export default function FAQSection() {
                     id={`faq-answer-${index}`}
                     role="region"
                     aria-labelledby={`faq-question-${index}`}
-                    itemScope
-                    itemProp="acceptedAnswer"
-                    itemType="https://schema.org/Answer"
                   >
                     <div className="p-5 bg-background-secondary/50 border border-t-0 border-gray-800 rounded-b-lg">
-                      <p className="text-text-secondary" itemProp="text">
-                        {faq.answer}
-                      </p>
+                      <p className="text-text-secondary">{faq.answer}</p>
                     </div>
                   </motion.div>
                 )}
@@ -166,7 +156,7 @@ export default function FAQSection() {
 
       {/* Verbesserte Version des FAQ-Schemas */}
       <Script
-        id="schema-faq"
+        id="faq-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
