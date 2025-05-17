@@ -1,51 +1,66 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend } from "recharts"
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 
-interface LeadSourcePieChartProps {
-  data: Array<{ referral_source: string; count: number }>
+// Definiere den Typ für die Daten
+interface LeadSourceData {
+  referral_source: string
+  count: number
 }
 
-export function LeadSourcePieChart({ data }: LeadSourcePieChartProps) {
-  // Daten für das Diagramm aufbereiten
+// Farben für das Diagramm
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D"]
+
+export function LeadSourcePieChart({ data }: { data: LeadSourceData[] }) {
+  // Stelle sicher, dass wir Daten haben
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Lead-Quellen</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px] flex items-center justify-center">
+          <p className="text-muted-foreground">Keine Daten verfügbar</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Formatiere die Daten für das Diagramm
   const chartData = data.map((item) => ({
-    name: item.referral_source || "Direkt",
+    name: item.referral_source || "Unbekannt",
     value: item.count,
   }))
 
-  // Farben für die verschiedenen Quellen
-  const COLORS = ["#2563eb", "#16a34a", "#ea580c", "#9333ea", "#0891b2", "#4f46e5", "#db2777"]
-
   return (
-    <Card className="col-span-1">
+    <Card>
       <CardHeader>
-        <CardTitle>Leads nach Quelle</CardTitle>
+        <CardTitle>Lead-Quellen</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={350}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={120}
-              fill="#8884d8"
-              dataKey="value"
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value: number) => [`${value} Leads`, "Anzahl"]}
-              labelFormatter={(name) => `Quelle: ${name}`}
-            />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => [`${value} Leads`, "Anzahl"]} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   )

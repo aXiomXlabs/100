@@ -18,11 +18,12 @@ export default async function AnalyticsPage() {
     .gte("created_at", thirtyDaysAgo.toISOString())
     .order("created_at", { ascending: true })
 
-  // Leads nach Quelle gruppieren
-  const { data: leadsBySource } = await supabase
-    .from("waitlist")
-    .select("referral_source, count")
-    .group("referral_source")
+  // Leads nach Quelle gruppieren - hier verwenden wir eine alternative Methode
+  // anstelle von .group(), da diese Funktion Probleme verursacht
+  const { data: allLeads } = await supabase.from("waitlist").select("referral_source")
+
+  // Manuelles Gruppieren der Daten
+  const leadsBySource = allLeads ? processSourceData(allLeads) : []
 
   // Wachstumsmetriken berechnen
   const now = new Date()
@@ -89,7 +90,7 @@ export default async function AnalyticsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <LeadChart data={leadsByDay} />
-        <LeadSourcePieChart data={leadsBySource || []} />
+        <LeadSourcePieChart data={leadsBySource} />
       </div>
     </div>
   )
@@ -119,4 +120,19 @@ function processTimeSeriesData(data: any[]) {
   }
 
   return result
+}
+
+// Hilfsfunktion zur manuellen Gruppierung der Daten nach Quelle
+function processSourceData(data: any[]) {
+  const sourceMap = new Map<string, number>()
+
+  data.forEach((entry) => {
+    const source = entry.referral_source || "Unbekannt"
+    sourceMap.set(source, (sourceMap.get(source) || 0) + 1)
+  })
+
+  return Array.from(sourceMap.entries()).map(([referral_source, count]) => ({
+    referral_source,
+    count,
+  }))
 }
