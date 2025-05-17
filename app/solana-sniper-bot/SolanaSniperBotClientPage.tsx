@@ -3,10 +3,9 @@
 import { useEffect, useRef } from "react"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CheckCircle, ArrowRight, Clock, Shield, Zap, BarChart3, Rocket, Users } from "lucide-react"
+import { CheckCircle, Clock, Shield, Zap, BarChart3, Rocket, Users } from "lucide-react"
 import Script from "next/script"
 // Füge diese Zeile nach den Imports hinzu
 // import { useEffect } from "react"
@@ -80,14 +79,6 @@ export default function SolanaSniperBotClientPage() {
               The fastest Solana Trading Bot with <span className="text-primary font-semibold">25ms latency</span> and
               same-block execution
             </p>
-            <div className="flex flex-wrap justify-center gap-4 mt-8">
-              <Button size="lg" className="bg-primary hover:bg-primary-hover text-white">
-                Join Waitlist <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button size="lg" variant="outline">
-                Learn More
-              </Button>
-            </div>
           </div>
 
           <div className="mt-16 relative w-full max-w-4xl">
