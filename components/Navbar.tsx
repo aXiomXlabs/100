@@ -83,16 +83,18 @@ export default function Navbar() {
             data-tracking-id="logo_click"
             onClick={() => trackNavClick("logo")}
           >
-            <Image
-              src="/images/rust-rocket-logo.png"
-              alt="Rust Rocket Logo"
-              width={40}
-              height={40}
-              className="mr-2"
-              priority={true}
-              itemProp="logo"
-            />
-            <span className="text-primary font-bold text-xl">Rust Rocket</span>
+            <div className="bg-transparent p-1 rounded-md group-hover:bg-primary/10 transition-all duration-300">
+              <Image
+                src="/images/rust-rocket-logo.png"
+                alt="Rust Rocket Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto"
+                priority={true}
+                itemProp="logo"
+              />
+            </div>
+            <span className="text-primary font-bold text-xl hidden sm:inline">Rust Rocket</span>
           </Link>
         </motion.div>
 
@@ -215,7 +217,7 @@ export default function Navbar() {
               <div className="pt-2 border-t border-gray-800 mt-4"></div>
               <div className="pt-2 border-t border-gray-800 mt-2">
                 <a
-                  href="https://t.me/rustrocket"
+                  href="https://t.me/rustxrocket"
                   target="_blank"
                   rel="noopener noreferrer"
                   id="mobile-telegram-link"
