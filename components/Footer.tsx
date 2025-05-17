@@ -159,9 +159,7 @@ export default function Footer() {
           </motion.div>
         </div>
 
-        <div className="mt-4 flex justify-center">
-          {/* CookieSettings entfernt */}
-        </div>
+        <div className="mt-4 flex justify-center">{/* CookieSettings entfernt */}</div>
 
         {/* Structured data for organization */}
         <script

@@ -31,6 +31,7 @@ export default function BDNNetworkSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [hoveredNode, setHoveredNode] = useState<number | null>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [showDescription, setShowDescription] = useState(false)
 
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
@@ -297,17 +298,27 @@ export default function BDNNetworkSection() {
             BDN Network
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-text-primary">
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-6 text-text-primary cursor-pointer hover:text-primary transition-colors duration-300"
+            onClick={() => setShowDescription(!showDescription)}
+          >
             Outpace the Market: Same-Block Execution via Our Exclusive{" "}
             <Tooltip text="Block Dependent Network - A specialized network for fastest transaction execution">
               <span className="text-gradient cursor-help">BDN Network</span>
             </Tooltip>
           </h2>
 
-          <p className="text-text-secondary text-lg">
-            Our global network of 15 private, optimized Solana gateways ensures that your transactions are routed
-            through the fastest and most reliable paths.
-          </p>
+          {showDescription && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.3 }}
+              className="text-text-secondary text-lg"
+            >
+              Our global network of 15 private, optimized Solana gateways ensures that your transactions are routed
+              through the fastest and most reliable paths.
+            </motion.p>
+          )}
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center mb-16">

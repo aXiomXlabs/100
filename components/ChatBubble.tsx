@@ -507,16 +507,16 @@ export default function ChatBubble() {
   }, [])
 
   // Test chat opening functionality
-  useEffect(() => {
-    console.log("Adding auto-open effect")
-    // Wait a bit and try to open the chat
-    const timer = setTimeout(() => {
-      console.log("Auto-opening chat after 3 seconds")
-      setIsOpen(true)
-    }, 3000)
-    
-    return () => clearTimeout(timer)
-  }, [])
+  // useEffect(() => {
+  //   console.log("Adding auto-open effect")
+  //   // Wait a bit and try to open the chat
+  //   const timer = setTimeout(() => {
+  //     console.log("Auto-opening chat after 3 seconds")
+  //     setIsOpen(true)
+  //   }, 3000)
+
+  //   return () => clearTimeout(timer)
+  // }, [])
 
   // Automatically send a follow-up message after 3 seconds when the chat opens
   useEffect(() => {
@@ -608,8 +608,8 @@ export default function ChatBubble() {
 
         // If no detailed info found, check for general questions
         if (!foundDetailedInfo) {
-        // Extended local fallback responses for common questions
-        const localResponses: Record<string, string> = {
+          // Extended local fallback responses for common questions
+          const localResponses: Record<string, string> = {
             "tell me about yourself":
               "I am the Rust Rocket AI assistant, developed with cutting-edge AI technology. I was specifically trained to be an expert on Rust Rocket and its features. I can provide detailed information about our Solana Trading Bot, Copy-Trading, and Same-Block Execution. I continuously learn and improve my responses based on user interactions. My goal is to provide you with the best possible support!",
             "what is rust rocket":
@@ -630,7 +630,7 @@ export default function ChatBubble() {
               "The Block Dependent Network (BDN) is our proprietary global network of 15 strategically placed Solana gateways on 5 continents. Each BDN node maintains direct high-speed connections to multiple Solana validators, with redundant paths and adaptive routing. The average latency is <15ms worldwide, with a network capacity of >10,000 TPS and 99.99% availability. Compared to standard RPC endpoints, our BDN offers 5-10x faster transaction submission and prioritized processing. For technical details, ask about 'BDN Network'.",
             "what can you do":
               "I am an advanced AI assistant for Rust Rocket and can help you with the following topics:\n\n• Detailed explanations of all Rust Rocket features\n• Information about Same-Block Execution technology\n• Explanations of the Copy-Trading system\n• Details about the BDN Network and Bloxroute integration\n• Comparisons with other trading bots\n• Answers about pricing and availability\n• Security features and best practices\n• Technical specifications\n• Getting started guides\n• General questions about Solana and memecoins\n\nI'm constantly learning and improving my answers with each interaction!",
-          "who created you":
+            "who created you":
               "I was created by the Rust Rocket development team, a group of experts in blockchain technology, algorithmic trading, and artificial intelligence. The team combines years of experience in high-frequency trading with a deep understanding of the Solana blockchain. My purpose is to help users understand and utilize the advanced features of Rust Rocket, particularly the Same-Block Execution and Copy Trading capabilities that distinguish Rust Rocket from other trading bots.",
             "what is solana":
               "Solana is a high-performance blockchain platform known for its fast transaction speeds (up to 65,000 TPS) and low fees. It uses an innovative Proof-of-History (PoH) consensus mechanism combined with Proof-of-Stake (PoS). Solana is particularly popular for DeFi applications, NFTs, and memecoins due to its efficiency. The blockchain has a block time of approximately 400 milliseconds, making it ideal for trading bots like Rust Rocket that can leverage this speed to enable Same-Block Execution.",
@@ -640,48 +640,48 @@ export default function ChatBubble() {
               "Rust Rocket is designed for maximum performance: The backend is developed in Rust, smart contracts use the Solana Program Library with custom optimizations. We use bare-metal servers with Intel Xeon processors, 10 Gbit/s network connections, and NVMe SSDs. Our direct integration with over 50 Solana validators and proprietary pipelining technology enables a latency of <10ms. We employ ML algorithms for trader identification and risk assessment. The success rate for Same-Block Execution is >99.8%. For complete technical specifications, ask about 'Technical Details'.",
           }
 
-        let foundLocalResponse = false
+          let foundLocalResponse = false
 
-        for (const [key, value] of Object.entries(localResponses)) {
-          if (lowerCaseInput.includes(key)) {
-            setMessages((prev) => [...prev, { role: "assistant", content: value }])
-            foundLocalResponse = true
-            break
+          for (const [key, value] of Object.entries(localResponses)) {
+            if (lowerCaseInput.includes(key)) {
+              setMessages((prev) => [...prev, { role: "assistant", content: value }])
+              foundLocalResponse = true
+              break
+            }
           }
-        }
 
-        // If no local response found and the API is available, try to use the API
-        if (!foundLocalResponse && apiStatus === "connected") {
-          console.log("No local response found, trying AI...")
-          // Call the AI API through our server action
-          const response = await chatWithGrokAI([...messages, userMessage])
+          // If no local response found and the API is available, try to use the API
+          if (!foundLocalResponse && apiStatus === "connected") {
+            console.log("No local response found, trying AI...")
+            // Call the AI API through our server action
+            const response = await chatWithGrokAI([...messages, userMessage])
 
-          if (response.success) {
-            setMessages((prev) => [...prev, { role: "assistant", content: response.message }])
-          } else {
-            console.error("Error from AI API:", response.error)
-            // Fallback to generic response on API error
+            if (response.success) {
+              setMessages((prev) => [...prev, { role: "assistant", content: response.message }])
+            } else {
+              console.error("Error from AI API:", response.error)
+              // Fallback to generic response on API error
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "assistant",
+                  content:
+                    "Sorry, I couldn't find a specific answer to your question. I can provide detailed information about Copy Trading, Bloxroute, Same-Block Execution, our BDN Network, advantages over competitors, security features, pricing, or technical details. What interests you the most?",
+                },
+              ])
+              setShowSuggestions(true)
+              setApiStatus("error")
+            }
+          } else if (!foundLocalResponse) {
+            // Fallback response if API is not available and no local response was found
             setMessages((prev) => [
               ...prev,
               {
                 role: "assistant",
                 content:
-                    "Sorry, I couldn't find a specific answer to your question. I can provide detailed information about Copy Trading, Bloxroute, Same-Block Execution, our BDN Network, advantages over competitors, security features, pricing, or technical details. What interests you the most?",
+                  "Sorry, I couldn't find a specific answer to your question. I can provide detailed information about Copy Trading, Bloxroute, Same-Block Execution, our BDN Network, advantages over competitors, security features, pricing, or technical details. What interests you the most?",
               },
             ])
-              setShowSuggestions(true)
-            setApiStatus("error")
-          }
-        } else if (!foundLocalResponse) {
-          // Fallback response if API is not available and no local response was found
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "assistant",
-              content:
-                  "Sorry, I couldn't find a specific answer to your question. I can provide detailed information about Copy Trading, Bloxroute, Same-Block Execution, our BDN Network, advantages over competitors, security features, pricing, or technical details. What interests you the most?",
-            },
-          ])
             setShowSuggestions(true)
           }
         }
@@ -709,15 +709,11 @@ export default function ChatBubble() {
     handleSubmit(new Event("submit") as unknown as React.FormEvent)
   }
 
-  const toggleChat = () => {
+  const toggleChat = useCallback(() => {
     console.log("toggleChat called, current isOpen:", isOpen)
-    try {
-    setIsOpen(!isOpen)
-      console.log("toggleChat after state update, new isOpen value should be:", !isOpen)
-    } catch (error) {
-      console.error("Error in toggleChat:", error)
-    }
-  }
+    setIsOpen((prevIsOpen) => !prevIsOpen)
+    console.log("Chat sollte jetzt umgeschaltet werden")
+  }, [])
 
   // Funktion zum Rendern der Kategorie-Icons
   const getCategoryIcon = (category: InfoCategory) => {
@@ -766,8 +762,8 @@ export default function ChatBubble() {
             </div>
             <button
               onClick={() => {
-                console.log("Close button clicked, setting isOpen to false");
-                setIsOpen(false);
+                console.log("Close button clicked, setting isOpen to false")
+                setIsOpen(false)
               }}
               className="text-gray-500 hover:text-text-primary transition-colors"
               aria-label="Close chat"

@@ -1,14 +1,15 @@
 "use client"
 
-import { useRef } from "react"
-import Image from "next/image"
+import { useRef, useState } from "react"
 import { Search, Zap, TrendingUp, ArrowRight } from "lucide-react"
 import { motion, useInView } from "framer-motion"
 import WaitlistButton from "./WaitlistButton"
+import CopyTradingDataFlowAnimation from "./CopyTradingDataFlowAnimation"
 
 export default function CopyTradingSection() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
+  const [showDescription, setShowDescription] = useState(false)
 
   return (
     <section
@@ -38,18 +39,38 @@ export default function CopyTradingSection() {
           </div>
 
           <h2
-            className="text-3xl md:text-4xl font-bold mb-6 text-text-primary"
+            className="text-3xl md:text-4xl font-bold mb-6 text-text-primary cursor-pointer hover:text-solana-purple transition-colors duration-300"
             id="copy-trading-heading"
             itemProp="headline"
+            onClick={() => setShowDescription(!showDescription)}
           >
             Stop Guessing, Start Copying: <span className="text-gradient">Intelligent Copy Trading</span>
           </h2>
 
-          <p className="text-text-secondary text-lg" itemProp="description">
-            Why spend hours analyzing wallets when Rust Rocket can find top performers and
-            <span className="text-primary font-semibold"> automatically</span> execute their trades for you,
-            <span className="text-primary font-semibold"> lightning-fast</span>?
-          </p>
+          {showDescription && (
+            <>
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                transition={{ duration: 0.3 }}
+                className="text-text-secondary text-lg mb-6"
+                itemProp="description"
+              >
+                Why spend hours analyzing wallets when Rust Rocket can find top performers and
+                <span className="text-primary font-semibold"> automatically</span> execute their trades for you,
+                <span className="text-primary font-semibold"> lightning-fast</span>?
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="mb-8 rounded-lg overflow-hidden shadow-lg"
+              >
+                <CopyTradingDataFlowAnimation />
+              </motion.div>
+            </>
+          )}
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -135,17 +156,12 @@ export default function CopyTradingSection() {
               className="mt-12 relative"
             >
               <div className="aspect-video rounded-lg overflow-hidden border border-gray-700 bg-background-secondary relative">
-                <Image
-                  src="/images/dashboard-preview.png"
+                <img
+                  src="/images/Dashboard.png"
                   alt="Solana copy trading dashboard preview showing wallet performance metrics"
-                  width={600}
-                  height={338}
-                  className="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity"
+                  className="w-full h-auto object-cover opacity-100 transition-opacity"
+                  loading="eager"
                 />
-                <div
-                  className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60"
-                  aria-hidden="true"
-                ></div>
                 <div className="absolute bottom-4 left-0 right-0 text-center">
                   <span className="text-sm font-medium px-3 py-1 bg-primary/90 rounded-full text-white">
                     Dashboard Preview

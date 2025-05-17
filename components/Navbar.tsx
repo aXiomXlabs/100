@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, X, ExternalLink } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import WaitlistButton from "./WaitlistButton"
@@ -83,16 +83,16 @@ export default function Navbar() {
             data-tracking-id="logo_click"
             onClick={() => trackNavClick("logo")}
           >
-            <div className="bg-transparent p-1 rounded-md group-hover:bg-primary/10 transition-all duration-300">
-              <Image
-                src="/images/rust-rocket-logo.png"
-                alt="Rust Rocket Logo"
-                width={48}
-                height={48}
-                className="h-10 w-auto"
-                priority
-              />
-            </div>
+            <Image
+              src="/images/rust-rocket-logo.png"
+              alt="Rust Rocket Logo"
+              width={40}
+              height={40}
+              className="mr-2"
+              priority={true}
+              itemProp="logo"
+            />
+            <span className="text-primary font-bold text-xl">Rust Rocket</span>
           </Link>
         </motion.div>
 

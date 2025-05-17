@@ -14,8 +14,8 @@ export default function CookieBannerFixedDelay() {
     const checkCookieConsent = () => {
       try {
         // Only run in browser
-        if (typeof window === 'undefined') return false
-        
+        if (typeof window === "undefined") return false
+
         // Check for consent
         const hasConsent = localStorage.getItem("cookieConsent")
         console.log("Cookie consent check:", hasConsent)
@@ -52,11 +52,14 @@ export default function CookieBannerFixedDelay() {
     try {
       console.log("Accepting all cookies")
       localStorage.setItem("cookieConsent", "true")
-      localStorage.setItem("cookieConsents", JSON.stringify({
-        necessary: true,
-        analytics: true,
-        marketing: true
-      }))
+      localStorage.setItem(
+        "cookieConsents",
+        JSON.stringify({
+          necessary: true,
+          analytics: true,
+          marketing: true,
+        }),
+      )
       setVisible(false)
       // Reload to apply analytics
       window.location.reload()
@@ -69,11 +72,14 @@ export default function CookieBannerFixedDelay() {
     try {
       console.log("Rejecting optional cookies")
       localStorage.setItem("cookieConsent", "true")
-      localStorage.setItem("cookieConsents", JSON.stringify({
-        necessary: true,
-        analytics: false,
-        marketing: false
-      }))
+      localStorage.setItem(
+        "cookieConsents",
+        JSON.stringify({
+          necessary: true,
+          analytics: false,
+          marketing: false,
+        }),
+      )
       setVisible(false)
     } catch (error) {
       console.error("Error rejecting cookies:", error)
@@ -89,8 +95,8 @@ export default function CookieBannerFixedDelay() {
             <div>
               <h3 className="text-lg font-medium mb-1">Cookie Settings</h3>
               <p className="text-sm text-gray-400">
-                We use cookies to provide you with the best possible experience on our website.
-                For more information, please see our Privacy Policy.
+                We use cookies to provide you with the best possible experience on our website. For more information,
+                please see our Privacy Policy.
               </p>
             </div>
           </div>
@@ -115,4 +121,4 @@ export default function CookieBannerFixedDelay() {
       </div>
     </div>
   )
-} 
+}

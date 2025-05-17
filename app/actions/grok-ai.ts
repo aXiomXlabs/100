@@ -15,7 +15,7 @@ function getOpenAIClient() {
   if (!openaiClient) {
     // Verwende den bereitgestellten API-Schlüssel direkt
     const apiKey = "xai-Ql6Xses2jXkpYaB0tdLgFv1Fe392nCbPpVEONHEUT3o6gXnP4RzLXlI9tw0YrmOyHBVUiR5VoUoyg2MX"
-    
+
     openaiClient = new OpenAI({
       apiKey: apiKey,
       baseURL: "https://api.x.ai/v1",

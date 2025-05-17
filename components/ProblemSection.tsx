@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { Target, Snail, HelpCircle, Frown } from "lucide-react"
 import { motion, useInView } from "framer-motion"
 
@@ -26,7 +26,10 @@ function PainPoint({ icon, title, description, index }: PainPointProps) {
       className="glass-card p-6 hover:border-solana-purple/30 transition-all duration-300 hover:translate-y-[-2px] hover:shadow-md group"
     >
       <div className="flex items-start gap-4">
-        <div className="p-3 rounded-lg bg-solana-purple/10 text-solana-purple group-hover:bg-solana-purple/20 transition-all duration-300">
+        <div
+          className="p-3 rounded-lg bg-solana-purple/10 text-solana-purple group-hover:bg-solana-purple/20 transition-all duration-300"
+          aria-hidden="true"
+        >
           {icon}
         </div>
         <div>
@@ -45,9 +48,10 @@ function PainPoint({ icon, title, description, index }: PainPointProps) {
 export default function ProblemSection() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
+  const [showDescription, setShowDescription] = useState(false)
 
   return (
-    <section ref={sectionRef} className="py-24 relative overflow-hidden" id="problems">
+    <section ref={sectionRef} className="py-24 relative overflow-hidden" id="problem">
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-solana-purple/5 rounded-full blur-3xl"></div>
@@ -63,27 +67,33 @@ export default function ProblemSection() {
       </div>
 
       <div className="container-custom relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-4xl mx-auto mb-16 text-center"
-        >
+        <div className="max-w-4xl mx-auto mb-16 text-center">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-background-tertiary text-text-secondary text-sm font-medium mb-4">
             <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
             The Problem
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-text-primary">
-            Lost in the Solana Meme Coin Frenzy? A High-Speed Game Where{" "}
-            <span className="text-gradient">Seconds Decide</span>
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-6 text-text-primary cursor-pointer hover:text-solana-purple transition-colors duration-300"
+            onClick={() => setShowDescription(!showDescription)}
+          >
+            Why Most <span className="text-gradient">Solana Sniper Bots</span> Fail — and Cost You Profits
           </h2>
 
-          <p className="text-text-secondary text-lg">
-            In the fast-paced world of Solana meme coins, especially on platforms like pump.fun, most traders are left
-            behind while a select few consistently profit.
-          </p>
-        </motion.div>
+          {showDescription && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.3 }}
+              className="text-text-secondary text-lg"
+            >
+              On Pump.fun and other meme-coin launchpads, seconds decide whether you 10× your bag or exit with crumbs.{" "}
+              <strong>94% of traders</strong> hit the buy button <strong>1.2s too late</strong>. Slow public-RPC bots
+              can burn
+              <strong> 10× potential gains</strong>.
+            </motion.p>
+          )}
+        </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           <PainPoint
@@ -95,7 +105,7 @@ export default function ProblemSection() {
 
           <PainPoint
             icon={<Snail className="h-6 w-6" />}
-            title="Slow Bots"
+            title="Slow Public RPC Bots (>400 ms)"
             description="Your trades lag, your profits vanish. Standard bots can't compete with professional trading infrastructure."
             index={1}
           />
@@ -115,26 +125,33 @@ export default function ProblemSection() {
           />
         </div>
 
-        {/* Stats section */}
+        {/* Stats section with improved context */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-16 grid md:grid-cols-3 gap-6"
+          className="mt-16"
         >
-          <div className="glass-card p-6 text-center">
-            <div className="text-4xl font-bold text-primary mb-2">94%</div>
-            <p className="text-text-secondary">of traders miss the initial price surge</p>
-          </div>
+          <p className="text-center text-lg mb-8">
+            <strong>94% of Solana traders miss launches</strong> because their trading bot responds after{" "}
+            <strong>1.2s</strong>. That delay can cost up to <strong>10× in lost gains</strong>.
+          </p>
 
-          <div className="glass-card p-6 text-center">
-            <div className="text-4xl font-bold text-solana-purple mb-2">1.2s</div>
-            <p className="text-text-secondary">average reaction time to new listings</p>
-          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="glass-card p-6 text-center">
+              <div className="text-4xl font-bold text-primary mb-2">94%</div>
+              <p className="text-text-secondary">of traders miss the initial price surge</p>
+            </div>
 
-          <div className="glass-card p-6 text-center">
-            <div className="text-4xl font-bold text-solana-green mb-2">10x</div>
-            <p className="text-text-secondary">potential gains lost to slow execution</p>
+            <div className="glass-card p-6 text-center">
+              <div className="text-4xl font-bold text-solana-purple mb-2">1.2s</div>
+              <p className="text-text-secondary">average reaction time to new listings</p>
+            </div>
+
+            <div className="glass-card p-6 text-center">
+              <div className="text-4xl font-bold text-solana-green mb-2">10x</div>
+              <p className="text-text-secondary">potential gains lost to slow execution</p>
+            </div>
           </div>
         </motion.div>
       </div>

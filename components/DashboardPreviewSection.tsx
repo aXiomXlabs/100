@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { LineChart, TrendingUp, Filter, Search, Clock, Wallet, ArrowRight } from "lucide-react"
 import { motion, useInView } from "framer-motion"
 import Link from "next/link"
@@ -8,6 +8,7 @@ import Link from "next/link"
 export default function DashboardPreviewSection() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
+  const [showDescription, setShowDescription] = useState(false)
 
   // Dummy data for the dashboard
   const topWallets = [
@@ -73,15 +74,25 @@ export default function DashboardPreviewSection() {
             Dashboard Preview
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-text-primary">
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-6 text-text-primary cursor-pointer hover:text-solana-blue transition-colors duration-300"
+            onClick={() => setShowDescription(!showDescription)}
+          >
             Discover Top Traders & Hot Meme Coins: Your <span className="text-gradient">Rust Rocket</span> Dashboard
           </h2>
 
-          <p className="text-text-secondary text-lg">
-            This page shows a <span className="text-primary font-semibold">demo with sample data</span> of how Rust
-            Rocket will help you identify the most profitable wallets on Solana. Filter, analyze, and choose who to
-            copy.
-          </p>
+          {showDescription && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.3 }}
+              className="text-text-secondary text-lg"
+            >
+              This page shows a <span className="text-primary font-semibold">demo with sample data</span> of how Rust
+              Rocket will help you identify the most profitable wallets on Solana. Filter, analyze, and choose who to
+              copy.
+            </motion.p>
+          )}
         </motion.div>
 
         {/* Dashboard Mockup */}

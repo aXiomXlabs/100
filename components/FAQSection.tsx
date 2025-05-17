@@ -3,6 +3,7 @@
 import { useState, useRef } from "react"
 import { motion, useInView, AnimatePresence } from "framer-motion"
 import { ChevronDown } from "lucide-react"
+import Script from "next/script"
 
 interface FAQItem {
   question: string
@@ -51,6 +52,7 @@ export default function FAQSection() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
+  const [showDescription, setShowDescription] = useState(false)
 
   const toggleFAQ = (index: number) => {
     // Track FAQ interaction
@@ -66,14 +68,7 @@ export default function FAQSection() {
   }
 
   return (
-    <section
-      ref={sectionRef}
-      className="py-24 relative overflow-hidden"
-      id="faq"
-      aria-labelledby="faq-heading"
-      itemScope
-      itemType="https://schema.org/FAQPage"
-    >
+    <section ref={sectionRef} className="py-24 relative overflow-hidden" id="faq" aria-labelledby="faq-heading">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -86,14 +81,25 @@ export default function FAQSection() {
             FAQ
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-text-primary" id="faq-heading">
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-6 text-text-primary cursor-pointer hover:text-primary transition-colors duration-300"
+            id="faq-heading"
+            onClick={() => setShowDescription(!showDescription)}
+          >
             Frequently Asked <span className="text-gradient">Questions</span>
           </h2>
 
-          <p className="text-text-secondary text-lg">
-            Here you'll find answers to the most common questions about Rust Rocket. If you have any other questions,
-            don't hesitate to contact us via Telegram.
-          </p>
+          {showDescription && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.3 }}
+              className="text-text-secondary text-lg"
+            >
+              Here you'll find answers to the most common questions about Rust Rocket. If you have any other questions,
+              don't hesitate to contact us via Telegram.
+            </motion.p>
+          )}
         </motion.div>
 
         <div className="max-w-3xl mx-auto">
@@ -104,9 +110,6 @@ export default function FAQSection() {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="mb-4"
-              itemScope
-              itemProp="mainEntity"
-              itemType="https://schema.org/Question"
             >
               <button
                 onClick={() => toggleFAQ(index)}
@@ -119,6 +122,9 @@ export default function FAQSection() {
                 aria-controls={`faq-answer-${index}`}
                 id={`faq-question-${index}`}
                 data-tracking-id={`faq_question_${index + 1}`}
+                itemScope
+                itemProp="mainEntity"
+                itemType="https://schema.org/Question"
               >
                 <span className="font-medium text-text-primary" itemProp="name">
                   {faq.question}
@@ -158,18 +164,22 @@ export default function FAQSection() {
         </div>
       </div>
 
-      {/* JSON-LD Schema for FAQ Page */}
-      <script
+      {/* Verbesserte Version des FAQ-Schemas */}
+      <Script
+        id="schema-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: faqs.map((faq) => ({
+            "@id": "https://rust-rocket.com/faq",
+            mainEntity: faqs.map((faq, index) => ({
               "@type": "Question",
+              "@id": `https://rust-rocket.com/faq#question${index + 1}`,
               name: faq.question,
               acceptedAnswer: {
                 "@type": "Answer",
+                "@id": `https://rust-rocket.com/faq#answer${index + 1}`,
                 text: faq.answer,
               },
             })),

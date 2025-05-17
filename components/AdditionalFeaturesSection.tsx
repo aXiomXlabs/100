@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { Target, GitBranch, MessageCircle, Shield, Zap, Rocket } from "lucide-react"
 import { motion, useInView } from "framer-motion"
 
@@ -40,6 +40,7 @@ function FeatureCard({ icon, title, description, accentColor, index }: FeaturePr
 export default function AdditionalFeaturesSection() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
+  const [showDescription, setShowDescription] = useState(false)
 
   return (
     <section ref={sectionRef} className="py-24 relative overflow-hidden" id="features">
@@ -81,14 +82,24 @@ export default function AdditionalFeaturesSection() {
             Features
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-text-primary">
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-6 text-text-primary cursor-pointer hover:text-primary transition-colors duration-300"
+            onClick={() => setShowDescription(!showDescription)}
+          >
             More Than Just Speed – A Full <span className="text-gradient">Trading Arsenal</span>
           </h2>
 
-          <p className="text-text-secondary text-lg">
-            Rust Rocket combines cutting-edge technology with user-friendly features to give you the ultimate trading
-            advantage on Solana.
-          </p>
+          {showDescription && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.3 }}
+              className="text-text-secondary text-lg"
+            >
+              Rust Rocket combines cutting-edge technology with user-friendly features to give you the ultimate trading
+              advantage on Solana.
+            </motion.p>
+          )}
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

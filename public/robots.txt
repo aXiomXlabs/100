@@ -1,0 +1,28 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://rust-rocket.com/sitemap.xml
+
+# Bilder explizit erlauben
+User-agent: Googlebot-Image
+Allow: /favicon-192.png
+Allow: /favicon-512.png
+Allow: /images/rust-rocket-logo.png
+Allow: /images/og-image.png
+Allow: /images/Dashboard.png
+
+# Spezielle Anweisungen für Google
+User-agent: Googlebot
+Allow: /
+Allow: /*.js$
+Allow: /*.css$
+
+# Spezielle Anweisungen für Google Mobile
+User-agent: Googlebot-Mobile
+Allow: /
+
+# Spezielle Anweisungen für Google News
+User-agent: Googlebot-News
+Allow: /blog/

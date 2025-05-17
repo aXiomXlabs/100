@@ -9,7 +9,7 @@ export default function TestCookiePage() {
   useEffect(() => {
     // Try to access localStorage
     try {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const hasConsent = localStorage.getItem("cookieConsent")
         setCookieState(`Cookie consent state: ${hasConsent || "Not set"}`)
 
@@ -28,11 +28,14 @@ export default function TestCookiePage() {
   const acceptCookies = () => {
     try {
       localStorage.setItem("cookieConsent", "true")
-      localStorage.setItem("cookieConsents", JSON.stringify({
-        necessary: true,
-        analytics: true,
-        marketing: true
-      }))
+      localStorage.setItem(
+        "cookieConsents",
+        JSON.stringify({
+          necessary: true,
+          analytics: true,
+          marketing: true,
+        }),
+      )
       setCookieState("Cookies accepted")
       setShowDebugBanner(false)
     } catch (error) {
@@ -43,11 +46,14 @@ export default function TestCookiePage() {
   const rejectCookies = () => {
     try {
       localStorage.setItem("cookieConsent", "true")
-      localStorage.setItem("cookieConsents", JSON.stringify({
-        necessary: true,
-        analytics: false,
-        marketing: false
-      }))
+      localStorage.setItem(
+        "cookieConsents",
+        JSON.stringify({
+          necessary: true,
+          analytics: false,
+          marketing: false,
+        }),
+      )
       setCookieState("Cookies rejected")
       setShowDebugBanner(false)
     } catch (error) {
@@ -58,23 +64,20 @@ export default function TestCookiePage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Cookie Banner Test Page</h1>
-      
+
       <div className="bg-gray-100 p-4 rounded mb-4">
         <pre>{cookieState}</pre>
       </div>
 
       <div className="mb-4">
-        <button 
+        <button
           onClick={() => localStorage.removeItem("cookieConsent")}
           className="px-4 py-2 bg-yellow-500 text-white rounded mr-2"
         >
           Clear Cookie Consent
         </button>
-        
-        <button 
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
+
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-500 text-white rounded">
           Reload Page
         </button>
       </div>
@@ -88,16 +91,10 @@ export default function TestCookiePage() {
                 <p>This is a test banner that appears after 5 seconds</p>
               </div>
               <div>
-                <button 
-                  onClick={rejectCookies}
-                  className="px-4 py-2 border border-white rounded mr-2"
-                >
+                <button onClick={rejectCookies} className="px-4 py-2 border border-white rounded mr-2">
                   Decline
                 </button>
-                <button 
-                  onClick={acceptCookies}
-                  className="px-4 py-2 bg-green-500 rounded"
-                >
+                <button onClick={acceptCookies} className="px-4 py-2 bg-green-500 rounded">
                   Accept All
                 </button>
               </div>
@@ -107,4 +104,4 @@ export default function TestCookiePage() {
       )}
     </div>
   )
-} 
+}
