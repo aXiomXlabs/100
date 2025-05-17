@@ -1,10 +1,9 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { Rocket, Zap, TrendingUp, ArrowRight } from "lucide-react"
+import { Rocket, Zap, TrendingUp } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import WaitlistButton from "./WaitlistButton"
 
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -145,22 +144,6 @@ export default function Hero() {
                   200+ beta wallets
                 </li>
               </ul>
-
-              {/* CTA Button with tooltip */}
-              <div className="mt-6 flex flex-col items-start">
-                <WaitlistButton
-                  id="hero-waitlist-button"
-                  data-tracking-id="hero_waitlist_click"
-                  className="bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-md text-base font-medium transition-all duration-300 shadow-lg flex items-center gap-2"
-                >
-                  Join Waitlist{" "}
-                  <ArrowRight
-                    className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-                    aria-hidden="true"
-                  />
-                </WaitlistButton>
-                <span className="text-xs text-text-secondary mt-2">No wallet needed</span>
-              </div>
 
               <div className="mt-8 grid grid-cols-3 gap-6">
                 <div className="flex flex-col items-center text-center">
