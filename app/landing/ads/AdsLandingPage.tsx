@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import { createClientSupabaseClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
@@ -155,9 +154,9 @@ export default function AdsLandingPage() {
           <div className="absolute inset-0 z-0 bg-gradient-to-b from-black via-gray-900 to-black"></div>
 
           <div className="container relative z-10 px-4 mx-auto">
-            <div className="grid items-center grid-cols-1 gap-12 lg:grid-cols-2">
+            <div className="flex justify-center items-center">
               {/* Hero Content */}
-              <div className="max-w-3xl">
+              <div className="max-w-3xl mx-auto text-center">
                 <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl">
                   <span className="text-primary">25 ms</span> Solana Sniper Bot with Same-Block Execution
                 </h1>
@@ -318,18 +317,6 @@ export default function AdsLandingPage() {
                     </p>
                   </form>
                 </div>
-              </div>
-
-              {/* Hero Image */}
-              <div className="relative hidden lg:block">
-                <Image
-                  src="/images/solana-sniper-dashboard.png"
-                  alt="Rust Rocket Solana Sniper Bot Dashboard"
-                  width={600}
-                  height={400}
-                  className="rounded-lg shadow-2xl"
-                  fetchPriority="high"
-                />
               </div>
             </div>
           </div>
