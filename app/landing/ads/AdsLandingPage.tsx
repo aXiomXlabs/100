@@ -1,13 +1,11 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { createClientSupabaseClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { Check } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { motion } from "framer-motion"
+import SolanaSniperAnimation from "@/components/SolanaSniperAnimation"
 
 export default function AdsLandingPage() {
   const [email, setEmail] = useState("")
@@ -149,250 +147,200 @@ export default function AdsLandingPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-black to-gray-900 text-white">
-      <main className="container mx-auto px-4 py-12 max-w-6xl">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600">
-              25ms Solana Sniper Bot
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto">
-              Same-block execution & intelligent copy-trading for Solana meme coins
-            </p>
-          </motion.div>
+    <div className="flex flex-col min-h-screen bg-black">
+      {/* Hero Section */}
+      <main className="flex-grow">
+        <section className="relative py-20 overflow-hidden">
+          {/* Hero Background */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-black via-gray-900 to-black"></div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-8"
-          >
-            <Image
-              src="/assets/og-ads.webp"
-              alt="Solana sniper bot Rust Rocket telegram interface"
-              width={1200}
-              height={630}
-              className="rounded-lg shadow-2xl mx-auto max-w-full"
-              priority
-              fetchPriority="high"
-              decoding="async"
-            />
-          </motion.div>
-        </div>
+          <div className="container relative z-10 px-4 mx-auto">
+            <div className="flex justify-center items-center">
+              {/* Hero Content */}
+              <div className="max-w-3xl mx-auto text-center">
+                <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-6xl">
+                  <span className="text-primary">25 ms</span> Solana Sniper Bot with Same-Block Execution
+                </h1>
+                <p className="mb-8 text-xl text-gray-300">
+                  Dominate Solana meme coins with the fastest same-block execution bot and intelligent copy trading.
+                  Perfect for pump.fun sniping and professional Solana trading.
+                </p>
 
-        {/* Features Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-        >
-          <FeatureCard
-            title="25ms Execution"
-            description="Execute trades in the same block as new token launches with our proprietary BDN network"
-          />
-          <FeatureCard
-            title="Copy Trading"
-            description="Automatically copy successful traders with customizable risk parameters"
-          />
-          <FeatureCard
-            title="Rug Protection"
-            description="Built-in safety features to protect against common scams and rug pulls"
-          />
-        </motion.div>
+                {/* KPI Strip */}
+                <div className="grid grid-cols-3 gap-4 p-4 mb-8 bg-gray-900 rounded-lg">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-primary">95%</p>
+                    <p className="text-sm text-gray-400">Success Rate</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-primary">25 ms</p>
+                    <p className="text-sm text-gray-400">Execution Time</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-primary">200+</p>
+                    <p className="text-sm text-gray-400">Beta Wallets</p>
+                  </div>
+                </div>
 
-        {/* Form Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 md:p-8 max-w-md mx-auto border border-gray-700"
-        >
-          <h2 className="text-2xl font-bold mb-6 text-center">Join Free Beta Waitlist</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="your@email.com"
-                className={`w-full px-4 py-2 bg-gray-700 border ${
-                  emailError ? "border-red-500" : "border-gray-600"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-white`}
-              />
-              {emailError && <p className="mt-1 text-sm text-red-500">{emailError}</p>}
-            </div>
-            <div>
-              <label htmlFor="telegram" className="block text-sm font-medium text-gray-300 mb-1">
-                Telegram Username (optional)
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">@</span>
-                <input
-                  type="text"
-                  id="telegram"
-                  name="telegram"
-                  value={telegramUsername}
-                  onChange={(e) => setTelegramUsername(e.target.value)}
-                  placeholder="username"
-                  className="w-full pl-8 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-white"
-                />
+                {/* Animierte Grafik statt statischem Bild */}
+                <div className="mb-8 rounded-lg shadow-2xl overflow-hidden">
+                  <SolanaSniperAnimation />
+                </div>
+
+                {/* Waitlist Form */}
+                <div className="p-6 bg-gray-900 rounded-lg">
+                  <h2 className="mb-4 text-2xl font-bold text-white">Join the Free Beta Waitlist</h2>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Email field */}
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                        Your Email Address{" "}
+                        <span className="text-red-500" aria-hidden="true">
+                          *
+                        </span>
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        className={`w-full px-4 py-2 bg-[#1A1A1A] border ${
+                          emailError ? "border-red-500" : "border-gray-700"
+                        } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white`}
+                        required
+                      />
+                      {emailError && <p className="mt-1 text-sm text-red-500">{emailError}</p>}
+                    </div>
+
+                    {/* Telegram username field */}
+                    <div>
+                      <label htmlFor="telegram" className="block text-sm font-medium text-gray-300 mb-1">
+                        Your Telegram Username (Optional)
+                      </label>
+                      <div className="flex">
+                        <span className="inline-flex items-center px-3 py-2 bg-[#1A1A1A] border border-r-0 border-gray-700 rounded-l-lg text-gray-400">
+                          @
+                        </span>
+                        <input
+                          type="text"
+                          id="telegram"
+                          name="telegram"
+                          value={telegramUsername}
+                          onChange={(e) => setTelegramUsername(e.target.value)}
+                          placeholder="username"
+                          className="flex-1 px-4 py-2 bg-[#1A1A1A] border border-gray-700 rounded-r-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-white"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Hidden UTM fields */}
+                    <input type="hidden" name="utm_source" />
+                    <input type="hidden" name="utm_medium" />
+                    <input type="hidden" name="utm_campaign" />
+
+                    {/* Consent checkbox */}
+                    <div className="flex items-start mt-4">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="consent"
+                          name="consent"
+                          type="checkbox"
+                          checked={consent}
+                          onChange={(e) => setConsent(e.target.checked)}
+                          className="w-4 h-4 bg-[#1A1A1A] border border-gray-700 rounded focus:ring-primary focus:ring-2"
+                          required
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="consent" className="text-gray-300">
+                          I agree to receive updates about Rust Rocket and confirm I have read the{" "}
+                          <a
+                            href="https://www.rust-rocket.com/privacy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            Privacy Policy
+                          </a>
+                          .
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Status message */}
+                    {formStatus.message && (
+                      <div
+                        className={`p-3 rounded-lg ${
+                          formStatus.type === "success"
+                            ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                            : "bg-red-500/10 text-red-400 border border-red-500/20"
+                        }`}
+                      >
+                        {formStatus.message}
+                      </div>
+                    )}
+
+                    {/* Submit button */}
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3 px-4 bg-primary hover:bg-primary-hover text-white font-medium rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        "Secure My Spot!"
+                      )}
+                    </button>
+
+                    {/* Risk Disclaimer */}
+                    <p className="mt-3 text-xs text-neutral-500">
+                      Crypto assets are volatile. You may lose all capital.
+                    </p>
+                  </form>
+                </div>
               </div>
             </div>
-            <input type="hidden" name="utm_source" value={utmSource} />
-            <input type="hidden" name="utm_medium" value={utmMedium} />
-            <input type="hidden" name="utm_campaign" value={utmCampaign} />
-            <div className="flex items-start mt-4">
-              <div className="flex items-center h-5">
-                <input
-                  id="consent"
-                  name="consent"
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="w-4 h-4 bg-[#1A1A1A] border border-gray-700 rounded focus:ring-primary focus:ring-2"
-                  required
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="consent" className="text-gray-300">
-                  I agree to receive updates about Rust Rocket and confirm I have read the{" "}
-                  <a
-                    href="https://www.rust-rocket.com/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Privacy Policy
-                  </a>
-                  .
-                </label>
-              </div>
-            </div>
-            {formStatus.message && (
-              <div
-                className={`p-3 rounded-lg ${
-                  formStatus.type === "success"
-                    ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                    : "bg-red-500/10 text-red-400 border border-red-500/20"
-                }`}
-              >
-                {formStatus.message}
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-4 rounded-md transition-all duration-300 flex items-center justify-center"
-            >
-              {isSubmitting ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span>Processing...</span>
-                </>
-              ) : (
-                "Secure My Spot!"
-              )}
-            </button>
-            <p className="mt-3 text-xs text-neutral-500">Crypto assets are volatile. You may lose all capital.</p>
-          </form>
-        </motion.div>
-
-        {/* Testimonials */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="mt-16"
-        >
-          <h2 className="text-2xl font-bold mb-8 text-center">What Early Users Say</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Testimonial
-              quote="I was able to get into three launches in the same block. Made 4x on each one. This bot is insane."
-              author="@solana_trader"
-            />
-            <Testimonial
-              quote="The copy trading feature alone is worth it. I've been following the top traders and my portfolio is up 300% this month."
-              author="@meme_investor"
-            />
           </div>
-        </motion.div>
-
-        {/* Footer */}
-        <div className="mt-16 text-center text-sm text-gray-500">
-          <p>© 2024 Rust Rocket. All rights reserved.</p>
-          <div className="mt-2">
-            <Link href="/privacy" className="text-gray-400 hover:text-white mx-2">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-gray-400 hover:text-white mx-2">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
+        </section>
       </main>
 
-      {/* Script für UTM-Parameter */}
+      {/* UTM Parameter Script */}
       <script
         dangerouslySetInnerHTML={{
           __html: `
-          const p = new URLSearchParams(location.search);
-          ['utm_source', 'utm_medium', 'utm_campaign'].forEach(k => {
-            const f = document.querySelector(\`[name="\${k}"]\`);
-            if (f) { f.value = p.get(k) || ''; }
-          });
-        `,
+            const p=new URLSearchParams(location.search);
+            ['utm_source','utm_medium','utm_campaign'].forEach(k=>{
+              const f=document.querySelector(\`[name="\${k}"]\`);
+              if(f){ f.value=p.get(k)||''; }
+            });
+          `,
         }}
       />
-    </div>
-  )
-}
-
-function FeatureCard({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-lg p-6 hover:bg-gray-800/50 transition-all duration-300">
-      <div className="flex items-center mb-4">
-        <div className="bg-green-500/20 p-2 rounded-full mr-3">
-          <Check className="h-5 w-5 text-green-500" />
-        </div>
-        <h3 className="text-xl font-semibold">{title}</h3>
-      </div>
-      <p className="text-gray-400">{description}</p>
-    </div>
-  )
-}
-
-function Testimonial({ quote, author }: { quote: string; author: string }) {
-  return (
-    <div className="bg-gray-800/20 backdrop-blur-sm border border-gray-700 rounded-lg p-6">
-      <p className="italic text-gray-300 mb-4">"{quote}"</p>
-      <p className="text-green-500 font-medium">{author}</p>
     </div>
   )
 }

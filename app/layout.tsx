@@ -8,7 +8,7 @@ import Script from "next/script"
 import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import CookieBannerFixedDelay from "@/components/CookieBannerFixedDelay"
+import ConsentGateGlobal from "@/components/ConsentGateGlobal"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -137,44 +137,8 @@ export default function RootLayout({
           <ChatBubble />
           <Analytics />
           <SpeedInsights />
-          <CookieBannerFixedDelay />
+          <ConsentGateGlobal />
         </WaitlistModalProvider>
-
-        {/* Google Analytics 4 - Only loads if consent is given */}
-        <Script
-          id="ga4-check-consent"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-            // Check if user has given consent for analytics cookies
-            function hasAnalyticsConsent() {
-              try {
-                const consents = localStorage.getItem('cookieConsents');
-                return consents ? JSON.parse(consents).analytics === true : false;
-              } catch (e) {
-                return false;
-              }
-            }
-
-            // Only load GA if consent is given
-            if (hasAnalyticsConsent()) {
-              // Load GA script
-              const gaScript = document.createElement('script');
-              gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-6GRKXCYXWW";
-              gaScript.async = true;
-              document.head.appendChild(gaScript);
-
-              // Initialize GA
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-6GRKXCYXWW', {
-                page_path: window.location.pathname,
-              });
-            }
-          `,
-          }}
-        />
 
         {/* JSON-LD Schema for Organization */}
         <Script

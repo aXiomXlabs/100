@@ -9,11 +9,11 @@ export default function AdsLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
+    <div className="ads-layout">
       <Navbar />
       {children}
       <Footer />
       <ConsentGateAds />
-    </>
+    </div>
   )
 }
