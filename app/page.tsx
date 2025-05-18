@@ -7,6 +7,7 @@ import BDNNetworkSection from "@/components/BDNNetworkSection"
 import DashboardPreviewSection from "@/components/DashboardPreviewSection"
 import AdditionalFeaturesSection from "@/components/AdditionalFeaturesSection"
 import VisionSection from "@/components/VisionSection"
+import RoadmapSection from "@/components/RoadmapSection"
 import FAQSection from "@/components/FAQSection"
 import Footer from "@/components/Footer"
 import ParticlesBackground from "@/components/ParticlesBackground"
@@ -32,6 +33,8 @@ export default function Home() {
         <DashboardPreviewSection />
         <SectionDivider />
         <AdditionalFeaturesSection />
+        <SectionDivider />
+        <RoadmapSection />
         <SectionDivider />
         <FAQSection />
         <SectionDivider />
