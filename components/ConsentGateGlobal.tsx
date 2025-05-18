@@ -21,12 +21,23 @@ declare global {
 export default function ConsentGateGlobal() {
   const [showBanner, setShowBanner] = useState(false)
 
+  // Sichere Wrapper-Funktionen für localStorage
+  const getLocalStorageItem = (key: string): string | null => {
+    if (typeof window === "undefined") return null
+    return localStorage.getItem(key)
+  }
+
+  const setLocalStorageItem = (key: string, value: string): void => {
+    if (typeof window === "undefined") return
+    localStorage.setItem(key, value)
+  }
+
   useEffect(() => {
     // Prüfe, ob wir im Browser sind
     if (typeof window === "undefined") return
 
     // Prüfe, ob Consent bereits gegeben wurde
-    const hasConsent = localStorage.getItem("cookieConsent") === "true"
+    const hasConsent = getLocalStorageItem("cookieConsent") === "true"
 
     if (!hasConsent) {
       // Zeige Banner nach kurzer Verzögerung
@@ -48,9 +59,9 @@ export default function ConsentGateGlobal() {
       marketing: true,
     }
 
-    localStorage.setItem("cookieConsent", "true")
-    localStorage.setItem("cookieConsents", JSON.stringify(consents))
-    localStorage.setItem("consentTimestamp", new Date().toISOString())
+    setLocalStorageItem("cookieConsent", "true")
+    setLocalStorageItem("cookieConsents", JSON.stringify(consents))
+    setLocalStorageItem("consentTimestamp", new Date().toISOString())
 
     setShowBanner(false)
     loadScripts()
@@ -78,9 +89,9 @@ export default function ConsentGateGlobal() {
       marketing: false,
     }
 
-    localStorage.setItem("cookieConsent", "true")
-    localStorage.setItem("cookieConsents", JSON.stringify(consents))
-    localStorage.setItem("consentTimestamp", new Date().toISOString())
+    setLocalStorageItem("cookieConsent", "true")
+    setLocalStorageItem("cookieConsents", JSON.stringify(consents))
+    setLocalStorageItem("consentTimestamp", new Date().toISOString())
 
     setShowBanner(false)
 
@@ -109,7 +120,7 @@ export default function ConsentGateGlobal() {
     let marketingConsent = false
 
     try {
-      const consentsString = localStorage.getItem("cookieConsents")
+      const consentsString = getLocalStorageItem("cookieConsents")
       if (consentsString) {
         const consents = JSON.parse(consentsString) as CookieConsents
         analyticsConsent = consents.analytics

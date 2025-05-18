@@ -10,6 +10,9 @@ export default function TestTrackingPage() {
   const [twitterLoaded, setTwitterLoaded] = useState<boolean>(false)
 
   useEffect(() => {
+    // Alle localStorage-Zugriffe in useEffect verschieben, um sicherzustellen,
+    // dass der Code nur auf dem Client ausgeführt wird
+
     // Prüfe Consent-Status
     const hasConsent = localStorage.getItem("cookieConsent") === "true"
     setConsentStatus(hasConsent ? "Gegeben" : "Nicht gegeben")
@@ -35,7 +38,7 @@ export default function TestTrackingPage() {
 
     // Prüfe, ob Twitter Pixel geladen ist
     setTwitterLoaded(!!window.twq)
-  }, [])
+  }, []) // Leeres Dependency-Array, damit der Effekt nur einmal ausgeführt wird
 
   const resetConsent = () => {
     localStorage.removeItem("cookieConsent")
@@ -74,11 +77,6 @@ export default function TestTrackingPage() {
             <p>
               <strong>Marketing-Consent:</strong> {marketingStatus}
             </p>
-            {localStorage.getItem("consentTimestamp") && (
-              <p>
-                <strong>Zeitpunkt:</strong> {new Date(localStorage.getItem("consentTimestamp") || "").toLocaleString()}
-              </p>
-            )}
           </div>
 
           <div className="bg-gray-50 p-4 rounded border">

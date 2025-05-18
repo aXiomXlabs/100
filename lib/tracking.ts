@@ -14,12 +14,18 @@ interface TrackingEvent {
   [key: string]: any
 }
 
+// Sichere Wrapper-Funktionen für localStorage
+const getLocalStorageItem = (key: string): string | null => {
+  if (typeof window === "undefined") return null
+  return localStorage.getItem(key)
+}
+
 // Prüft, ob Analytics-Consent gegeben wurde
 export function hasAnalyticsConsent(): boolean {
   if (typeof window === "undefined") return false
 
   try {
-    const consentsString = localStorage.getItem("cookieConsents")
+    const consentsString = getLocalStorageItem("cookieConsents")
     if (!consentsString) return false
 
     const consents = JSON.parse(consentsString) as CookieConsents
@@ -35,7 +41,7 @@ export function hasMarketingConsent(): boolean {
   if (typeof window === "undefined") return false
 
   try {
-    const consentsString = localStorage.getItem("cookieConsents")
+    const consentsString = getLocalStorageItem("cookieConsents")
     if (!consentsString) return false
 
     const consents = JSON.parse(consentsString) as CookieConsents
