@@ -1,11 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
-import { createClientSupabaseClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import SolanaSniperAnimation from "@/components/SolanaSniperAnimation"
+import { trackConversion } from "@/lib/conversion-tracking"
+import { addToWaitlist } from "@/lib/waitlist"
 
 export default function AdsLandingPage() {
   const [email, setEmail] = useState("")
@@ -17,9 +17,13 @@ export default function AdsLandingPage() {
     message: string | null
   }>({ type: null, message: null })
   const [emailError, setEmailError] = useState("")
-  const [utmSource, setUtmSource] = useState("")
-  const [utmMedium, setUtmMedium] = useState("")
-  const [utmCampaign, setUtmCampaign] = useState("")
+  const [utmParams, setUtmParams] = useState({
+    source: "",
+    medium: "",
+    campaign: "",
+    content: "",
+    term: "",
+  })
 
   const router = useRouter()
 
@@ -27,9 +31,25 @@ export default function AdsLandingPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search)
-      setUtmSource(params.get("utm_source") || "")
-      setUtmMedium(params.get("utm_medium") || "")
-      setUtmCampaign(params.get("utm_campaign") || "")
+      const newUtmParams = {
+        source: params.get("utm_source") || "",
+        medium: params.get("utm_medium") || "",
+        campaign: params.get("utm_campaign") || "",
+        content: params.get("utm_content") || "",
+        term: params.get("utm_term") || "",
+      }
+
+      setUtmParams(newUtmParams)
+
+      // Tracking des Seitenaufrufs mit UTM-Parametern
+      if (typeof window.dataLayer !== "undefined") {
+        window.dataLayer.push({
+          event: "page_view",
+          page_type: "landing_page",
+          page_path: window.location.pathname,
+          ...Object.fromEntries(Object.entries(newUtmParams).map(([key, value]) => [`utm_${key}`, value])),
+        })
+      }
     }
   }, [])
 
@@ -49,7 +69,7 @@ export default function AdsLandingPage() {
 
     // Validate email
     if (!validateEmail(email)) {
-      setEmailError("Please enter a valid email address")
+      setEmailError("Bitte gib eine gültige E-Mail-Adresse ein")
       return
     }
 
@@ -57,7 +77,7 @@ export default function AdsLandingPage() {
     if (!consent) {
       setFormStatus({
         type: "error",
-        message: "Please agree to the privacy policy to continue",
+        message: "Bitte stimme den Datenschutzbestimmungen zu, um fortzufahren",
       })
       return
     }
@@ -65,13 +85,34 @@ export default function AdsLandingPage() {
     setIsSubmitting(true)
 
     try {
-      // Supabase integration
-      await handleSupabaseSubmit(email, telegramUsername)
+      // Neue Funktion zur Waitlist-Anmeldung verwenden
+      const result = await addToWaitlist(email, telegramUsername, utmParams)
+
+      if (!result.success) {
+        setFormStatus({
+          type: "error",
+          message: result.message,
+        })
+        setIsSubmitting(false)
+        return
+      }
+
+      // Conversion-Tracking
+      trackConversion({
+        action: "waitlist_signup",
+        category: "conversion",
+        label: "Ads Landing Page Signup",
+        value: 10.0,
+        currency: "EUR",
+        transactionId: result.data?.transaction_id || `signup_${Date.now()}`,
+        email_domain: email.split("@")[1],
+        ...Object.fromEntries(Object.entries(utmParams).map(([key, value]) => [`utm_${key}`, value])),
+      })
 
       // Show success message
       setFormStatus({
         type: "success",
-        message: "Thanks for joining! We'll be in touch soon.",
+        message: "Vielen Dank für deine Anmeldung! Wir melden uns bald bei dir.",
       })
 
       // Clear form
@@ -83,72 +124,13 @@ export default function AdsLandingPage() {
       router.push("/landing/ads/thanks")
     } catch (error) {
       console.error("Error submitting form:", error)
-
-      // Check if it's a duplicate email error
-      if (error instanceof Error && error.message.includes("already on our waitlist")) {
-        setFormStatus({
-          type: "error",
-          message: "This email is already on our waitlist.",
-        })
-      } else {
-        setFormStatus({
-          type: "error",
-          message: "Something went wrong. Please try again.",
-        })
-      }
+      setFormStatus({
+        type: "error",
+        message: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      })
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  // Supabase submission
-  const handleSupabaseSubmit = async (email: string, telegramUsername: string) => {
-    const supabase = createClientSupabaseClient()
-
-    // Check if email already exists
-    const { data: existingUser, error: checkError } = await supabase
-      .from("waitlist")
-      .select("id")
-      .eq("email", email)
-      .maybeSingle()
-
-    if (checkError) {
-      console.error("Error checking existing user:", checkError)
-      throw new Error("Error checking database")
-    }
-
-    if (existingUser) {
-      throw new Error("This email is already on our waitlist")
-    }
-
-    // Get UTM values from form fields
-    const utmSourceValue = document.querySelector<HTMLInputElement>('[name="utm_source"]')?.value || utmSource
-    const utmMediumValue = document.querySelector<HTMLInputElement>('[name="utm_medium"]')?.value || utmMedium
-    const utmCampaignValue = document.querySelector<HTMLInputElement>('[name="utm_campaign"]')?.value || utmCampaign
-
-    // Construct referral source
-    let referralSource = utmSourceValue || "direct"
-    if (utmMediumValue || utmCampaignValue) {
-      referralSource += ` (medium: ${utmMediumValue || "none"}, campaign: ${utmCampaignValue || "none"})`
-    }
-
-    // Insert new waitlist entry
-    const { error: insertError } = await supabase.from("waitlist").insert({
-      email,
-      telegram_username: telegramUsername || null,
-      referral_source: referralSource,
-      utm_source: utmSourceValue,
-      utm_medium: utmMediumValue,
-      utm_campaign: utmCampaignValue,
-      created_at: new Date().toISOString(),
-    })
-
-    if (insertError) {
-      console.error("Error inserting waitlist entry:", insertError)
-      throw insertError
-    }
-
-    return true
   }
 
   return (
@@ -241,9 +223,11 @@ export default function AdsLandingPage() {
                     </div>
 
                     {/* Hidden UTM fields */}
-                    <input type="hidden" name="utm_source" value={utmSource} />
-                    <input type="hidden" name="utm_medium" value={utmMedium} />
-                    <input type="hidden" name="utm_campaign" value={utmCampaign} />
+                    <input type="hidden" name="utm_source" value={utmParams.source} />
+                    <input type="hidden" name="utm_medium" value={utmParams.medium} />
+                    <input type="hidden" name="utm_campaign" value={utmParams.campaign} />
+                    <input type="hidden" name="utm_content" value={utmParams.content} />
+                    <input type="hidden" name="utm_term" value={utmParams.term} />
 
                     {/* Consent checkbox */}
                     <div className="flex items-start mt-4">

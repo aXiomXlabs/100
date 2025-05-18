@@ -9,6 +9,7 @@ import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import ConsentGateGlobal from "@/components/ConsentGateGlobal"
+import GoogleTagManager from "@/components/GoogleTagManager"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -190,8 +191,39 @@ export default function RootLayout({
             }),
           }}
         />
+
+        {/* Facebook Pixel Code */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', 'DEIN_FACEBOOK_PIXEL_ID'); // HIER DEINE ECHTE FACEBOOK PIXEL ID EINSETZEN!
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=DEIN_FACEBOOK_PIXEL_ID&ev=PageView&noscript=1" // HIER DEINE ECHTE FACEBOOK PIXEL ID EINSETZEN!
+            alt=""
+          />
+        </noscript>
+        {/* End Facebook Pixel Code */}
       </head>
       <body>
+        {/* Google Tag Manager */}
+        <GoogleTagManager />
+
         <WaitlistModalProvider>
           <Suspense>{children}</Suspense>
           <ChatBubble />
@@ -208,7 +240,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               const p=new URLSearchParams(location.search);
-              ['utm_source','utm_medium','utm_campaign'].forEach(k=>{
+              ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(k=>{
                 const f=document.querySelector(\`[name="\${k}"]\`);
                 if(f){ f.value=p.get(k)||''; }
               });
