@@ -209,11 +209,14 @@ export default function Hero() {
                 <div className="relative w-4/5 h-4/5 animate-float">
                   <Image
                     src="/images/rust-rocket-logo.png"
-                    alt="Rust Rocket logo – Solana sniper bot"
+                    alt="Solana sniper bot Rust Rocket interface"
                     fill
                     className="object-contain"
                     priority
                     fetchPriority="high"
+                    width={1280}
+                    height={720}
+                    decoding="async"
                   />
                 </div>
               </div>
@@ -243,7 +246,7 @@ export default function Hero() {
             >
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-solana-green/10 flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-solana-green" />
+                  <Zap className="w-4 h-4 text-solana-green" aria-hidden="true" />
                 </div>
                 <div>
                   <div className="text-xs text-text-secondary">Execution Speed</div>
@@ -259,7 +262,7 @@ export default function Hero() {
             >
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-solana-purple/10 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-solana-purple" />
+                  <TrendingUp className="w-4 h-4 text-solana-purple" aria-hidden="true" />
                 </div>
                 <div>
                   <div className="text-xs text-text-secondary">Success Rate</div>

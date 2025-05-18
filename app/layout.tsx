@@ -140,7 +140,7 @@ export default function RootLayout({
           <ConsentGateGlobal />
         </WaitlistModalProvider>
 
-        {/* JSON-LD Schema for Organization */}
+        {/* Organization Schema - Optimiert gemäß SEO-Audit */}
         <Script
           id="schema-organization"
           type="application/ld+json"
@@ -148,39 +148,77 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "@id": "https://rust-rocket.com/#organization",
               name: "Rust Rocket",
-              alternateName: "RustRocket",
               url: "https://rust-rocket.com/",
-              logo: {
-                "@type": "ImageObject",
-                "@id": "https://rust-rocket.com/#logo",
-                url: "https://rust-rocket.com/favicon-512.png",
-                contentUrl: "https://rust-rocket.com/favicon-512.png",
-                width: 512,
-                height: 512,
-                caption: "Rust Rocket Logo - Solana Sniper Bot",
-              },
-              image: {
-                "@type": "ImageObject",
-                "@id": "https://rust-rocket.com/#image",
-                url: "https://rust-rocket.com/images/og-image.png",
-                width: 1200,
-                height: 630,
-              },
-              description:
-                "Provider of the fastest Solana sniper bot with 25 ms execution time and intelligent copy-trading for Pump.fun and Raydium.",
+              logo: "https://rust-rocket.com/favicon-192.png",
               sameAs: ["https://x.com/RustRocketBot", "https://t.me/rustrocket"],
-              foundingDate: "2024",
-              founder: {
-                "@type": "Person",
-                name: "Rust Rocket Team",
-              },
             }),
           }}
         />
 
-        {/* JSON-LD Schema for Website */}
+        {/* FAQ Schema - Optimiert gemäß SEO-Audit */}
+        <Script
+          id="schema-faq"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "What is a Solana sniper bot?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "A Solana sniper bot is an automated trading tool that executes trades on the Solana blockchain with extremely low latency. Rust Rocket achieves 25 ms execution time and same-block execution for Pump.fun token launches.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "How does Rust Rocket's copy-trading feature work?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rust Rocket's intelligent copy-trading automatically identifies and mirrors successful Solana traders' strategies with custom stop-loss and auto-sell conditions to protect investments while executing with 25 ms latency.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What makes Rust Rocket faster than other Solana bots?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rust Rocket achieves superior speed through 15 private BDN gateways providing direct, low-latency connections to Solana. While standard bots use public RPCs with 400+ ms latency, our infrastructure delivers 25 ms execution time.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Does Rust Rocket work with Pump.fun?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Yes, Rust Rocket is specifically optimized for Pump.fun and Raydium. Our 25 ms execution time ensures you can participate in new token launches at the earliest possible moment, often in the same block as the launch transaction.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "How does Rust Rocket protect against rug pulls?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rust Rocket includes built-in rug-pull protection that analyzes token contracts and liquidity patterns in real-time, setting automatic stop-loss levels and executing emergency sells if suspicious activity is detected.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "When will Rust Rocket be available?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Rust Rocket's beta version launches on May 9, 2025. Join our waitlist now to get early access and be among the first to experience our 25 ms Solana sniper bot with intelligent copy-trading features.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+
+        {/* Weitere JSON-LD Schemas bleiben unverändert */}
         <Script
           id="schema-website"
           type="application/ld+json"
@@ -207,7 +245,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* JSON-LD Schema for SoftwareApplication */}
         <Script
           id="schema-software-application"
           type="application/ld+json"
@@ -239,7 +276,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* JSON-LD Schema for BreadcrumbList */}
         <Script
           id="schema-breadcrumb"
           type="application/ld+json"
@@ -271,7 +307,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* JSON-LD Schema for LocalBusiness */}
         <Script
           id="schema-local-business"
           type="application/ld+json"
@@ -314,7 +349,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* JSON-LD Schema for Product - Same-Block Execution */}
         <Script
           id="schema-product-same-block"
           type="application/ld+json"
@@ -352,7 +386,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* JSON-LD Schema for Product - Copy Trading */}
         <Script
           id="schema-product-copy-trading"
           type="application/ld+json"
@@ -390,7 +423,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* JSON-LD Schema for Product - BDN Network */}
         <Script
           id="schema-product-bdn-network"
           type="application/ld+json"
@@ -428,61 +460,6 @@ export default function RootLayout({
           }}
         />
 
-        {/* JSON-LD Schema for FAQ */}
-        <Script
-          id="schema-faq"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: [
-                {
-                  "@type": "Question",
-                  name: "What is a Solana sniper bot?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "A Solana sniper bot is an automated trading tool that executes trades on the Solana blockchain with extremely low latency. Rust Rocket's sniper bot achieves 25 ms execution time and same-block execution, allowing you to get into new token launches on platforms like Pump.fun before price surges.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "How does Rust Rocket's copy-trading feature work?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Rust Rocket's intelligent copy-trading feature automatically identifies and mirrors successful Solana traders' strategies. You can set custom parameters like stop-loss and auto-sell conditions to protect your investments and maximize profits while the bot handles the execution with 25 ms latency.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "What makes Rust Rocket faster than other Solana bots?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Rust Rocket achieves superior speed through our network of 15 private BDN (Block Distribution Network) gateways that provide direct, low-latency connections to the Solana blockchain. While standard bots rely on public RPCs with 400+ ms latency, our infrastructure delivers 25 ms execution time and same-block execution capabilities.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Does Rust Rocket work with Pump.fun?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Yes, Rust Rocket is specifically optimized for Pump.fun and Raydium, the most popular Solana meme coin launchpads. Our 25 ms execution time ensures you can participate in new token launches at the earliest possible moment, often in the same block as the launch transaction.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "How does Rust Rocket protect against rug pulls?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Rust Rocket includes built-in rug-pull protection that analyzes token contracts and liquidity patterns in real-time. The bot can automatically set stop-loss levels and execute emergency sells if suspicious activity is detected, helping to safeguard your investments in the volatile meme coin market.",
-                  },
-                },
-              ],
-            }),
-          }}
-        />
-
-        {/* JSON-LD Schema for Article Template */}
         <Script
           id="schema-article-template"
           type="application/ld+json"

@@ -237,7 +237,8 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       // Check if gtag is available
       if (typeof window !== "undefined" && "gtag" in window) {
         // @ts-ignore - gtag is not typed
-        window.gtag("event", "join_waitlist_success", {
+        window.gtag("event", "beta_signup", {
+          value: 0,
           event_category: "conversion",
           event_label: "waitlist_signup",
           method: "email",
@@ -245,13 +246,17 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
           referral_source: getReferralSource(),
         })
 
-        // TODO: GOOGLE ANALYTICS EVENT - Waitlist Signup Success
-        // dataLayer.push({'event': 'join_waitlist_success', 'form_location': 'modal'});
-        // gtag('event', 'conversion', {'send_to': 'AW-YOUR_AW_ID/YOUR_CONVERSION_LABEL'}); // Example Google Ads Conversion
-        // Track other analytics events here (e.g., Meta Pixel)
-      }
+        // Twitter/X Pixel tracking
+        if (typeof window !== "undefined" && "twq" in window) {
+          // @ts-ignore - twq is not typed
+          window.twq("event", "tw-ooo", {
+            currency: "EUR",
+            value: 0,
+          })
+        }
 
-      console.log("Tracking waitlist signup for:", email)
+        console.log("Tracking waitlist signup for:", email)
+      }
     } catch (error) {
       console.error("Error tracking signup:", error)
       // Don't throw error here, as tracking failure shouldn't affect user experience

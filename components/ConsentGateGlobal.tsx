@@ -18,8 +18,31 @@ declare global {
   }
 }
 
+// Texte für verschiedene Sprachen
+const translations = {
+  en: {
+    description:
+      "We use cookies and similar technologies to enhance your experience and measure the effectiveness of our advertising. Please consent to their use.",
+    decline: "Decline",
+    accept: "Accept",
+  },
+  de: {
+    description:
+      "Wir verwenden Cookies und ähnliche Technologien, um dein Erlebnis zu verbessern und die Effektivität unserer Werbung zu messen. Bitte stimme der Verwendung zu.",
+    decline: "Ablehnen",
+    accept: "Akzeptieren",
+  },
+  es: {
+    description:
+      "Utilizamos cookies y tecnologías similares para mejorar tu experiencia y medir la efectividad de nuestra publicidad. Por favor, acepta su uso.",
+    decline: "Rechazar",
+    accept: "Aceptar",
+  },
+}
+
 export default function ConsentGateGlobal() {
   const [showBanner, setShowBanner] = useState(false)
+  const [language, setLanguage] = useState("en")
 
   // Sichere Wrapper-Funktionen für localStorage
   const getLocalStorageItem = (key: string): string | null => {
@@ -35,6 +58,16 @@ export default function ConsentGateGlobal() {
   useEffect(() => {
     // Prüfe, ob wir im Browser sind
     if (typeof window === "undefined") return
+
+    // Bestimme die Sprache basierend auf dem Pfad
+    const path = window.location.pathname
+    if (path.startsWith("/de/")) {
+      setLanguage("de")
+    } else if (path.startsWith("/es/")) {
+      setLanguage("es")
+    } else {
+      setLanguage("en")
+    }
 
     // Prüfe, ob Consent bereits gegeben wurde
     const hasConsent = getLocalStorageItem("cookieConsent") === "true"
@@ -214,26 +247,26 @@ export default function ConsentGateGlobal() {
   // Wenn Banner nicht angezeigt werden soll, rendere nichts
   if (!showBanner) return null
 
+  // Hole die Übersetzungen für die aktuelle Sprache
+  const text = translations[language as keyof typeof translations]
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gray-900 border-t border-gray-800">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-sm text-gray-300">
-            Wir verwenden Cookies und ähnliche Technologien, um dein Erlebnis zu verbessern und die Effektivität unserer
-            Werbung zu messen. Bitte stimme der Verwendung zu.
-          </div>
+          <div className="text-sm text-gray-300">{text.description}</div>
           <div className="flex gap-2">
             <button
               onClick={declineCookies}
               className="px-4 py-2 text-sm text-gray-300 bg-gray-800 rounded hover:bg-gray-700 transition-colors"
             >
-              Ablehnen
+              {text.decline}
             </button>
             <button
               onClick={acceptCookies}
               className="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors"
             >
-              Akzeptieren
+              {text.accept}
             </button>
           </div>
         </div>
