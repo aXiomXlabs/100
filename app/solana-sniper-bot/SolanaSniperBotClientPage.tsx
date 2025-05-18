@@ -6,9 +6,7 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CheckCircle, Clock, Shield, Zap, BarChart3, Rocket, Users, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import WaitlistButton from "@/components/WaitlistButton"
+import { CheckCircle, Clock, Shield, Zap, BarChart3, Rocket, Users, Bell } from "lucide-react"
 import Script from "next/script"
 
 export default function SolanaSniperBotClientPage() {
@@ -501,53 +499,36 @@ export default function SolanaSniperBotClientPage() {
 
         {/* Telegram Integration Section */}
         <section className="container-custom py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Control Everything from Telegram</h2>
-              <p className="text-lg text-text-secondary mb-6">
-                Our Solana Sniper Bot is fully integrated with Telegram, allowing you to execute trades, monitor
-                performance, and receive alerts directly in your favorite messaging app.
-              </p>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Control Everything from Telegram</h2>
+            <p className="text-lg text-text-secondary mb-8">
+              Our Solana Sniper Bot is fully integrated with Telegram, allowing you to execute trades, monitor
+              performance, and receive alerts directly in your favorite messaging app.
+            </p>
 
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span>Simple command interface for executing trades</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span>Real-time alerts for price movements and opportunities</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span>Secure authentication system to protect your wallet</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span>Detailed performance reports and analytics</span>
-                </li>
-              </ul>
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-background-secondary p-5 rounded-xl border border-border hover:border-primary/50 transition-all duration-300">
+                <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-3" />
+                <h3 className="font-semibold mb-2">Simple Command Interface</h3>
+                <p className="text-text-secondary">Execute trades with simple, intuitive commands</p>
+              </div>
 
-              <Button asChild>
-                <a href="https://t.me/rustrocket_bot" target="_blank" rel="noopener noreferrer" className="gap-2">
-                  Try Demo Bot <ExternalLink className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
+              <div className="bg-background-secondary p-5 rounded-xl border border-border hover:border-primary/50 transition-all duration-300">
+                <Bell className="h-8 w-8 text-amber-500 mx-auto mb-3" />
+                <h3 className="font-semibold mb-2">Real-time Alerts</h3>
+                <p className="text-text-secondary">Get notified about price movements and opportunities</p>
+              </div>
 
-            <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 rounded-xl blur-xl"></div>
-              <div className="relative bg-background-tertiary rounded-xl overflow-hidden border border-border image-glow hover-scale">
-                <div className="animate-float animate-delay-3">
-                  <Image
-                    src="/images/solana-telegram-bot.png"
-                    alt="Solana Telegram Bot Interface"
-                    width={600}
-                    height={800}
-                    className="w-full h-auto rounded-xl"
-                  />
-                </div>
-                <div className="gradient-overlay"></div>
+              <div className="bg-background-secondary p-5 rounded-xl border border-border hover:border-primary/50 transition-all duration-300">
+                <Shield className="h-8 w-8 text-blue-500 mx-auto mb-3" />
+                <h3 className="font-semibold mb-2">Secure Authentication</h3>
+                <p className="text-text-secondary">Protect your wallet with advanced security features</p>
+              </div>
+
+              <div className="bg-background-secondary p-5 rounded-xl border border-border hover:border-primary/50 transition-all duration-300">
+                <BarChart3 className="h-8 w-8 text-purple-500 mx-auto mb-3" />
+                <h3 className="font-semibold mb-2">Detailed Reports</h3>
+                <p className="text-text-secondary">Access comprehensive performance analytics</p>
               </div>
             </div>
           </div>
@@ -642,16 +623,6 @@ export default function SolanaSniperBotClientPage() {
               Join our waitlist today to be among the first to access our Solana Sniper Bot when we launch. Limited
               spots available for our beta program.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <WaitlistButton size="lg" className="px-8">
-                Join Waitlist <ExternalLink className="ml-2 h-4 w-4" />
-              </WaitlistButton>
-              <Button variant="outline" size="lg" className="px-8" asChild>
-                <a href="https://t.me/rustrocket_bot" target="_blank" rel="noopener noreferrer">
-                  Try Demo <ExternalLink className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
           </div>
         </section>
       </main>

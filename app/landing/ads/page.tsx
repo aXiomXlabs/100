@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Same-block fills & copy-trading. Join the free beta waitlist.",
   robots: {
     index: false,
-    follow: true,
+    follow: false,
   },
   openGraph: {
     title: "25 ms Solana Sniper Bot – Free Beta | Rust Rocket",

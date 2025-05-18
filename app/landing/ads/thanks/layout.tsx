@@ -3,7 +3,7 @@ import ConsentGateAds from "@/components/ConsentGateAds"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 
-export default function AdsLayout({
+export default function ThanksLayout({
   children,
 }: {
   children: React.ReactNode
