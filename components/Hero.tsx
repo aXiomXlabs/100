@@ -197,7 +197,7 @@ export default function Hero() {
 
           {/* Right column - Visual element */}
           <div className="relative">
-            <div className="relative aspect-square max-w-md mx-auto">
+            <div className="relative aspect-square max-w-md mx-auto md:mx-0">
               {/* Glowing orb background */}
               <div
                 className="absolute inset-0 bg-gradient-radial from-primary/20 via-primary/5 to-transparent rounded-full blur-2xl animate-pulse-slow"
@@ -214,9 +214,8 @@ export default function Hero() {
                     className="object-contain"
                     priority
                     fetchPriority="high"
-                    width={1280}
-                    height={720}
-                    decoding="async"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ maxWidth: "100%", height: "auto" }}
                   />
                 </div>
               </div>

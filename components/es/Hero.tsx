@@ -217,7 +217,7 @@ export default function HeroES() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative aspect-square max-w-md mx-auto">
+            <div className="relative aspect-square max-w-md mx-auto md:mx-0">
               {/* Glowing orb background */}
               <div
                 className="absolute inset-0 bg-gradient-radial from-primary/20 via-primary/5 to-transparent rounded-full blur-2xl animate-pulse-slow"
@@ -233,6 +233,8 @@ export default function HeroES() {
                     fill
                     className="object-contain"
                     priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ maxWidth: "100%", height: "auto" }}
                   />
                 </div>
               </div>

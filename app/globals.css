@@ -244,6 +244,23 @@ body {
 
 /* Mobile Optimierungen */
 @media (max-width: 640px) {
+  .animate-float {
+    animation: none; /* Deaktiviere Float-Animation auf mobilen Geräten für bessere Performance */
+  }
+
+  /* Verbessere die Bilddarstellung */
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Optimiere die Darstellung von Next.js Images */
+  span[style*="box-sizing: border-box; display: block; overflow: hidden;"] {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 200px;
+  }
   html {
     /* Reduziere Scroll-Padding auf mobilen Geräten */
     scroll-padding-top: 60px;
