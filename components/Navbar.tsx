@@ -149,17 +149,17 @@ export default function Navbar() {
         </motion.div>
 
         {/* Mobile menu button */}
-        <div className="md:hidden flex items-center gap-4">
+        <div className="md:hidden flex items-center gap-2">
           <WaitlistButton
             id="nav-mobile-waitlist-button"
             data-tracking-id="nav_mobile_waitlist_click"
-            className="bg-primary hover:bg-primary-hover text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors shadow-md"
+            className="bg-primary hover:bg-primary-hover text-white px-2 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors shadow-md"
           >
             Join Waitlist
           </WaitlistButton>
           <button
             type="button"
-            className="text-text-primary hover:text-primary transition-colors"
+            className="text-text-primary hover:text-primary transition-colors p-1.5"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
@@ -169,9 +169,9 @@ export default function Navbar() {
           >
             <span className="sr-only">Toggle menu</span>
             {mobileMenuOpen ? (
-              <X className="h-6 w-6" aria-hidden="true" />
+              <X className="h-5 w-5" aria-hidden="true" />
             ) : (
-              <Menu className="h-6 w-6" aria-hidden="true" />
+              <Menu className="h-5 w-5" aria-hidden="true" />
             )}
           </button>
         </div>
@@ -189,7 +189,7 @@ export default function Navbar() {
             className="md:hidden bg-background-secondary/90 backdrop-blur-md border-t border-gray-800"
             aria-labelledby="mobile-menu-button"
           >
-            <nav className="container-custom py-4 space-y-2" aria-label="Mobile navigation">
+            <nav className="container-custom py-4 space-y-1" aria-label="Mobile navigation">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -197,7 +197,7 @@ export default function Navbar() {
                   id={`mobile-${link.id}`}
                   data-tracking-id={`mobile_nav_${link.name.toLowerCase().replace(/\s+/g, "_")}_click`}
                   onClick={() => trackNavClick(`mobile_${link.name}`)}
-                  className="block text-base font-medium py-2 px-3 rounded-md text-text-primary hover:text-primary hover:bg-background-tertiary transition-colors"
+                  className="block text-base font-medium py-3 px-3 rounded-md text-text-primary hover:text-primary hover:bg-background-tertiary transition-colors"
                   aria-current={activeSection === link.href.substring(1) ? "page" : undefined}
                 >
                   {link.name}

@@ -113,7 +113,7 @@ export default function FAQSection() {
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className={`w-full text-left p-5 rounded-lg flex justify-between items-center transition-all duration-300 ${
+                className={`w-full text-left p-4 sm:p-5 rounded-lg flex justify-between items-center transition-all duration-300 ${
                   activeIndex === index
                     ? "bg-background-tertiary border-primary/30 border"
                     : "bg-background-secondary hover:bg-background-tertiary border border-gray-800"
@@ -123,9 +123,9 @@ export default function FAQSection() {
                 id={`faq-question-${index}`}
                 data-tracking-id={`faq_question_${index + 1}`}
               >
-                <span className="font-medium text-text-primary">{faq.question}</span>
+                <span className="font-medium text-sm sm:text-base text-text-primary">{faq.question}</span>
                 <ChevronDown
-                  className={`h-5 w-5 text-primary transition-transform duration-300 ${
+                  className={`h-5 w-5 text-primary transition-transform duration-300 flex-shrink-0 ml-2 ${
                     activeIndex === index ? "transform rotate-180" : ""
                   }`}
                   aria-hidden="true"
@@ -143,8 +143,8 @@ export default function FAQSection() {
                     role="region"
                     aria-labelledby={`faq-question-${index}`}
                   >
-                    <div className="p-5 bg-background-secondary/50 border border-t-0 border-gray-800 rounded-b-lg">
-                      <p className="text-text-secondary">{faq.answer}</p>
+                    <div className="p-4 sm:p-5 bg-background-secondary/50 border border-t-0 border-gray-800 rounded-b-lg">
+                      <p className="text-sm sm:text-base text-text-secondary">{faq.answer}</p>
                     </div>
                   </motion.div>
                 )}

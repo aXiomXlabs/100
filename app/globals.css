@@ -241,3 +241,65 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Mobile Optimierungen */
+@media (max-width: 640px) {
+  html {
+    /* Reduziere Scroll-Padding auf mobilen Geräten */
+    scroll-padding-top: 60px;
+  }
+
+  /* Verbessere Touch-Ziele */
+  button,
+  a,
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Verbessere Lesbarkeit auf kleinen Bildschirmen */
+  p,
+  li,
+  input,
+  textarea {
+    font-size: 16px !important; /* Verhindert Zoom auf iOS */
+  }
+
+  /* Optimiere Container-Abstände */
+  .container-custom {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Verbessere Abstände zwischen Abschnitten */
+  section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+/* Verbessere die Darstellung auf kleinen Geräten */
+@media (max-width: 375px) {
+  h1 {
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .container-custom {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* Optimiere für Geräte mit niedrigem Datenvolumen */
+@media (prefers-reduced-data: reduce) {
+  img,
+  video {
+    max-resolution: 0.5dppx;
+  }
+}

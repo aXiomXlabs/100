@@ -205,11 +205,25 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       throw new Error("This email is already on our waitlist")
     }
 
+    // Get UTM parameters from hidden form fields
+    const utmSource = document.querySelector<HTMLInputElement>('[name="utm_source"]')?.value || ""
+    const utmMedium = document.querySelector<HTMLInputElement>('[name="utm_medium"]')?.value || ""
+    const utmCampaign = document.querySelector<HTMLInputElement>('[name="utm_campaign"]')?.value || ""
+
+    // Construct referral source
+    let referralSource = utmSource || "direct"
+    if (utmMedium || utmCampaign) {
+      referralSource += ` (medium: ${utmMedium || "none"}, campaign: ${utmCampaign || "none"})`
+    }
+
     // Insert new waitlist entry
     const { error: insertError } = await supabase.from("waitlist").insert({
       email,
       telegram_username: telegramUsername || null,
-      referral_source: getReferralSource(),
+      referral_source: referralSource,
+      utm_source: utmSource,
+      utm_medium: utmMedium,
+      utm_campaign: utmCampaign,
       created_at: new Date().toISOString(),
     })
 
@@ -219,16 +233,6 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     }
 
     return true
-  }
-
-  // Get referral source from URL parameters
-  const getReferralSource = () => {
-    if (typeof window === "undefined") return "direct"
-
-    const urlParams = new URLSearchParams(window.location.search)
-    const source = urlParams.get("utm_source") || urlParams.get("ref") || urlParams.get("source") || "direct"
-
-    return source
   }
 
   // Google Analytics tracking
@@ -243,7 +247,6 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
           event_label: "waitlist_signup",
           method: "email",
           email_domain: email.split("@")[1],
-          referral_source: getReferralSource(),
         })
 
         // Twitter/X Pixel tracking
@@ -374,6 +377,11 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
               />
             </div>
           </div>
+
+          {/* Hidden UTM fields */}
+          <input type="hidden" name="utm_source" />
+          <input type="hidden" name="utm_medium" />
+          <input type="hidden" name="utm_campaign" />
 
           {/* Consent checkbox */}
           <div className="flex items-start mt-4">

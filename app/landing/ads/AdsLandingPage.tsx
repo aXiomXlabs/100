@@ -121,20 +121,25 @@ export default function AdsLandingPage() {
       throw new Error("This email is already on our waitlist")
     }
 
-    // Sammeln Sie alle UTM-Parameter in einem Feld
-    let referralSource = "direct"
-    if (utmSource) {
-      referralSource = utmSource
-      if (utmMedium || utmCampaign) {
-        referralSource += ` (medium: ${utmMedium || "none"}, campaign: ${utmCampaign || "none"})`
-      }
+    // Get UTM values from form fields
+    const utmSourceValue = document.querySelector<HTMLInputElement>('[name="utm_source"]')?.value || utmSource
+    const utmMediumValue = document.querySelector<HTMLInputElement>('[name="utm_medium"]')?.value || utmMedium
+    const utmCampaignValue = document.querySelector<HTMLInputElement>('[name="utm_campaign"]')?.value || utmCampaign
+
+    // Construct referral source
+    let referralSource = utmSourceValue || "direct"
+    if (utmMediumValue || utmCampaignValue) {
+      referralSource += ` (medium: ${utmMediumValue || "none"}, campaign: ${utmCampaignValue || "none"})`
     }
 
-    // Insert new waitlist entry with simplified referral tracking
+    // Insert new waitlist entry
     const { error: insertError } = await supabase.from("waitlist").insert({
       email,
       telegram_username: telegramUsername || null,
       referral_source: referralSource,
+      utm_source: utmSourceValue,
+      utm_medium: utmMediumValue,
+      utm_campaign: utmCampaignValue,
       created_at: new Date().toISOString(),
     })
 
@@ -236,9 +241,9 @@ export default function AdsLandingPage() {
                     </div>
 
                     {/* Hidden UTM fields */}
-                    <input type="hidden" name="utm_source" />
-                    <input type="hidden" name="utm_medium" />
-                    <input type="hidden" name="utm_campaign" />
+                    <input type="hidden" name="utm_source" value={utmSource} />
+                    <input type="hidden" name="utm_medium" value={utmMedium} />
+                    <input type="hidden" name="utm_campaign" value={utmCampaign} />
 
                     {/* Consent checkbox */}
                     <div className="flex items-start mt-4">
@@ -328,19 +333,6 @@ export default function AdsLandingPage() {
           </div>
         </section>
       </main>
-
-      {/* UTM Parameter Script */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            const p=new URLSearchParams(location.search);
-            ['utm_source','utm_medium','utm_campaign'].forEach(k=>{
-              const f=document.querySelector(\`[name="\${k}"]\`);
-              if(f){ f.value=p.get(k)||''; }
-            });
-          `,
-        }}
-      />
     </div>
   )
 }

@@ -24,15 +24,19 @@ function FeatureCard({ icon, title, description, accentColor, index }: FeaturePr
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="glass-card p-6 hover:translate-y-[-2px] transition-all duration-300 group h-full"
+      className="glass-card p-4 sm:p-6 hover:translate-y-[-2px] transition-all duration-300 group h-full"
     >
-      <div className={`p-3 rounded-lg ${accentColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
+      <div
+        className={`p-2 sm:p-3 rounded-lg ${accentColor} mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}
+      >
         {icon}
       </div>
-      <h4 className="text-xl font-bold mb-3 text-text-primary group-hover:text-primary transition-colors duration-300">
+      <h4 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-text-primary group-hover:text-primary transition-colors duration-300">
         {title}
       </h4>
-      <p className="text-text-secondary group-hover:text-text-primary transition-colors duration-300">{description}</p>
+      <p className="text-sm sm:text-base text-text-secondary group-hover:text-text-primary transition-colors duration-300">
+        {description}
+      </p>
     </motion.div>
   )
 }
@@ -102,7 +106,7 @@ export default function AdditionalFeaturesSection() {
           )}
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <FeatureCard
             icon={<Target className="h-6 w-6 text-primary" />}
             title="Pump.fun Specialist"
