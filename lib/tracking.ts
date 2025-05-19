@@ -17,7 +17,12 @@ interface TrackingEvent {
 // Sichere Wrapper-Funktionen für localStorage
 const getLocalStorageItem = (key: string): string | null => {
   if (typeof window === "undefined") return null
-  return localStorage.getItem(key)
+  try {
+    return localStorage.getItem(key)
+  } catch (error) {
+    console.error("Error accessing localStorage:", error)
+    return null
+  }
 }
 
 // Prüft, ob Analytics-Consent gegeben wurde
@@ -109,6 +114,67 @@ export function trackTwitterConversion(eventName: string, params?: Record<string
   }
 }
 
+// Sendet ein Conversion-Event an Facebook Pixel, wenn Consent gegeben wurde
+export function trackFacebookConversion(eventName: string, params?: Record<string, any>): void {
+  if (typeof window === "undefined") return
+
+  // Prüfe, ob Marketing-Consent gegeben wurde
+  if (!hasMarketingConsent()) {
+    console.log("Facebook conversion not tracked (no consent):", eventName)
+    return
+  }
+
+  // Prüfe, ob fbq verfügbar ist
+  if (typeof window.fbq !== "function") {
+    console.error("Facebook Pixel not loaded, can't track conversion:", eventName)
+    return
+  }
+
+  // Sende Conversion an Facebook Pixel
+  try {
+    window.fbq("track", eventName, params)
+    console.log("Facebook conversion tracked successfully:", eventName)
+  } catch (error) {
+    console.error("Error tracking Facebook conversion:", error)
+  }
+}
+
+// Trackt die Scroll-Tiefe
+export function trackScrollDepth(): void {
+  if (typeof window === "undefined") return
+  if (!hasAnalyticsConsent()) return
+
+  const scrollMarks = [25, 50, 75, 90, 100]
+  const marks = new Set()
+
+  const calculateScrollPercentage = (): number => {
+    const windowHeight = window.innerHeight
+    const documentHeight = document.documentElement.scrollHeight
+    const scrollTop = window.scrollY
+    return Math.floor((scrollTop / (documentHeight - windowHeight)) * 100)
+  }
+
+  const handleScroll = (): void => {
+    const scrollPercentage = calculateScrollPercentage()
+
+    for (const mark of scrollMarks) {
+      if (scrollPercentage >= mark && !marks.has(mark)) {
+        marks.add(mark)
+        trackEvent({
+          event: "scroll_depth",
+          category: "Engagement",
+          action: "Scroll",
+          label: `Scrolled ${mark}%`,
+          value: mark,
+          non_interaction: true,
+        })
+      }
+    }
+  }
+
+  window.addEventListener("scroll", handleScroll, { passive: true })
+}
+
 // Initialisiert die Tracking-Funktionen
 export function initTracking(): void {
   if (typeof window === "undefined") return
@@ -116,6 +182,10 @@ export function initTracking(): void {
   // Definiere globale Tracking-Funktionen
   window.trackEvent = trackEvent
   window.trackTwitterConversion = trackTwitterConversion
+  window.trackFacebookConversion = trackFacebookConversion
+
+  // Initialisiere Scroll-Tracking
+  trackScrollDepth()
 
   console.log("Tracking functions initialized")
 }
@@ -126,7 +196,9 @@ declare global {
     dataLayer: any[]
     gtag: (...args: any[]) => void
     twq: any
+    fbq: any
     trackEvent: typeof trackEvent
     trackTwitterConversion: typeof trackTwitterConversion
+    trackFacebookConversion: typeof trackFacebookConversion
   }
 }

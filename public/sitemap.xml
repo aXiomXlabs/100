@@ -1,127 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-<url>
-  <loc>https://rust-rocket.com/</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>1.0</priority>
-  <image:image>
-    <image:loc>https://rust-rocket.com/favicon-512.png</image:loc>
-    <image:title>Rust Rocket Logo</image:title>
-    <image:caption>Official logo of Rust Rocket Solana Sniper Bot</image:caption>
-  </image:image>
-  <image:image>
-    <image:loc>https://rust-rocket.com/images/og-image.png</image:loc>
-    <image:title>Rust Rocket Banner</image:title>
-    <image:caption>Rust Rocket - 25ms Solana Sniper Bot with Pro Copy Trading</image:caption>
-  </image:image>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/"/>
-  <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/"/>
-  <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/"/>
-</url>
-<url>
-  <loc>https://rust-rocket.com/solana-sniper-bot</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>1.0</priority>
-  <image:image>
-    <image:loc>https://rust-rocket.com/images/Dashboard.png</image:loc>
-    <image:title>Rust Rocket Solana Sniper Bot Dashboard</image:title>
-    <image:caption>Dashboard des Rust Rocket Solana Sniper Bots mit Echtzeit-Daten</image:caption>
-  </image:image>
-  <image:image>
-    <image:loc>https://rust-rocket.com/solana-sniper-bot-telegram.png</image:loc>
-    <image:title>Solana Sniper Bot in Action</image:title>
-    <image:caption>Rust Rocket Solana Sniper Bot in Aktion auf Telegram</image:caption>
-  </image:image>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/solana-sniper-bot"/>
-</url>
-<url>
-  <loc>https://rust-rocket.com/de/</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.9</priority>
-  <image:image>
-    <image:loc>https://rust-rocket.com/favicon-512.png</image:loc>
-    <image:title>Rust Rocket Logo</image:title>
-    <image:caption>Offizielles Logo des Rust Rocket Solana Sniper Bots</image:caption>
-  </image:image>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/"/>
-  <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/"/>
-  <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/"/>
-</url>
-<url>
-  <loc>https://rust-rocket.com/es/</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.9</priority>
-  <image:image>
-    <image:loc>https://rust-rocket.com/favicon-512.png</image:loc>
-    <image:title>Rust Rocket Logo</image:title>
-    <image:caption>Logo oficial de Rust Rocket Solana Sniper Bot</image:caption>
-  </image:image>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/"/>
-  <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/"/>
-  <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/"/>
-</url>
-<url>
-  <loc>https://rust-rocket.com/blog</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.8</priority>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/blog"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/blog"/>
-</url>
-<url>
-  <loc>https://rust-rocket.com/blog/future-of-solana-trading</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.7</priority>
-  <image:image>
-    <image:loc>https://rust-rocket.com/solana-trading-future.png</image:loc>
-    <image:title>Future of Solana Trading</image:title>
-    <image:caption>The Future of Solana Trading with Rust Rocket</image:caption>
-  </image:image>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/blog/future-of-solana-trading"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/blog/future-of-solana-trading"/>
-</url>
-<!-- Weitere Blog-Artikel -->
-<url>
-  <loc>https://rust-rocket.com/de/solana-sniper-bot</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.9</priority>
-  <image:image>
-    <image:loc>https://rust-rocket.com/images/Dashboard.png</image:loc>
-    <image:title>Rust Rocket Solana Sniper Bot Dashboard</image:title>
-    <image:caption>Dashboard des Rust Rocket Solana Sniper Bots mit Echtzeit-Daten</image:caption>
-  </image:image>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/solana-sniper-bot"/>
-</url>
-<url>
-  <loc>https://rust-rocket.com/es/solana-sniper-bot</loc>
-  <lastmod>2025-05-18</lastmod>
-  <changefreq>weekly</changefreq>
-  <priority>0.9</priority>
-  <image:image>
-    <image:loc>https://rust-rocket.com/images/Dashboard.png</image:loc>
-    <image:title>Rust Rocket Solana Sniper Bot Dashboard</image:title>
-    <image:caption>Dashboard del Rust Rocket Solana Sniper Bot con datos en tiempo real</image:caption>
-  </image:image>
-  <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/solana-sniper-bot"/>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://rust-rocket.com/solana-sniper-bot"/>
-</url>
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Hauptseite -->
+  <url>
+    <loc>https://rust-rocket.com/</loc>
+    <lastmod>2025-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/"/>
+  </url>
+  
+  <!-- Deutsche Version -->
+  <url>
+    <loc>https://rust-rocket.com/de/</loc>
+    <lastmod>2025-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/"/>
+  </url>
+  
+  <!-- Spanische Version -->
+  <url>
+    <loc>https://rust-rocket.com/es/</loc>
+    <lastmod>2025-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rust-rocket.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rust-rocket.com/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rust-rocket.com/de/"/>
+  </url>
+  
+  <!-- Solana Sniper Bot Seite -->
+  <url>
+    <loc>https://rust-rocket.com/solana-sniper-bot</loc>
+    <lastmod>2025-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Blog Hauptseite -->
+  <url>
+    <loc>https://rust-rocket.com/blog</loc>
+    <lastmod>2025-05-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog Artikel -->
+  <url>
+    <loc>https://rust-rocket.com/blog/future-of-solana-trading</loc>
+    <lastmod>2025-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

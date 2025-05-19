@@ -147,6 +147,28 @@ export default function RootLayout({
           }}
         />
 
+        {/* SoftwareApplication Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Rust Rocket",
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Web",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "USD",
+                availability: "https://schema.org/ComingSoon",
+              },
+              description:
+                "Ultraschneller Solana Sniper Bot mit 25ms Ausführungszeit und Same-Block Execution Technologie.",
+            }),
+          }}
+        />
+
         {/* FAQ Schema */}
         <script
           type="application/ld+json"
@@ -204,7 +226,7 @@ export default function RootLayout({
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', 'DEIN_FACEBOOK_PIXEL_ID'); // HIER DEINE ECHTE FACEBOOK PIXEL ID EINSETZEN!
+              fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID || "DEIN_FACEBOOK_PIXEL_ID"}'); // Umgebungsvariable oder Platzhalter
               fbq('track', 'PageView');
             `,
           }}
@@ -214,7 +236,7 @@ export default function RootLayout({
             height="1"
             width="1"
             style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=DEIN_FACEBOOK_PIXEL_ID&ev=PageView&noscript=1" // HIER DEINE ECHTE FACEBOOK PIXEL ID EINSETZEN!
+            src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FB_PIXEL_ID || "DEIN_FACEBOOK_PIXEL_ID"}&ev=PageView&noscript=1`}
             alt=""
           />
         </noscript>
@@ -247,6 +269,16 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* Initialisiere Tracking nach dem Laden der Seite */}
+        <Script id="init-tracking" strategy="afterInteractive">
+          {`
+            import { initTracking } from '@/lib/tracking';
+            document.addEventListener('DOMContentLoaded', () => {
+              initTracking();
+            });
+          `}
+        </Script>
       </body>
     </html>
   )

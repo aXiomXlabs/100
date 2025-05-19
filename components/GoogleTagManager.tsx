@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import Script from "next/script"
 
 // Google Tag Manager ID
-const GTM_ID = "GTM-XXXXXXX" // HIER DEINE ECHTE GTM-ID EINSETZEN!
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-XXXXXXX" // Platzhalter-ID wird verwendet, wenn keine Umgebungsvariable gesetzt ist
 
 export default function GoogleTagManager() {
   useEffect(() => {
@@ -45,6 +45,7 @@ export default function GoogleTagManager() {
           height="0"
           width="0"
           style={{ display: "none", visibility: "hidden" }}
+          title="Google Tag Manager"
         />
       </noscript>
     </>

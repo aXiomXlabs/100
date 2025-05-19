@@ -1,33 +1,14 @@
-# Allow all crawlers
+# robots.txt für rust-rocket.com
 User-agent: *
 Allow: /
-Disallow: /thanks
-Disallow: /landing/ads
-Disallow: /landing/ads/thanks
-Disallow: /test-cookie
-Disallow: /test-tracking
 
-# Sitemap location
+# Verbiete Zugriff auf Admin-Bereich
+Disallow: /admin/
+Disallow: /api/
+Disallow: /thanks/
+Disallow: /landing/ads/thanks/
+Disallow: /test-tracking/
+Disallow: /test-cookie/
+
+# Sitemap
 Sitemap: https://rust-rocket.com/sitemap.xml
-
-# Bilder explizit erlauben
-User-agent: Googlebot-Image
-Allow: /favicon-192.png
-Allow: /favicon-512.png
-Allow: /images/rust-rocket-logo.png
-Allow: /images/og-image.png
-Allow: /images/Dashboard.png
-
-# Spezielle Anweisungen für Google
-User-agent: Googlebot
-Allow: /
-Allow: /*.js$
-Allow: /*.css$
-
-# Spezielle Anweisungen für Google Mobile
-User-agent: Googlebot-Mobile
-Allow: /
-
-# Spezielle Anweisungen für Google News
-User-agent: Googlebot-News
-Allow: /blog/
