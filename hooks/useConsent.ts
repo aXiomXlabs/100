@@ -119,27 +119,25 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
     if (window.dataLayer) delete window.dataLayer
   }, [])
 
-  // Load Twitter Pixel
+  // Load Twitter Pixel - SIMPLIFIED VERSION
   const loadTwitterPixel = useCallback(() => {
     if (typeof window === "undefined") return
     if (document.getElementById("twitter-pixel")) return
 
-    // Twitter Pixel Script - Fixed the function to avoid t.josun error
+    // Create a simple global twq function
+    window.twq = (...args: any[]) => {
+      window.twq.queue = window.twq.queue || []
+      window.twq.queue.push(args)
+    }
+
+    // Add script tag
     const script = document.createElement("script")
     script.id = "twitter-pixel"
     script.async = true
     script.src = "https://static.ads-twitter.com/uwt.js"
     document.head.appendChild(script)
 
-    // Initialize Twitter Pixel safely
-    if (!window.twq) {
-      window.twq = (...args: any[]) => {
-        window.twq.exe ? window.twq.exe.apply(window.twq, args) : window.twq.queue.push(args)
-      }
-      window.twq.version = "1.1"
-      window.twq.queue = []
-    }
-
+    // Initialize
     window.twq("init", "pork0")
   }, [])
 
@@ -154,7 +152,7 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
     if (window.twq) delete window.twq
   }, [])
 
-  // Load Facebook Pixel
+  // Load Facebook Pixel - SIMPLIFIED VERSION
   const loadFacebookPixel = useCallback(() => {
     if (typeof window === "undefined") return
     if (document.getElementById("fb-pixel")) return
@@ -162,28 +160,21 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
     const fbPixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID
     if (!fbPixelId) return
 
-    // Facebook Pixel Script - Rewritten to avoid potential errors
+    // Create a simple global fbq function
+    window.fbq = (...args: any[]) => {
+      window.fbq.queue = window.fbq.queue || []
+      window.fbq.queue.push(args)
+    }
+    window._fbq = window.fbq
+
+    // Add script tag
     const script = document.createElement("script")
     script.id = "fb-pixel"
     script.async = true
     script.src = "https://connect.facebook.net/en_US/fbevents.js"
     document.head.appendChild(script)
 
-    // Initialize Facebook Pixel safely
-    if (!window.fbq) {
-      window.fbq = (...args: any[]) => {
-        if (window.fbq.callMethod) {
-          window.fbq.callMethod.apply(window.fbq, args)
-        } else {
-          window.fbq.queue.push(args)
-        }
-      }
-      window.fbq.push = window.fbq
-      window.fbq.loaded = true
-      window.fbq.version = "2.0"
-      window.fbq.queue = []
-    }
-
+    // Initialize
     window.fbq("init", fbPixelId)
   }, [])
 
@@ -196,6 +187,7 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
       fbScript.remove()
     }
     if (window.fbq) delete window.fbq
+    if (window._fbq) delete window._fbq
   }, [])
 
   // Update consent
@@ -284,16 +276,10 @@ declare global {
     dataLayer: any[]
     gtag: (...args: any[]) => void
     twq: (...args: any[]) => void & {
-      exe?: (...args: any[]) => void
-      queue: any[]
-      version: string
+      queue?: any[]
     }
     fbq: (...args: any[]) => void & {
-      callMethod?: (...args: any[]) => void
-      queue: any[]
-      loaded: boolean
-      version: string
-      push: (...args: any[]) => void
+      queue?: any[]
     }
     _fbq: any
   }
