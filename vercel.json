@@ -1,0 +1,13 @@
+{
+  "redirects": [
+    { "source": "/legal/privacy", "destination": "/legal/privacy-policy", "permanent": true },
+    { "source": "/arbitrage/:path*", "destination": "/", "permanent": false, "statusCode": 410 },
+    { "source": "/roadmap", "destination": "/#roadmap", "permanent": true },
+    { "source": "/register", "destination": "/#waitlist", "permanent": true },
+    { "source": "/network", "destination": "/#network", "permanent": true },
+    { "source": "/search", "destination": "/", "permanent": true },
+    { "source": "/legal/:file*.html", "destination": "/legal/privacy-policy", "permanent": true },
+    { "source": "/join-waitlist", "destination": "/#waitlist", "permanent": true },
+    { "source": "/:slug*.html", "destination": "/", "permanent": true }
+  ]
+}

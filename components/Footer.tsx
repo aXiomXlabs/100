@@ -112,9 +112,17 @@ export default function Footer() {
           </motion.div>
         </div>
 
-        {/* Copyright text in a separate row */}
-        <div className="mt-1 text-center">
-          <p className="text-gray-400 text-xs">© {currentYear} Rust Rocket. All rights reserved.</p>
+        {/* Copyright text and links in a separate row */}
+        <div className="mt-1 text-center flex flex-wrap justify-center gap-4 text-xs text-gray-400">
+          <p>© {currentYear} Rust Rocket. All rights reserved.</p>
+          <div className="flex gap-4">
+            <Link href="/legal/privacy-policy" className="hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/legal/terms" className="hover:text-white transition-colors">
+              Terms
+            </Link>
+          </div>
         </div>
 
         {/* Structured data for organization */}
