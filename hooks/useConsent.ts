@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useCallback, createContext, useContext } from "react"
 
 type ConsentState = {
@@ -55,139 +54,6 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
       console.error("Error loading consent status:", error)
       setHasInteracted(false)
     }
-  }, [])
-
-  // Load tracking scripts based on consent
-  useEffect(() => {
-    if (typeof window === "undefined" || !hasInteracted) return // Don't load scripts if user hasn't interacted yet
-
-    // Google Analytics
-    if (consent.statistics) {
-      loadGoogleAnalytics()
-    } else {
-      removeGoogleAnalytics()
-    }
-
-    // Twitter Pixel
-    if (consent.marketing) {
-      loadTwitterPixel()
-    } else {
-      removeTwitterPixel()
-    }
-
-    // Facebook Pixel
-    if (consent.marketing) {
-      loadFacebookPixel()
-    } else {
-      removeFacebookPixel()
-    }
-  }, [consent, hasInteracted])
-
-  // Load Google Analytics
-  const loadGoogleAnalytics = useCallback(() => {
-    if (typeof window === "undefined") return
-    if (document.getElementById("ga-script")) return
-
-    // GA4 Script
-    const gaScript = document.createElement("script")
-    gaScript.id = "ga-script"
-    gaScript.async = true
-    gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"
-    document.head.appendChild(gaScript)
-
-    // GA4 Config
-    window.dataLayer = window.dataLayer || []
-    function gtag(...args: any[]) {
-      window.dataLayer.push(args)
-    }
-    gtag("js", new Date())
-    gtag("config", "G-XXXXXXX", { anonymize_ip: true })
-
-    // Define GA4 globally
-    window.gtag = gtag
-  }, [])
-
-  // Remove Google Analytics
-  const removeGoogleAnalytics = useCallback(() => {
-    if (typeof window === "undefined") return
-
-    const gaScript = document.getElementById("ga-script")
-    if (gaScript) {
-      gaScript.remove()
-    }
-    if (window.gtag) delete window.gtag
-    if (window.dataLayer) delete window.dataLayer
-  }, [])
-
-  // Load Twitter Pixel - SIMPLIFIED VERSION
-  const loadTwitterPixel = useCallback(() => {
-    if (typeof window === "undefined") return
-    if (document.getElementById("twitter-pixel")) return
-
-    // Create a simple global twq function
-    window.twq = (...args: any[]) => {
-      window.twq.queue = window.twq.queue || []
-      window.twq.queue.push(args)
-    }
-
-    // Add script tag
-    const script = document.createElement("script")
-    script.id = "twitter-pixel"
-    script.async = true
-    script.src = "https://static.ads-twitter.com/uwt.js"
-    document.head.appendChild(script)
-
-    // Initialize
-    window.twq("init", "pork0")
-  }, [])
-
-  // Remove Twitter Pixel
-  const removeTwitterPixel = useCallback(() => {
-    if (typeof window === "undefined") return
-
-    const twitterScript = document.getElementById("twitter-pixel")
-    if (twitterScript) {
-      twitterScript.remove()
-    }
-    if (window.twq) delete window.twq
-  }, [])
-
-  // Load Facebook Pixel - SIMPLIFIED VERSION
-  const loadFacebookPixel = useCallback(() => {
-    if (typeof window === "undefined") return
-    if (document.getElementById("fb-pixel")) return
-
-    const fbPixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID
-    if (!fbPixelId) return
-
-    // Create a simple global fbq function
-    window.fbq = (...args: any[]) => {
-      window.fbq.queue = window.fbq.queue || []
-      window.fbq.queue.push(args)
-    }
-    window._fbq = window.fbq
-
-    // Add script tag
-    const script = document.createElement("script")
-    script.id = "fb-pixel"
-    script.async = true
-    script.src = "https://connect.facebook.net/en_US/fbevents.js"
-    document.head.appendChild(script)
-
-    // Initialize
-    window.fbq("init", fbPixelId)
-  }, [])
-
-  // Remove Facebook Pixel
-  const removeFacebookPixel = useCallback(() => {
-    if (typeof window === "undefined") return
-
-    const fbScript = document.getElementById("fb-pixel")
-    if (fbScript) {
-      fbScript.remove()
-    }
-    if (window.fbq) delete window.fbq
-    if (window._fbq) delete window._fbq
   }, [])
 
   // Update consent
@@ -268,19 +134,4 @@ export const useConsent = () => {
     }
   }
   return context
-}
-
-// Type definitions for global objects
-declare global {
-  interface Window {
-    dataLayer: any[]
-    gtag: (...args: any[]) => void
-    twq: (...args: any[]) => void & {
-      queue?: any[]
-    }
-    fbq: (...args: any[]) => void & {
-      queue?: any[]
-    }
-    _fbq: any
-  }
 }

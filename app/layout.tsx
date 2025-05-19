@@ -11,6 +11,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 // Importiere den ConsentProvider und ConsentBanner am Anfang der Datei:
 import { ConsentProvider } from "@/hooks/useConsent"
 import ConsentBanner from "@/components/ConsentBanner" // Moved to be rendered inside ConsentProvider
+// Füge den TrackingScripts-Import hinzu
+import TrackingScripts from "@/components/TrackingScripts"
 
 // Entferne den alten ConsentGateGlobal-Import:
 // Entferne: import ConsentGateGlobal from '@/components/ConsentGateGlobal';
@@ -114,6 +116,7 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 }
 
+// Füge TrackingScripts zur Komponente hinzu (innerhalb des ConsentProvider)
 export default function RootLayout({
   children,
 }: {
@@ -226,6 +229,7 @@ export default function RootLayout({
             <Analytics />
             <SpeedInsights />
             <ConsentBanner />
+            <TrackingScripts />
           </WaitlistModalProvider>
         </ConsentProvider>
 
