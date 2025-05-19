@@ -4,12 +4,16 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import ChatBubble from "@/components/ChatBubble"
 import { WaitlistModalProvider } from "@/components/WaitlistModalProvider"
-import Script from "next/script"
 import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import ConsentGateGlobal from "@/components/ConsentGateGlobal"
-import GoogleTagManager from "@/components/GoogleTagManager"
+// Integriere den ConsentProvider und ConsentBanner in das Layout
+// Importiere den ConsentProvider und ConsentBanner am Anfang der Datei:
+import { ConsentProvider } from "@/hooks/useConsent"
+import ConsentBanner from "@/components/ConsentBanner" // Moved to be rendered inside ConsentProvider
+
+// Entferne den alten ConsentGateGlobal-Import:
+// Entferne: import ConsentGateGlobal from '@/components/ConsentGateGlobal';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -214,8 +218,21 @@ export default function RootLayout({
           }}
         />
 
+        {/* Twitter/X Pixel Code */}
+        {/* <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+              },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
+              a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+              twq('init','pork0');
+              twq('consent','default','denied');
+            `,
+          }}
+        /> */}
+
         {/* Facebook Pixel Code */}
-        <script
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `
               !function(f,b,e,v,n,t,s)
@@ -239,23 +256,19 @@ export default function RootLayout({
             src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FB_PIXEL_ID || "DEIN_FACEBOOK_PIXEL_ID"}&ev=PageView&noscript=1`}
             alt=""
           />
-        </noscript>
+        </noscript> */}
         {/* End Facebook Pixel Code */}
       </head>
       <body>
-        {/* Google Tag Manager */}
-        <GoogleTagManager />
-
-        <WaitlistModalProvider>
-          <Suspense>{children}</Suspense>
-          <ChatBubble />
-          <Analytics />
-          <SpeedInsights />
-          <ConsentGateGlobal />
-        </WaitlistModalProvider>
-
-        {/* Fallback Cookie Banner Script */}
-        <Script id="cookie-banner-fallback" src="/js/cookie-banner.js" strategy="afterInteractive" />
+        <ConsentProvider>
+          <WaitlistModalProvider>
+            <Suspense>{children}</Suspense>
+            <ChatBubble />
+            <Analytics />
+            <SpeedInsights />
+            <ConsentBanner />
+          </WaitlistModalProvider>
+        </ConsentProvider>
 
         {/* UTM Parameter Script */}
         <script
@@ -269,16 +282,6 @@ export default function RootLayout({
             `,
           }}
         />
-
-        {/* Initialisiere Tracking nach dem Laden der Seite */}
-        <Script id="init-tracking" strategy="afterInteractive">
-          {`
-            import { initTracking } from '@/lib/tracking';
-            document.addEventListener('DOMContentLoaded', () => {
-              initTracking();
-            });
-          `}
-        </Script>
       </body>
     </html>
   )
