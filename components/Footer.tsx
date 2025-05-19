@@ -4,11 +4,9 @@ import type React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { useConsent } from "@/hooks/useConsent"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
-  const { openModal } = useConsent()
 
   // Animation Varianten für Container-Elemente
   const containerVariants = {
@@ -124,13 +122,6 @@ export default function Footer() {
             <Link href="/legal/terms" className="hover:text-white transition-colors">
               Terms
             </Link>
-            <button
-              onClick={openModal}
-              className="hover:text-white transition-colors cursor-pointer"
-              aria-label="Change cookie settings"
-            >
-              Cookie Settings
-            </button>
           </div>
         </div>
 

@@ -30,11 +30,11 @@ export function hasAnalyticsConsent(): boolean {
   if (typeof window === "undefined") return false
 
   try {
-    const consentsString = getLocalStorageItem("rr_consent")
+    const consentsString = getLocalStorageItem("cookieConsents")
     if (!consentsString) return false
 
-    const consents = JSON.parse(consentsString) as { stat: boolean }
-    return consents.stat === true
+    const consents = JSON.parse(consentsString) as CookieConsents
+    return consents.analytics === true
   } catch (error) {
     console.error("Error checking analytics consent:", error)
     return false
@@ -46,10 +46,10 @@ export function hasMarketingConsent(): boolean {
   if (typeof window === "undefined") return false
 
   try {
-    const consentsString = getLocalStorageItem("rr_consent")
+    const consentsString = getLocalStorageItem("cookieConsents")
     if (!consentsString) return false
 
-    const consents = JSON.parse(consentsString) as { marketing: boolean }
+    const consents = JSON.parse(consentsString) as CookieConsents
     return consents.marketing === true
   } catch (error) {
     console.error("Error checking marketing consent:", error)
@@ -99,18 +99,16 @@ export function trackTwitterConversion(eventName: string, params?: Record<string
     return
   }
 
+  // Prüfe, ob twq verfügbar ist
+  if (typeof window.twq !== "function") {
+    console.error("Twitter Pixel not loaded, can't track conversion:", eventName)
+    return
+  }
+
   // Sende Conversion an Twitter/X Pixel
   try {
-    // Sicherer Weg, Twitter-Tracking zu implementieren
-    if (typeof window.twq === "function") {
-      window.twq("track", eventName, params || {})
-      console.log("Twitter conversion tracked successfully:", eventName)
-    } else {
-      console.log("Twitter Pixel not available, event queued for later:", eventName)
-      // Speichere das Event für später, wenn Twitter Pixel geladen wird
-      window._twqQueue = window._twqQueue || []
-      window._twqQueue.push(["track", eventName, params || {}])
-    }
+    window.twq("track", eventName, params)
+    console.log("Twitter conversion tracked successfully:", eventName)
   } catch (error) {
     console.error("Error tracking Twitter conversion:", error)
   }
@@ -126,18 +124,16 @@ export function trackFacebookConversion(eventName: string, params?: Record<strin
     return
   }
 
+  // Prüfe, ob fbq verfügbar ist
+  if (typeof window.fbq !== "function") {
+    console.error("Facebook Pixel not loaded, can't track conversion:", eventName)
+    return
+  }
+
   // Sende Conversion an Facebook Pixel
   try {
-    // Sicherer Weg, Facebook-Tracking zu implementieren
-    if (typeof window.fbq === "function") {
-      window.fbq("track", eventName, params || {})
-      console.log("Facebook conversion tracked successfully:", eventName)
-    } else {
-      console.log("Facebook Pixel not available, event queued for later:", eventName)
-      // Speichere das Event für später, wenn Facebook Pixel geladen wird
-      window._fbqQueue = window._fbqQueue || []
-      window._fbqQueue.push(["track", eventName, params || {}])
-    }
+    window.fbq("track", eventName, params)
+    console.log("Facebook conversion tracked successfully:", eventName)
   } catch (error) {
     console.error("Error tracking Facebook conversion:", error)
   }
@@ -201,8 +197,6 @@ declare global {
     gtag: (...args: any[]) => void
     twq: any
     fbq: any
-    _twqQueue: any[]
-    _fbqQueue: any[]
     trackEvent: typeof trackEvent
     trackTwitterConversion: typeof trackTwitterConversion
     trackFacebookConversion: typeof trackFacebookConversion

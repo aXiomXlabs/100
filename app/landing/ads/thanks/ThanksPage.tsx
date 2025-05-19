@@ -1,97 +1,76 @@
 "use client"
 
 import { useEffect } from "react"
-import Image from "next/image"
 import Link from "next/link"
-import { trackConversion } from "@/lib/conversion-tracking"
-import { ArrowLeft, Check } from "lucide-react"
+import Image from "next/image"
+import Script from "next/script"
 
 export default function ThanksPage() {
   useEffect(() => {
-    // Conversion-Tracking beim Laden der Seite
-    trackConversion({
-      action: "waitlist_signup_complete",
-      category: "conversion",
-      label: "Ads Landing Page Signup",
-      value: 15.0, // Höherer Wert für Anmeldungen über Ads
-      currency: "EUR",
-      transactionId: `ads_signup_${Date.now()}`,
-      page: "/landing/ads/thanks",
-    })
+    // Fire conversion events
+    if (typeof window !== "undefined") {
+      // Google Analytics 4 conversion event
+      if ("gtag" in window) {
+        // @ts-ignore - gtag is not typed
+        window.gtag("event", "beta_signup", {
+          event_category: "conversion",
+          event_label: "waitlist_signup",
+          value: 0,
+        })
+      }
 
-    // Twitter/X Conversion-Event
-    if (typeof window !== "undefined" && "twq" in window) {
-      // @ts-ignore - twq ist nicht typisiert
-      window.twq("event", "tw-ooo", {
-        currency: "EUR",
-        value: 0,
-      })
+      // Twitter/X Pixel conversion event
+      if ("twq" in window) {
+        // @ts-ignore - twq is not typed
+        window.twq("event", "tw-ooo", {
+          currency: "EUR",
+          value: 0,
+        })
+      }
     }
   }, [])
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      <main className="flex-grow flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-gray-900 rounded-xl shadow-xl p-8 text-center">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-green-500" />
+    <div className="flex flex-col min-h-screen bg-black">
+      <main className="flex-grow flex items-center justify-center py-20">
+        <div className="container px-4 mx-auto">
+          <div className="max-w-md mx-auto text-center">
+            <div className="mb-8 flex justify-center">
+              <Image
+                src="/images/rust-rocket-logo.png"
+                alt="Rust Rocket Logo"
+                width={100}
+                height={100}
+                className="rounded-full"
+              />
             </div>
-          </div>
-
-          <Image
-            src="/images/rust-rocket-logo.png"
-            alt="Rust Rocket Logo"
-            width={120}
-            height={120}
-            className="mx-auto mb-6"
-            priority
-          />
-
-          <h1 className="text-2xl font-bold text-white mb-4">Thanks for Joining!</h1>
-
-          <p className="text-gray-300 mb-6">
-            You've successfully joined the Rust Rocket waitlist. We'll keep you updated on our launch and send you
-            exclusive early access information.
-          </p>
-
-          <div className="bg-gray-800 p-4 rounded-lg mb-6">
-            <h2 className="text-lg font-medium text-white mb-2">What's Next?</h2>
-            <ul className="text-gray-300 text-left space-y-2">
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Check your email for a confirmation message</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Follow us on Twitter for the latest updates</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Join our Telegram community for exclusive insights</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex justify-center space-x-4">
+            <h1 className="text-3xl font-bold text-white mb-4">Thanks for Joining!</h1>
+            <p className="text-xl text-gray-300 mb-8">
+              You've successfully joined the Rust Rocket waitlist. We'll be in touch soon with more information about
+              our beta program.
+            </p>
             <Link
-              href="/"
-              className="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              href="/solana-sniper-bot"
+              className="inline-block py-3 px-6 bg-primary hover:bg-primary-hover text-white font-medium rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Link>
-            <Link
-              href="https://t.me/rustrocket"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
-            >
-              Join Telegram
+              Learn More About Rust Rocket
             </Link>
           </div>
         </div>
       </main>
+
+      {/* Conversion tracking scripts */}
+      <Script id="conversion-events" strategy="afterInteractive">
+        {`
+          // This script fires conversion events for Google Analytics and Twitter/X
+          if (typeof gtag === 'function') {
+            gtag('event', 'beta_signup', {value: 0});
+          }
+          if (typeof twq === 'function') {
+            twq('event', 'tw-ooo', {currency: 'EUR', value: 0});
+          }
+        `}
+      </Script>
     </div>
   )
 }

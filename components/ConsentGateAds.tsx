@@ -1,61 +1,109 @@
 "use client"
 
-import { useEffect } from "react"
-import { hasMarketingConsent } from "@/lib/tracking"
+import { useState, useEffect } from "react"
 
-const ConsentGateAds = () => {
+export default function ConsentGateAds() {
+  const [showBanner, setShowBanner] = useState(false)
+
   useEffect(() => {
-    if (typeof window === "undefined") return // Server-side check
-
-    const loadPixels = () => {
-      if (hasMarketingConsent()) {
-        // Load Facebook Pixel
-        if (process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
-          !((f, b, e, v, n, t, s) => {
-            if (f.fbq) return
-            n = f.fbq = (...args: any[]) => {
-              n.callMethod ? n.callMethod.apply(n, args) : n.queue.push(args)
-            }
-            if (!f._fbq) f._fbq = n
-            n.push = n
-            n.loaded = !0
-            n.version = "2.0"
-            n.queue = []
-            t = b.createElement(e)
-            t.async = !0
-            t.src = v
-            s = b.getElementsByTagName(e)[0]
-            s.parentNode.insertBefore(t, s)
-          })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js")
-
-          window.fbq("init", process.env.NEXT_PUBLIC_FB_PIXEL_ID)
-          window.fbq("track", "PageView")
-        }
-
-        // Load Twitter Pixel
-        !((e, t, n, s, u, a) => {
-          e.twq ||
-            ((s = e.twq =
-              (...args: any[]) => {
-                s.exe ? s.exe.apply(s, args) : s.queue.push(args)
-              }),
-            (s.version = "1.1"),
-            (s.queue = []),
-            (u = t.createElement(n)),
-            (u.async = !0),
-            (u.src = "https://static.ads-twitter.com/uwt.js"),
-            (a = t.getElementsByTagName(n)[0]),
-            a.parentNode.insertBefore(u, a))
-        })(window, document, "script")
-        window.twq("init", "pork0")
-        window.twq("track", "PageView")
-      }
+    // Check if consent has already been given
+    const hasConsent = localStorage.getItem("adsConsentGiven") === "true"
+    if (!hasConsent) {
+      setShowBanner(true)
+    } else {
+      // If consent was already given, load the scripts
+      loadAdvertisingScripts()
     }
-
-    loadPixels()
   }, [])
 
-  return null
-}
+  const acceptCookies = () => {
+    localStorage.setItem("adsConsentGiven", "true")
+    setShowBanner(false)
+    loadAdvertisingScripts()
 
-export default ConsentGateAds
+    // Push event to dataLayer
+    if (typeof window !== "undefined" && window.dataLayer) {
+      window.dataLayer.push({ event: "cookies_accepted" })
+    }
+  }
+
+  const declineCookies = () => {
+    localStorage.setItem("adsConsentGiven", "false")
+    setShowBanner(false)
+
+    // Push event to dataLayer
+    if (typeof window !== "undefined" && window.dataLayer) {
+      window.dataLayer.push({ event: "cookies_declined" })
+    }
+  }
+
+  const loadAdvertisingScripts = () => {
+    // Load Google Analytics
+    const gaScript = document.createElement("script")
+    gaScript.src = "https://www.googletagmanager.com/gtag/js?id=G-6GRKXCYXWW"
+    gaScript.async = true
+    document.head.appendChild(gaScript)
+
+    // Initialize GA
+    const dataLayer = (window.dataLayer = window.dataLayer || [])
+    function gtag() {
+      // @ts-ignore
+      dataLayer.push(arguments)
+    }
+    // @ts-ignore
+    gtag("js", new Date())
+    // @ts-ignore
+    gtag("config", "G-6GRKXCYXWW")
+
+    // Load Twitter/X Pixel
+    const twScript = document.createElement("script")
+    twScript.src = "https://static.ads-twitter.com/uwt.js"
+    twScript.async = true
+    document.head.appendChild(twScript)
+
+    // Initialize Twitter/X Pixel
+    const twq = (window.twq =
+      window.twq ||
+      (() => {
+        // @ts-ignore
+        twq.exe ? twq.exe.apply(twq, arguments) : twq.queue.push(arguments)
+      }))
+    // @ts-ignore
+    twq.version = "1.1"
+    // @ts-ignore
+    twq.queue = []
+    // @ts-ignore
+    twq("init", "YOUR_TWITTER_PIXEL_ID") // Replace with your actual Twitter Pixel ID
+    // @ts-ignore
+    twq("track", "PageView")
+  }
+
+  if (!showBanner) return null
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gray-900 border-t border-gray-800">
+      <div className="container mx-auto">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-gray-300">
+            Wir verwenden Cookies und ähnliche Technologien, um dein Erlebnis zu verbessern und die Effektivität unserer
+            Werbung zu messen. Bitte stimme der Verwendung zu.
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={declineCookies}
+              className="px-4 py-2 text-sm text-gray-300 bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+            >
+              Ablehnen
+            </button>
+            <button
+              onClick={acceptCookies}
+              className="px-4 py-2 text-sm text-white bg-primary rounded hover:bg-primary-hover transition-colors"
+            >
+              Akzeptieren
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

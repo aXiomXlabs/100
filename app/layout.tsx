@@ -4,18 +4,12 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import ChatBubble from "@/components/ChatBubble"
 import { WaitlistModalProvider } from "@/components/WaitlistModalProvider"
+import Script from "next/script"
 import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-// Integriere den ConsentProvider und ConsentBanner in das Layout
-// Importiere den ConsentProvider und ConsentBanner am Anfang der Datei:
-import { ConsentProvider } from "@/hooks/useConsent"
-import ConsentBanner from "@/components/ConsentBanner" // Moved to be rendered inside ConsentProvider
-// Füge den TrackingScripts-Import hinzu
-import TrackingScripts from "@/components/TrackingScripts"
-
-// Entferne den alten ConsentGateGlobal-Import:
-// Entferne: import ConsentGateGlobal from '@/components/ConsentGateGlobal';
+import ConsentGateGlobal from "@/components/ConsentGateGlobal"
+import GoogleTagManager from "@/components/GoogleTagManager"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -116,7 +110,6 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 }
 
-// Füge TrackingScripts zur Komponente hinzu (innerhalb des ConsentProvider)
 export default function RootLayout({
   children,
 }: {
@@ -220,18 +213,49 @@ export default function RootLayout({
             }),
           }}
         />
+
+        {/* Facebook Pixel Code */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID || "DEIN_FACEBOOK_PIXEL_ID"}'); // Umgebungsvariable oder Platzhalter
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FB_PIXEL_ID || "DEIN_FACEBOOK_PIXEL_ID"}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
+        {/* End Facebook Pixel Code */}
       </head>
       <body>
-        <ConsentProvider>
-          <WaitlistModalProvider>
-            <Suspense>{children}</Suspense>
-            <ChatBubble />
-            <Analytics />
-            <SpeedInsights />
-            <ConsentBanner />
-            <TrackingScripts />
-          </WaitlistModalProvider>
-        </ConsentProvider>
+        {/* Google Tag Manager */}
+        <GoogleTagManager />
+
+        <WaitlistModalProvider>
+          <Suspense>{children}</Suspense>
+          <ChatBubble />
+          <Analytics />
+          <SpeedInsights />
+          <ConsentGateGlobal />
+        </WaitlistModalProvider>
+
+        {/* Fallback Cookie Banner Script */}
+        <Script id="cookie-banner-fallback" src="/js/cookie-banner.js" strategy="afterInteractive" />
 
         {/* UTM Parameter Script */}
         <script
@@ -245,6 +269,16 @@ export default function RootLayout({
             `,
           }}
         />
+
+        {/* Initialisiere Tracking nach dem Laden der Seite */}
+        <Script id="init-tracking" strategy="afterInteractive">
+          {`
+            import { initTracking } from '@/lib/tracking';
+            document.addEventListener('DOMContentLoaded', () => {
+              initTracking();
+            });
+          `}
+        </Script>
       </body>
     </html>
   )
