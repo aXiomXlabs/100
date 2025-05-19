@@ -103,13 +103,13 @@ importers:
         version: 2.49.4
       '@sveltejs/kit':
         specifier: latest
-        version: 2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))
+        version: 2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))
       '@vercel/analytics':
         specifier: latest
-        version: 1.5.0(@remix-run/react@2.16.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.0.2))(@sveltejs/kit@2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))
+        version: 1.5.0(@remix-run/react@2.16.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.0.2))(@sveltejs/kit@2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))
       '@vercel/speed-insights':
         specifier: latest
-        version: 1.2.0(@sveltejs/kit@2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))
+        version: 1.2.0(@sveltejs/kit@2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.0.0)
@@ -1397,8 +1397,8 @@ packages:
     peerDependencies:
       acorn: ^8.9.0
 
-  '@sveltejs/kit@2.21.0':
-    resolution: {integrity: sha512-kvu4h9qXduiPk1Q1oqFKDLFGu/7mslEYbVaqpbBcBxjlRJnvNCFwEvEwKt0Mx9TtSi8J77xRelvJobrGlst4nQ==}
+  '@sveltejs/kit@2.21.1':
+    resolution: {integrity: sha512-vLbtVwtDcK8LhJKnFkFYwM0uCdFmzioQnif0bjEYH1I24Arz22JPr/hLUiXGVYAwhu8INKx5qrdvr4tHgPwX6w==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
@@ -1463,8 +1463,8 @@ packages:
   '@types/node-fetch@2.6.12':
     resolution: {integrity: sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA==}
 
-  '@types/node@18.19.100':
-    resolution: {integrity: sha512-ojmMP8SZBKprc3qGrGk8Ujpo80AXkrP7G2tOT4VWr5jlr5DHjsJF+emXJz+Wm0glmy4Js62oKMdZZ6B9Y+tEcA==}
+  '@types/node@18.19.101':
+    resolution: {integrity: sha512-Ykg7fcE3+cOQlLUv2Ds3zil6DVjriGQaSN/kEpl5HQ3DIGM6W0F2n9+GkWV4bRt7KjLymgzNdTnSKCbFUUJ7Kw==}
 
   '@types/node@22.0.0':
     resolution: {integrity: sha512-VT7KSYudcPOzP5Q0wfbowyNLaVR8QWUdw+088uFWwfvpY6uCWaXpqV6ieLAu9WBcnTa7H4Z5RLK8I5t2FuOcqw==}
@@ -1604,8 +1604,8 @@ packages:
   arg@5.0.2:
     resolution: {integrity: sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==}
 
-  aria-hidden@1.2.5:
-    resolution: {integrity: sha512-N+u63/2br5AG+OSrk0rIgFOYPSEYlkD7Yk5fq3LDole6QDIAbAFpbchE5fhBiUdRV2Fa8pWAaXvy+VK/maBeTA==}
+  aria-hidden@1.2.6:
+    resolution: {integrity: sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA==}
     engines: {node: '>=10'}
 
   aria-query@5.3.2:
@@ -3161,7 +3161,7 @@ snapshots:
       '@radix-ui/react-primitive': 2.1.2(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-slot': 1.2.2(@types/react@19.0.0)(react@19.0.0)
       '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.0.0)(react@19.0.0)
-      aria-hidden: 1.2.5
+      aria-hidden: 1.2.6
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       react-remove-scroll: 2.7.0(@types/react@19.0.0)(react@19.0.0)
@@ -3271,7 +3271,7 @@ snapshots:
       '@radix-ui/react-roving-focus': 1.1.9(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-slot': 1.2.2(@types/react@19.0.0)(react@19.0.0)
       '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.0.0)(react@19.0.0)
-      aria-hidden: 1.2.5
+      aria-hidden: 1.2.6
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       react-remove-scroll: 2.7.0(@types/react@19.0.0)(react@19.0.0)
@@ -3334,7 +3334,7 @@ snapshots:
       '@radix-ui/react-primitive': 2.1.2(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-slot': 1.2.2(@types/react@19.0.0)(react@19.0.0)
       '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.0.0)(react@19.0.0)
-      aria-hidden: 1.2.5
+      aria-hidden: 1.2.6
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       react-remove-scroll: 2.7.0(@types/react@19.0.0)(react@19.0.0)
@@ -3472,7 +3472,7 @@ snapshots:
       '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.0.0)(react@19.0.0)
       '@radix-ui/react-use-previous': 1.1.1(@types/react@19.0.0)(react@19.0.0)
       '@radix-ui/react-visually-hidden': 1.2.2(@types/react-dom@19.0.0)(@types/react@19.0.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      aria-hidden: 1.2.5
+      aria-hidden: 1.2.6
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       react-remove-scroll: 2.7.0(@types/react@19.0.0)(react@19.0.0)
@@ -3816,7 +3816,7 @@ snapshots:
     dependencies:
       acorn: 8.14.1
 
-  '@sveltejs/kit@2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))':
+  '@sveltejs/kit@2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))':
     dependencies:
       '@sveltejs/acorn-typescript': 1.0.5(acorn@8.14.1)
       '@sveltejs/vite-plugin-svelte': 5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))
@@ -3895,7 +3895,7 @@ snapshots:
       '@types/node': 22.0.0
       form-data: 4.0.2
 
-  '@types/node@18.19.100':
+  '@types/node@18.19.101':
     dependencies:
       undici-types: 5.26.5
 
@@ -3917,19 +3917,19 @@ snapshots:
     dependencies:
       '@types/node': 22.0.0
 
-  '@vercel/analytics@1.5.0(@remix-run/react@2.16.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.0.2))(@sveltejs/kit@2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))':
+  '@vercel/analytics@1.5.0(@remix-run/react@2.16.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.0.2))(@sveltejs/kit@2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))':
     optionalDependencies:
       '@remix-run/react': 2.16.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.0.2)
-      '@sveltejs/kit': 2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))
+      '@sveltejs/kit': 2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))
       next: 15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
       svelte: 5.30.2
       vue: 3.5.14(typescript@5.0.2)
       vue-router: 4.5.1(vue@3.5.14(typescript@5.0.2))
 
-  '@vercel/speed-insights@1.2.0(@sveltejs/kit@2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))':
+  '@vercel/speed-insights@1.2.0(@sveltejs/kit@2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(next@15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(svelte@5.30.2)(vue-router@4.5.1(vue@3.5.14(typescript@5.0.2)))(vue@3.5.14(typescript@5.0.2))':
     optionalDependencies:
-      '@sveltejs/kit': 2.21.0(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))
+      '@sveltejs/kit': 2.21.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0)))(svelte@5.30.2)(vite@6.3.5(@types/node@22.0.0)(jiti@1.21.7)(yaml@2.8.0))
       next: 15.2.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
       svelte: 5.30.2
@@ -4023,9 +4023,8 @@ snapshots:
 
   arg@5.0.2: {}
 
-  aria-hidden@1.2.5:
+  aria-hidden@1.2.6:
     dependencies:
-      caniuse-lite: 1.0.30001718
       tslib: 2.8.1
 
   aria-query@5.3.2: {}
@@ -4580,7 +4579,7 @@ snapshots:
 
   openai@4.100.0(ws@8.18.2)(zod@3.24.1):
     dependencies:
-      '@types/node': 18.19.100
+      '@types/node': 18.19.101
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
