@@ -215,7 +215,7 @@ export default function Navbar() {
               <div className="pt-2 border-t border-gray-800 mt-4"></div>
               <div className="pt-2 border-t border-gray-800 mt-2">
                 <a
-                  href="https://t.me/rust_rocket"
+                  href="https://t.me/rustrocket"
                   target="_blank"
                   rel="noopener noreferrer"
                   id="mobile-telegram-link"

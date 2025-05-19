@@ -1,4 +1,6 @@
-// Typdefinitionen
+import { hasAnalyticsConsent } from "./tracking"
+
+// Typdefinitionen für bessere Typensicherheit
 interface ConversionEvent {
   action: string
   category?: string
@@ -6,100 +8,104 @@ interface ConversionEvent {
   value?: number
   currency?: string
   transactionId?: string
-  [key: string]: any
+  page?: string
+  email_domain?: string
+  [key: string]: any // Für zusätzliche benutzerdefinierte Parameter
 }
 
-// Sichere Wrapper-Funktionen für localStorage
-const getLocalStorageItem = (key: string): string | null => {
-  if (typeof window === "undefined") return null
+// Konversions-Tracking für Waitlist-Anmeldungen
+export function trackWaitlistConversion(email: string, source?: string): void {
+  if (typeof window === "undefined") return
+
+  // Prüfe, ob Analytics-Consent gegeben wurde
+  if (!hasAnalyticsConsent()) {
+    console.log("Waitlist conversion not tracked (no consent)")
+    return
+  }
+
+  // Prüfe, ob gtag verfügbar ist
+  if (typeof window.gtag !== "function") {
+    console.error("Google Analytics not loaded, can't track waitlist conversion")
+    return
+  }
+
+  // Sende Konversion an Google Analytics
   try {
-    return localStorage.getItem(key)
+    window.gtag("event", "waitlist_signup", {
+      event_category: "Conversion",
+      event_label: source || "Website",
+      email_domain: email.split("@")[1], // Nur die Domain für Datenschutz
+      source: source || "Website",
+    })
+
+    console.log("Waitlist conversion tracked successfully")
   } catch (error) {
-    console.error("Error accessing localStorage:", error)
-    return null
+    console.error("Error tracking waitlist conversion:", error)
   }
 }
 
-// Prüft, ob Marketing-Consent gegeben wurde
-export function hasMarketingConsent(): boolean {
-  if (typeof window === "undefined") return false
+// Konversions-Tracking für Seitenaufrufe
+export function trackPageView(path: string): void {
+  if (typeof window === "undefined") return
 
+  // Prüfe, ob Analytics-Consent gegeben wurde
+  if (!hasAnalyticsConsent()) {
+    console.log("Page view not tracked (no consent):", path)
+    return
+  }
+
+  // Prüfe, ob gtag verfügbar ist
+  if (typeof window.gtag !== "function") {
+    console.error("Google Analytics not loaded, can't track page view:", path)
+    return
+  }
+
+  // Sende Seitenaufruf an Google Analytics
   try {
-    const consentsString = getLocalStorageItem("cookieConsent")
-    return consentsString === "true"
+    window.gtag("event", "page_view", {
+      page_path: path,
+      page_title: document.title,
+    })
+
+    console.log("Page view tracked successfully:", path)
   } catch (error) {
-    console.error("Error checking marketing consent:", error)
-    return false
+    console.error("Error tracking page view:", error)
   }
 }
 
-// Sendet ein Conversion-Event an alle konfigurierten Tracking-Systeme
+/**
+ * Verfolgt ein Conversion-Event über verschiedene Tracking-Systeme
+ * @param event Das zu verfolgende Conversion-Event
+ */
 export function trackConversion(event: ConversionEvent): void {
   if (typeof window === "undefined") return
 
-  // Prüfe, ob Marketing-Consent gegeben wurde
-  if (!hasMarketingConsent()) {
-    console.log("Conversion not tracked (no consent):", event)
+  // Prüfe, ob Analytics-Consent gegeben wurde
+  if (!hasAnalyticsConsent()) {
+    console.log("Conversion not tracked (no analytics consent):", event)
     return
   }
 
   try {
     // Google Analytics / GTM Tracking
-    if (typeof window.dataLayer !== "undefined") {
-      window.dataLayer.push({
-        event: "conversion",
-        conversionAction: event.action,
-        conversionCategory: event.category || "conversion",
-        conversionLabel: event.label || event.action,
-        conversionValue: event.value || 0,
-        ...event,
-      })
-      console.log("GTM conversion tracked:", event)
-    }
-
-    // Google Ads Conversion Tracking
     if (typeof window.gtag === "function") {
-      window.gtag("event", "conversion", {
-        send_to: "AW-CONVERSION_ID/CONVERSION_LABEL", // HIER DEINE ECHTEN WERTE EINSETZEN!
+      window.gtag("event", event.action, {
+        event_category: event.category || "conversion",
+        event_label: event.label || event.action,
         value: event.value || 0,
         currency: event.currency || "EUR",
         transaction_id: event.transactionId,
+        page_location: event.page || (typeof window !== "undefined" ? window.location.href : ""),
+        ...Object.fromEntries(
+          Object.entries(event).filter(
+            ([key]) => !["action", "category", "label", "value", "currency", "transactionId", "page"].includes(key),
+          ),
+        ),
       })
-      console.log("Google Ads conversion tracked:", event)
-    }
 
-    // Facebook Pixel Tracking
-    if (typeof window.fbq === "function") {
-      window.fbq("track", event.action, {
-        content_name: event.label,
-        content_category: event.category,
-        value: event.value || 0,
-        currency: event.currency || "EUR",
-        ...event,
-      })
-      console.log("Facebook Pixel conversion tracked:", event)
-    }
-
-    // Twitter/X Pixel Tracking
-    if (typeof window.twq === "function") {
-      window.twq("track", event.action, {
-        value: event.value || 0,
-        currency: event.currency || "EUR",
-        ...event,
-      })
-      console.log("Twitter conversion tracked:", event)
+      console.log(`[Tracking] Google Analytics event tracked: ${event.action}`)
     }
   } catch (error) {
-    console.error("Error tracking conversion:", error)
-  }
-}
-
-// Erweitere die Window-Schnittstelle
-declare global {
-  interface Window {
-    dataLayer: any[]
-    gtag: (...args: any[]) => void
-    twq: any
-    fbq: any
+    console.error("[Tracking] Error tracking conversion:", error)
   }
 }

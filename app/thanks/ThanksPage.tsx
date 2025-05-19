@@ -18,6 +18,15 @@ export default function ThanksPage() {
       transactionId: `signup_${Date.now()}`,
       page: "/thanks",
     })
+
+    // Twitter/X Conversion-Event
+    if (typeof window !== "undefined" && "twq" in window) {
+      // @ts-ignore - twq ist nicht typisiert
+      window.twq("event", "tw-ooo", {
+        currency: "EUR",
+        value: 0,
+      })
+    }
   }, [])
 
   return (
