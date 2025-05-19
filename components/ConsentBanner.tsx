@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useConsent } from "@/hooks/useConsent"
-import { Dialog } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { X } from "lucide-react"
@@ -96,107 +95,105 @@ export default function ConsentBanner() {
       )}
 
       {/* Modal */}
-      <Dialog open={isModalOpen} onOpenChange={closeModal}>
-        <div
-          className={`fixed inset-0 z-50 bg-black/50 ${isModalOpen ? "block" : "hidden"}`}
-          onClick={closeModal}
-          aria-hidden="true"
-        />
-        <div
-          className={`fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] bg-gray-900 text-white p-6 shadow-lg rounded-lg ${isModalOpen ? "block" : "hidden"}`}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="cookie-settings-title"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 id="cookie-settings-title" className="text-xl font-semibold">
-              Cookie Settings
-            </h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={closeModal}
-              aria-label="Close"
-              className="text-gray-300 hover:text-white hover:bg-gray-800"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+      {isModalOpen && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/50" onClick={closeModal} aria-hidden="true" />
+          <div
+            className="fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] bg-gray-900 text-white p-6 shadow-lg rounded-lg"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cookie-settings-title"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 id="cookie-settings-title" className="text-xl font-semibold">
+                Cookie Settings
+              </h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeModal}
+                aria-label="Close"
+                className="text-gray-300 hover:text-white hover:bg-gray-800"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
-          <div className="space-y-4">
-            {/* Essential Cookies */}
-            <div className="flex items-start space-x-3 pt-2">
-              <Checkbox id="essential-cookies" checked={true} disabled={true} />
-              <div className="space-y-1 leading-none">
-                <label
-                  htmlFor="essential-cookies"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Essential (always active)
-                </label>
-                <p className="text-sm text-gray-400">
-                  These cookies are necessary for the basic functions of the website and cannot be disabled.
-                </p>
+            <div className="space-y-4">
+              {/* Essential Cookies */}
+              <div className="flex items-start space-x-3 pt-2">
+                <Checkbox id="essential-cookies" checked={true} disabled={true} />
+                <div className="space-y-1 leading-none">
+                  <label
+                    htmlFor="essential-cookies"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Essential (always active)
+                  </label>
+                  <p className="text-sm text-gray-400">
+                    These cookies are necessary for the basic functions of the website and cannot be disabled.
+                  </p>
+                </div>
+              </div>
+
+              {/* Statistics Cookies */}
+              <div className="flex items-start space-x-3 pt-2">
+                <Checkbox
+                  id="statistics-cookies"
+                  checked={modalConsent.statistics}
+                  onCheckedChange={(checked) => setModalConsent((prev) => ({ ...prev, statistics: checked === true }))}
+                />
+                <div className="space-y-1 leading-none">
+                  <label
+                    htmlFor="statistics-cookies"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Statistics (Google Analytics 4)
+                  </label>
+                  <p className="text-sm text-gray-400">
+                    These cookies help us understand how visitors interact with our website by collecting information
+                    anonymously.
+                  </p>
+                </div>
+              </div>
+
+              {/* Marketing Cookies */}
+              <div className="flex items-start space-x-3 pt-2">
+                <Checkbox
+                  id="marketing-cookies"
+                  checked={modalConsent.marketing}
+                  onCheckedChange={(checked) => setModalConsent((prev) => ({ ...prev, marketing: checked === true }))}
+                />
+                <div className="space-y-1 leading-none">
+                  <label
+                    htmlFor="marketing-cookies"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Marketing (Twitter/X Pixel, Facebook Pixel)
+                  </label>
+                  <p className="text-sm text-gray-400">
+                    These cookies are used to make advertising more relevant to you and to measure the effectiveness of
+                    our marketing campaigns.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Statistics Cookies */}
-            <div className="flex items-start space-x-3 pt-2">
-              <Checkbox
-                id="statistics-cookies"
-                checked={modalConsent.statistics}
-                onCheckedChange={(checked) => setModalConsent((prev) => ({ ...prev, statistics: checked === true }))}
-              />
-              <div className="space-y-1 leading-none">
-                <label
-                  htmlFor="statistics-cookies"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Statistics (Google Analytics 4)
-                </label>
-                <p className="text-sm text-gray-400">
-                  These cookies help us understand how visitors interact with our website by collecting information
-                  anonymously.
-                </p>
-              </div>
-            </div>
-
-            {/* Marketing Cookies */}
-            <div className="flex items-start space-x-3 pt-2">
-              <Checkbox
-                id="marketing-cookies"
-                checked={modalConsent.marketing}
-                onCheckedChange={(checked) => setModalConsent((prev) => ({ ...prev, marketing: checked === true }))}
-              />
-              <div className="space-y-1 leading-none">
-                <label
-                  htmlFor="marketing-cookies"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Marketing (Twitter/X Pixel, Facebook Pixel)
-                </label>
-                <p className="text-sm text-gray-400">
-                  These cookies are used to make advertising more relevant to you and to measure the effectiveness of
-                  our marketing campaigns.
-                </p>
-              </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={closeModal}
+                className="bg-transparent text-white border-gray-600 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button onClick={saveModalConsent} className="bg-blue-600 hover:bg-blue-700 text-white">
+                Save
+              </Button>
             </div>
           </div>
-
-          <div className="flex justify-end gap-2 mt-6">
-            <Button
-              variant="outline"
-              onClick={closeModal}
-              className="bg-transparent text-white border-gray-600 hover:bg-gray-800"
-            >
-              Cancel
-            </Button>
-            <Button onClick={saveModalConsent} className="bg-blue-600 hover:bg-blue-700 text-white">
-              Save
-            </Button>
-          </div>
-        </div>
-      </Dialog>
+        </>
+      )}
     </>
   )
 }

@@ -36,6 +36,8 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
 
   // Load consent from localStorage
   useEffect(() => {
+    if (typeof window === "undefined") return
+
     try {
       const savedConsent = localStorage.getItem("rr_consent")
       if (savedConsent) {
@@ -57,7 +59,7 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
 
   // Load tracking scripts based on consent
   useEffect(() => {
-    if (!hasInteracted) return // Don't load scripts if user hasn't interacted yet
+    if (typeof window === "undefined" || !hasInteracted) return // Don't load scripts if user hasn't interacted yet
 
     // Google Analytics
     if (consent.statistics) {
@@ -83,6 +85,7 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
 
   // Load Google Analytics
   const loadGoogleAnalytics = useCallback(() => {
+    if (typeof window === "undefined") return
     if (document.getElementById("ga-script")) return
 
     // GA4 Script
@@ -106,97 +109,114 @@ export const ConsentProvider = ({ children }: { children: React.ReactNode }) => 
 
   // Remove Google Analytics
   const removeGoogleAnalytics = useCallback(() => {
+    if (typeof window === "undefined") return
+
     const gaScript = document.getElementById("ga-script")
     if (gaScript) {
       gaScript.remove()
     }
-    delete window.gtag
-    delete window.dataLayer
+    if (window.gtag) delete window.gtag
+    if (window.dataLayer) delete window.dataLayer
   }, [])
 
   // Load Twitter Pixel
   const loadTwitterPixel = useCallback(() => {
+    if (typeof window === "undefined") return
     if (document.getElementById("twitter-pixel")) return
 
-    // Twitter Pixel Script
-    !((e, t, n, s, u, a) => {
-      e.twq ||
-        ((s = e.twq =
-          (...args: any[]) => {
-            s.exe ? s.exe.apply(s, args) : s.queue.push(args)
-          }),
-        (s.version = "1.1"),
-        (s.queue = []),
-        (u = t.createElement(n)),
-        (u.async = !0),
-        (u.src = "https://static.ads-twitter.com/uwt.js"),
-        (u.id = "twitter-pixel"),
-        (a = t.getElementsByTagName(n)[0]),
-        a.parentNode?.insertBefore(u, a))
-    })(window, document, "script")
+    // Twitter Pixel Script - Fixed the function to avoid t.josun error
+    const script = document.createElement("script")
+    script.id = "twitter-pixel"
+    script.async = true
+    script.src = "https://static.ads-twitter.com/uwt.js"
+    document.head.appendChild(script)
+
+    // Initialize Twitter Pixel safely
+    if (!window.twq) {
+      window.twq = (...args: any[]) => {
+        window.twq.exe ? window.twq.exe.apply(window.twq, args) : window.twq.queue.push(args)
+      }
+      window.twq.version = "1.1"
+      window.twq.queue = []
+    }
+
     window.twq("init", "pork0")
   }, [])
 
   // Remove Twitter Pixel
   const removeTwitterPixel = useCallback(() => {
+    if (typeof window === "undefined") return
+
     const twitterScript = document.getElementById("twitter-pixel")
     if (twitterScript) {
       twitterScript.remove()
     }
-    delete window.twq
+    if (window.twq) delete window.twq
   }, [])
 
   // Load Facebook Pixel
   const loadFacebookPixel = useCallback(() => {
+    if (typeof window === "undefined") return
     if (document.getElementById("fb-pixel")) return
 
     const fbPixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID
     if (!fbPixelId) return
 
-    // Facebook Pixel Script
-    !((f, b, e, v, n, t, s) => {
-      if (f.fbq) return
-      n = f.fbq = (...args: any[]) => {
-        n.callMethod ? n.callMethod.apply(n, args) : n.queue.push(args)
+    // Facebook Pixel Script - Rewritten to avoid potential errors
+    const script = document.createElement("script")
+    script.id = "fb-pixel"
+    script.async = true
+    script.src = "https://connect.facebook.net/en_US/fbevents.js"
+    document.head.appendChild(script)
+
+    // Initialize Facebook Pixel safely
+    if (!window.fbq) {
+      window.fbq = (...args: any[]) => {
+        if (window.fbq.callMethod) {
+          window.fbq.callMethod.apply(window.fbq, args)
+        } else {
+          window.fbq.queue.push(args)
+        }
       }
-      if (!f._fbq) f._fbq = n
-      n.push = n
-      n.loaded = !0
-      n.version = "2.0"
-      n.queue = []
-      t = b.createElement(e)
-      t.async = !0
-      t.src = v
-      t.id = "fb-pixel"
-      s = b.getElementsByTagName(e)[0]
-      s.parentNode?.insertBefore(t, s)
-    })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js")
+      window.fbq.push = window.fbq
+      window.fbq.loaded = true
+      window.fbq.version = "2.0"
+      window.fbq.queue = []
+    }
 
     window.fbq("init", fbPixelId)
   }, [])
 
   // Remove Facebook Pixel
   const removeFacebookPixel = useCallback(() => {
+    if (typeof window === "undefined") return
+
     const fbScript = document.getElementById("fb-pixel")
     if (fbScript) {
       fbScript.remove()
     }
-    delete window.fbq
+    if (window.fbq) delete window.fbq
   }, [])
 
   // Update consent
   const updateConsent = useCallback((newConsent: Partial<ConsentState>) => {
+    if (typeof window === "undefined") return
+
     setConsent((prev) => {
       const updated = { ...prev, ...newConsent }
 
       // Save to localStorage
-      localStorage.setItem(
-        "rr_consent",
-        JSON.stringify({
-          stat: updated.statistics,
-          marketing: updated.marketing,
-        }),
-      )
+      try {
+        localStorage.setItem(
+          "rr_consent",
+          JSON.stringify({
+            stat: updated.statistics,
+            marketing: updated.marketing,
+          }),
+        )
+      } catch (error) {
+        console.error("Error saving consent:", error)
+      }
 
       return updated
     })
@@ -263,7 +283,18 @@ declare global {
   interface Window {
     dataLayer: any[]
     gtag: (...args: any[]) => void
-    twq: (...args: any[]) => void
-    fbq: (...args: any[]) => void
+    twq: (...args: any[]) => void & {
+      exe?: (...args: any[]) => void
+      queue: any[]
+      version: string
+    }
+    fbq: (...args: any[]) => void & {
+      callMethod?: (...args: any[]) => void
+      queue: any[]
+      loaded: boolean
+      version: string
+      push: (...args: any[]) => void
+    }
+    _fbq: any
   }
 }
