@@ -1,133 +1,139 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect, useCallback, createContext, useContext } from "react"
+import { useState, useEffect } from "react"
 
-type ConsentState = {
+export type ConsentCategories = {
   essential: boolean
   statistics: boolean
+  marketing: boolean
 }
 
-type ConsentContextType = {
-  consent: ConsentState
-  isModalOpen: boolean
-  hasInteracted: boolean
-  updateConsent: (newConsent: Partial<ConsentState>) => void
-  openModal: () => void
-  closeModal: () => void
-  acceptAll: () => void
-  essentialOnly: () => void
-}
+const CONSENT_STORAGE_KEY = "userConsent"
+const CONSENT_VERSION = "1.0" // Increment when consent requirements change
 
-const defaultConsent: ConsentState = {
-  essential: true, // Always active
-  statistics: false,
-}
+export function useConsent() {
+  const [consent, setConsent] = useState<ConsentCategories>({
+    essential: true, // Always required
+    statistics: false,
+    marketing: false,
+  })
 
-const ConsentContext = createContext<ConsentContextType | undefined>(undefined)
+  const [consentShown, setConsentShown] = useState(false)
+  const [initialized, setInitialized] = useState(false)
 
-export const ConsentProvider = ({ children }: { children: React.ReactNode }) => {
-  const [consent, setConsent] = useState<ConsentState>(defaultConsent)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [hasInteracted, setHasInteracted] = useState(true) // Default true, set to false if no consent found
-
-  // Load consent from localStorage
+  // Load consent from localStorage on mount
   useEffect(() => {
     if (typeof window === "undefined") return
 
     try {
-      const savedConsent = localStorage.getItem("rr_consent")
-      if (savedConsent) {
-        const parsedConsent = JSON.parse(savedConsent)
-        setConsent({
-          essential: true, // Always active
-          statistics: !!parsedConsent.stat,
-        })
-      } else {
-        // No consent found, show banner
-        setHasInteracted(false)
+      const storedConsent = localStorage.getItem(CONSENT_STORAGE_KEY)
+      if (storedConsent) {
+        const { consent: savedConsent, version } = JSON.parse(storedConsent)
+
+        // If consent version has changed, we need to re-ask
+        if (version === CONSENT_VERSION) {
+          setConsent(savedConsent)
+          setConsentShown(true)
+        }
       }
     } catch (error) {
-      console.error("Error loading consent status:", error)
-      setHasInteracted(false)
+      console.error("Error loading consent settings:", error)
+    } finally {
+      setInitialized(true)
     }
   }, [])
 
-  // Update consent
-  const updateConsent = useCallback((newConsent: Partial<ConsentState>) => {
+  // Save consent to localStorage whenever it changes
+  useEffect(() => {
+    if (!initialized || typeof window === "undefined") return
+
+    try {
+      localStorage.setItem(
+        CONSENT_STORAGE_KEY,
+        JSON.stringify({
+          consent,
+          version: CONSENT_VERSION,
+          timestamp: new Date().toISOString(),
+        }),
+      )
+
+      // Apply consent to tracking services
+      applyConsentToServices(consent)
+    } catch (error) {
+      console.error("Error saving consent settings:", error)
+    }
+  }, [consent, initialized])
+
+  // Function to update consent
+  const updateConsent = (newConsent: Partial<ConsentCategories>) => {
+    setConsent((prev) => ({ ...prev, ...newConsent }))
+    setConsentShown(true)
+  }
+
+  // Accept all categories
+  const acceptAll = () => {
+    updateConsent({
+      statistics: true,
+      marketing: true,
+    })
+  }
+
+  // Reject all optional categories
+  const rejectAll = () => {
+    updateConsent({
+      statistics: false,
+      marketing: false,
+    })
+  }
+
+  // Apply consent settings to tracking services
+  const applyConsentToServices = (currentConsent: ConsentCategories) => {
     if (typeof window === "undefined") return
 
-    setConsent((prev) => {
-      const updated = { ...prev, ...newConsent }
+    // Google Analytics
+    if (typeof window.gtag === "function") {
+      window.gtag("consent", "update", {
+        analytics_storage: currentConsent.statistics ? "granted" : "denied",
+        ad_storage: currentConsent.marketing ? "granted" : "denied",
+      })
+    }
 
-      // Save to localStorage
-      try {
-        localStorage.setItem(
-          "rr_consent",
-          JSON.stringify({
-            stat: updated.statistics,
-          }),
-        )
-      } catch (error) {
-        console.error("Error saving consent:", error)
+    // Twitter Pixel
+    if (typeof window.twq === "function") {
+      if (currentConsent.marketing) {
+        window.twq("consent", "grant")
+      } else {
+        window.twq("consent", "revoke")
       }
+    }
 
-      return updated
-    })
-    setHasInteracted(true)
-  }, [])
+    // Facebook Pixel
+    if (typeof window.fbq === "function") {
+      if (currentConsent.marketing) {
+        window.fbq("consent", "grant")
+      } else {
+        window.fbq("consent", "revoke")
+      }
+    }
 
-  // Accept all cookies
-  const acceptAll = useCallback(() => {
-    updateConsent({ statistics: true })
-    setIsModalOpen(false)
-  }, [updateConsent])
-
-  // Accept only essential cookies
-  const essentialOnly = useCallback(() => {
-    updateConsent({ statistics: false })
-    setIsModalOpen(false)
-  }, [updateConsent])
-
-  // Open modal
-  const openModal = useCallback(() => {
-    setIsModalOpen(true)
-  }, [])
-
-  // Close modal
-  const closeModal = useCallback(() => {
-    setIsModalOpen(false)
-  }, [])
-
-  const value = {
-    consent,
-    isModalOpen,
-    hasInteracted,
-    updateConsent,
-    openModal,
-    closeModal,
-    acceptAll,
-    essentialOnly,
+    console.log("Applied consent settings:", currentConsent)
   }
 
-  return <ConsentContext.Provider value={value}>{children}</ConsentContext.Provider>
+  return {
+    consent,
+    consentShown,
+    updateConsent,
+    acceptAll,
+    rejectAll,
+  }
 }
 
-export const useConsent = () => {
-  const context = useContext(ConsentContext)
-  if (context === undefined) {
-    console.warn("useConsent is being used outside of a ConsentProvider. Fallback values will be used.")
-    // Return fallback values
-    return {
-      consent: { essential: true, statistics: false },
-      isModalOpen: false,
-      hasInteracted: true,
-      updateConsent: () => {},
-      openModal: () => {},
-      closeModal: () => {},
-      acceptAll: () => {},
-      essentialOnly: () => {},
-    }
+// Add type definitions for global tracking objects
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void
+    twq: (...args: any[]) => void
+    fbq: (...args: any[]) => void
+    dataLayer: any[]
   }
-  return context
 }

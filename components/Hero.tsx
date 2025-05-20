@@ -108,7 +108,7 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* NEW SEO-optimized H1 - Made clickable */}
+            {/* SEO-optimized H1 */}
             <h1
               id="hero-heading"
               className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6"
@@ -118,7 +118,7 @@ export default function Hero() {
               <span className="text-gradient font-extrabold">Rust Rocket</span>
             </h1>
 
-            {/* NEW SEO-optimized lead paragraph - Only visible when showDescription is true */}
+            {/* SEO-optimized lead paragraph */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -129,7 +129,7 @@ export default function Hero() {
                 execution in 25 ms – TVTG-licensed & MPC-secure.
               </p>
 
-              {/* NEW KPI strip */}
+              {/* KPI strip */}
               <ul className="flex flex-wrap gap-6 text-sm text-text-secondary mb-6">
                 <li className="flex items-center">
                   <span className="inline-block w-2 h-2 rounded-full bg-primary mr-2"></span>
@@ -208,7 +208,7 @@ export default function Hero() {
               <div className="relative z-10 w-full h-full flex items-center justify-center">
                 <div className="relative w-4/5 h-4/5 animate-float">
                   <Image
-                    src="/images/rust-rocket-logo.png"
+                    src="/images/rust-rocket-logo.gif"
                     alt="Solana sniper bot Rust Rocket interface"
                     fill
                     className="object-contain"
@@ -216,6 +216,7 @@ export default function Hero() {
                     fetchPriority="high"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     style={{ maxWidth: "100%", height: "auto" }}
+                    decoding="async"
                   />
                 </div>
               </div>

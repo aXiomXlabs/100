@@ -4,11 +4,9 @@ import type React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { useConsent } from "@/hooks/useConsent"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
-  const { openModal } = useConsent()
 
   // Animation Varianten für Container-Elemente
   const containerVariants = {
@@ -55,13 +53,15 @@ export default function Footer() {
               id="footer-logo-link"
               data-tracking-id="footer_logo_click"
             >
-              <Image
-                src="/images/rust-rocket-logo.png"
-                alt="Rust Rocket Logo"
-                width={107}
-                height={107}
-                className="h-[85px] w-auto"
-              />
+              <div className="relative h-[85px] w-[107px]">
+                <Image
+                  src="/images/rust-rocket-logo.gif"
+                  alt="Rust Rocket Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </Link>
           </motion.div>
 
@@ -114,24 +114,9 @@ export default function Footer() {
           </motion.div>
         </div>
 
-        {/* Copyright text and links in a separate row */}
-        <div className="mt-1 text-center flex flex-wrap justify-center gap-4 text-xs text-gray-400">
-          <p>© {currentYear} Rust Rocket. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="/legal/privacy-policy" className="hover:text-white transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/legal/terms" className="hover:text-white transition-colors">
-              Terms
-            </Link>
-            <button
-              onClick={openModal}
-              className="hover:text-white transition-colors cursor-pointer"
-              aria-label="Change cookie settings"
-            >
-              Cookie Settings
-            </button>
-          </div>
+        {/* Copyright text in a separate row */}
+        <div className="mt-1 text-center">
+          <p className="text-gray-400 text-xs">© {currentYear} Rust Rocket. All rights reserved.</p>
         </div>
 
         {/* Structured data for organization */}
@@ -143,7 +128,7 @@ export default function Footer() {
               "@type": "Organization",
               name: "Rust Rocket",
               url: "https://www.rust-rocket.com",
-              logo: "https://www.rust-rocket.com/images/rust-rocket-logo.png",
+              logo: "https://www.rust-rocket.com/images/rust-rocket-logo.gif",
               sameAs: ["https://x.com/ax_rustrocket", "https://t.me/rustxrocket", "https://discord.gg/rustrocket"],
             }),
           }}

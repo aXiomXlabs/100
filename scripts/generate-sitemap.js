@@ -1,97 +1,84 @@
-// scripts/generate-sitemap.js
 const fs = require("fs")
 const path = require("path")
 const glob = require("glob")
-const prettier = require("prettier")
 
-// Konfiguration
-const SITE_URL = "https://rust-rocket.com"
-const EXCLUDED_PATHS = ["/api/", "/admin/", "/test-", "/404", "/410", "/500", "/_"]
+// Base URL of the website
+const BASE_URL = "https://rust-rocket.com"
 
-// Lebende Pfade - nur diese sollen in der Sitemap erscheinen
-const VALID_PATHS = [
-  "/",
-  "/de",
-  "/es",
-  "/solana-sniper-bot",
-  "/de/solana-sniper-bot",
-  "/es/solana-sniper-bot",
-  "/blog",
-  "/blog/future-of-solana-trading",
-  "/legal/privacy-policy",
-  "/legal/terms",
-]
+// Paths to exclude from the sitemap
+const EXCLUDED_PATHS = ["/landing/ads", "/landing/ads/*", "/admin", "/admin/*", "/api", "/api/*", "/_*", "/404", "/500"]
 
-// Funktion zum Generieren der Sitemap
-async function generateSitemap() {
-  console.log("Generating sitemap...")
+// Function to check if a path should be excluded
+function shouldExclude(path) {
+  return EXCLUDED_PATHS.some((pattern) => {
+    if (pattern.endsWith("*")) {
+      const prefix = pattern.slice(0, -1)
+      return path.startsWith(prefix)
+    }
+    return path === pattern
+  })
+}
 
-  // Aktuelle Sitemap-Einträge erstellen
+// Get all pages from the app directory
+function getPages() {
+  const appPages = glob.sync("app/**/page.{tsx,jsx,js,ts}", { ignore: ["app/**/node_modules/**"] })
+
+  return appPages
+    .map((page) => {
+      // Convert file path to URL path
+      let urlPath = page
+        .replace("app/", "/")
+        .replace(/\/page\.(tsx|jsx|js|ts)$/, "")
+        .replace(/\/$$.*?$$\//g, "/") // Remove Next.js route groups like (auth)
+        .replace(/\[\.{3}(.*?)\]/g, ":$1") // Handle catch-all routes [...param]
+        .replace(/\[(.*?)\]/g, ":$1") // Handle dynamic routes [param]
+
+      // Handle index routes
+      if (urlPath === "/index" || urlPath === "") {
+        urlPath = "/"
+      }
+
+      return urlPath
+    })
+    .filter((path) => !shouldExclude(path))
+}
+
+// Generate sitemap XML
+function generateSitemap() {
+  const pages = getPages()
+
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  ${VALID_PATHS.map((path) => {
-    // Bestimme die Priorität basierend auf der Pfadtiefe
-    let priority = "1.0"
-    if (path.split("/").length > 2) {
-      priority = "0.8"
-    }
-    if (path.includes("/blog/")) {
-      priority = "0.7"
-    }
-    if (path.includes("/legal/")) {
-      priority = "0.5"
-    }
-
-    // Bestimme die Änderungshäufigkeit
-    let changefreq = "weekly"
-    if (path.includes("/blog/")) {
-      changefreq = "monthly"
-    }
-
-    // Erstelle hreflang-Tags für mehrsprachige Seiten
-    let hreflangTags = ""
-    if (
-      path === "/" ||
-      path === "/de" ||
-      path === "/es" ||
-      path === "/solana-sniper-bot" ||
-      path === "/de/solana-sniper-bot" ||
-      path === "/es/solana-sniper-bot"
-    ) {
-      const basePath = path.includes("solana-sniper-bot") ? "/solana-sniper-bot" : "/"
-
-      hreflangTags = `
-    <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}${basePath}"/>
-    <xhtml:link rel="alternate" hreflang="de" href="${SITE_URL}/de${basePath}"/>
-    <xhtml:link rel="alternate" hreflang="es" href="${SITE_URL}/es${basePath}"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${basePath}"/>`
-    }
-
-    return `  <url>
-    <loc>${SITE_URL}${path}</loc>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages
+  .map(
+    (page) => `  <url>
+    <loc>${BASE_URL}${page}</loc>
     <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>${hreflangTags}
-  </url>`
-  }).join("\n")}
+    <changefreq>weekly</changefreq>
+    <priority>${page === "/" ? "1.0" : "0.8"}</priority>
+  </url>`,
+  )
+  .join("\n")}
 </urlset>`
 
-  // Formatiere die Sitemap mit Prettier
-  const formattedSitemap = await prettier.format(sitemap, {
-    parser: "html",
-    printWidth: 120,
-  })
-
-  // Schreibe die Sitemap in die Datei
-  fs.writeFileSync(path.join(process.cwd(), "public", "sitemap.xml"), formattedSitemap)
-
+  fs.writeFileSync(path.join(process.cwd(), "public", "sitemap.xml"), sitemap)
   console.log("Sitemap generated successfully!")
 }
 
-// Führe die Funktion aus
-generateSitemap().catch((err) => {
-  console.error("Error generating sitemap:", err)
-  process.exit(1)
-})
+// Generate robots.txt
+function generateRobotsTxt() {
+  const robotsTxt = `# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow: /landing/ads
+Disallow: /admin
+Disallow: /api
+
+Sitemap: ${BASE_URL}/sitemap.xml`
+
+  fs.writeFileSync(path.join(process.cwd(), "public", "robots.txt"), robotsTxt)
+  console.log("robots.txt generated successfully!")
+}
+
+// Run the generators
+generateSitemap()
+generateRobotsTxt()

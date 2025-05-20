@@ -5,7 +5,6 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 import { createClientSupabaseClient } from "@/lib/supabase"
-import { useConsent } from "@/hooks/useConsent"
 
 interface WaitlistModalProps {
   isOpen: boolean
@@ -15,7 +14,7 @@ interface WaitlistModalProps {
 export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
   const [email, setEmail] = useState("")
   const [telegramUsername, setTelegramUsername] = useState("")
-  const [consentState, setConsentState] = useState(false)
+  const [consent, setConsent] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formStatus, setFormStatus] = useState<{
     type: "success" | "error" | null
@@ -23,42 +22,17 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
   }>({ type: null, message: null })
   const [emailError, setEmailError] = useState("")
 
-  // Consent-Hook für Tracking
-  const { consent } = useConsent()
-
-  // Füge eine Fallback-Funktion für trackWaitlistSignup hinzu, falls der Consent-Kontext nicht verfügbar ist
-  const trackWaitlistSignup = () => {
-    try {
-      // Tracking für Waitlist-Anmeldung
-      if (consent.statistics && window.gtag) {
-        window.gtag("event", "beta_signup", { value: 0 })
-      }
-
-      // Wenn der Nutzer Marketing akzeptiert hat
-      if (consent.marketing) {
-        // Twitter Pixel
-        if (window.twq) {
-          window.twq("event", "tw-ooo", { currency: "EUR", value: 0 })
-        }
-
-        // Facebook Pixel
-        if (window.fbq) {
-          window.fbq("track", "Lead")
-        }
-      }
-    } catch (error) {
-      console.error("Fehler beim Tracking:", error)
-    }
-  }
-
   // Reset form when modal is opened
   useEffect(() => {
     if (isOpen) {
       setEmail("")
       setTelegramUsername("")
-      setConsentState(false)
+      setConsent(false)
       setFormStatus({ type: null, message: null })
       setEmailError("")
+
+      // Track modal open event with consent check
+      trackEvent("waitlist_modal_open", "engagement", "waitlist_modal")
     }
   }, [isOpen])
 
@@ -67,6 +41,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
         onClose()
+        trackEvent("waitlist_modal_close", "engagement", "escape_key")
       }
     }
 
@@ -93,6 +68,44 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     return re.test(email)
   }
 
+  // Safe tracking function that respects consent
+  const trackEvent = (event: string, category?: string, label?: string, value?: number) => {
+    // Check if we have consent for analytics
+    const consentData = localStorage.getItem("userConsent")
+    if (!consentData) return
+
+    try {
+      const { consent } = JSON.parse(consentData)
+
+      // Google Analytics tracking (requires statistics consent)
+      if (consent.statistics && typeof window.gtag === "function") {
+        window.gtag("event", event, {
+          event_category: category,
+          event_label: label,
+          value: value,
+        })
+      }
+
+      // Conversion tracking for successful signup (requires marketing consent)
+      if (event === "beta_signup" && consent.marketing) {
+        // Twitter conversion
+        if (typeof window.twq === "function") {
+          window.twq("event", "tw-ooo", {
+            currency: "EUR",
+            value: 0,
+          })
+        }
+
+        // Facebook conversion
+        if (typeof window.fbq === "function") {
+          window.fbq("track", "Lead")
+        }
+      }
+    } catch (error) {
+      console.error("Error tracking event:", error)
+    }
+  }
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -104,15 +117,17 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     // Validate email
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address")
+      trackEvent("waitlist_form_error", "form", "invalid_email")
       return
     }
 
     // Validate consent
-    if (!consentState) {
+    if (!consent) {
       setFormStatus({
         type: "error",
         message: "Please agree to the privacy policy to continue",
       })
+      trackEvent("waitlist_form_error", "form", "consent_missing")
       return
     }
 
@@ -122,26 +137,8 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       // Supabase integration
       await handleSupabaseSubmit(email, telegramUsername)
 
-      // Tracking für Waitlist-Anmeldung
-      trackWaitlistSignup()
-
-      // Wenn der Nutzer Statistik akzeptiert hat
-      if (consent.statistics && window.gtag) {
-        window.gtag("event", "beta_signup", { value: 0 })
-      }
-
-      // Wenn der Nutzer Marketing akzeptiert hat
-      if (consent.marketing) {
-        // Twitter Pixel
-        if (window.twq) {
-          window.twq("event", "tw-ooo", { currency: "EUR", value: 0 })
-        }
-
-        // Facebook Pixel
-        if (window.fbq) {
-          window.fbq("track", "Lead")
-        }
-      }
+      // Track successful signup
+      trackEvent("beta_signup", "conversion", "waitlist_signup", 0)
 
       // Show success message
       setFormStatus({
@@ -152,7 +149,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       // Clear form
       setEmail("")
       setTelegramUsername("")
-      setConsentState(false)
+      setConsent(false)
 
       // Close modal after 3 seconds on success
       setTimeout(() => {
@@ -167,11 +164,13 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
           type: "error",
           message: "This email is already on our waitlist.",
         })
+        trackEvent("waitlist_form_error", "form", "duplicate_email")
       } else {
         setFormStatus({
           type: "error",
           message: "Something went wrong. Please try again.",
         })
+        trackEvent("waitlist_form_error", "form", "server_error")
       }
     } finally {
       setIsSubmitting(false)
@@ -198,10 +197,18 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       throw new Error("This email is already on our waitlist")
     }
 
-    // Get UTM parameters from hidden form fields
-    const utmSource = document.querySelector<HTMLInputElement>('[name="utm_source"]')?.value || ""
-    const utmMedium = document.querySelector<HTMLInputElement>('[name="utm_medium"]')?.value || ""
-    const utmCampaign = document.querySelector<HTMLInputElement>('[name="utm_campaign"]')?.value || ""
+    // Get UTM parameters from hidden form fields or sessionStorage
+    const getUtmParam = (name: string) => {
+      const field = document.querySelector<HTMLInputElement>(`[name="${name}"]`)
+      if (field?.value) return field.value
+      return sessionStorage.getItem(name) || ""
+    }
+
+    const utmSource = getUtmParam("utm_source")
+    const utmMedium = getUtmParam("utm_medium")
+    const utmCampaign = getUtmParam("utm_campaign")
+    const utmContent = getUtmParam("utm_content")
+    const utmTerm = getUtmParam("utm_term")
 
     // Construct referral source
     let referralSource = utmSource || "direct"
@@ -217,6 +224,8 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       utm_source: utmSource,
       utm_medium: utmMedium,
       utm_campaign: utmCampaign,
+      utm_content: utmContent,
+      utm_term: utmTerm,
       created_at: new Date().toISOString(),
     })
 
@@ -229,6 +238,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
   }
 
   const handleModalClose = () => {
+    trackEvent("waitlist_modal_close", "engagement", "close_button")
     onClose()
   }
 
@@ -335,6 +345,8 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
           <input type="hidden" name="utm_source" />
           <input type="hidden" name="utm_medium" />
           <input type="hidden" name="utm_campaign" />
+          <input type="hidden" name="utm_content" />
+          <input type="hidden" name="utm_term" />
 
           {/* Consent checkbox */}
           <div className="flex items-start mt-4">
@@ -343,8 +355,8 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                 id="consent"
                 name="consent"
                 type="checkbox"
-                checked={consentState}
-                onChange={(e) => setConsentState(e.target.checked)}
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
                 className="w-4 h-4 bg-[#1A1A1A] border border-gray-700 rounded focus:ring-primary focus:ring-2"
                 required
                 aria-required="true"
@@ -411,9 +423,14 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                 <span className="sr-only">Please wait while we process your submission</span>
               </>
             ) : (
-              "Join Waitlist"
+              "Secure My Spot!"
             )}
           </button>
+
+          {/* Privacy note */}
+          <p className="text-xs text-gray-400 text-center mt-4">
+            We respect your privacy and will never share your information with third parties.
+          </p>
         </form>
       </div>
     </div>

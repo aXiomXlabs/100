@@ -84,10 +84,10 @@ export default function Navbar() {
             onClick={() => trackNavClick("logo")}
           >
             <Image
-              src="/images/rust-rocket-logo.png"
+              src="/images/rust-rocket-logo.gif"
               alt="Rust Rocket Logo"
-              width={40}
-              height={40}
+              width={50}
+              height={50}
               className="mr-2"
               priority={true}
               itemProp="logo"
@@ -215,7 +215,7 @@ export default function Navbar() {
               <div className="pt-2 border-t border-gray-800 mt-4"></div>
               <div className="pt-2 border-t border-gray-800 mt-2">
                 <a
-                  href="https://t.me/rustrocket"
+                  href="https://t.me/rust_rocket"
                   target="_blank"
                   rel="noopener noreferrer"
                   id="mobile-telegram-link"

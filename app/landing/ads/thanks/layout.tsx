@@ -1,7 +1,15 @@
 import type React from "react"
-import ConsentGateAds from "@/components/ConsentGateAds"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+import type { Metadata } from "next"
+import CookieConsentBanner from "@/components/CookieConsentBanner"
+
+export const metadata: Metadata = {
+  title: "Thank You | Rust Rocket",
+  description: "Thank you for your interest in Rust Rocket - the fastest Solana sniper bot.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default function ThanksLayout({
   children,
@@ -9,11 +17,9 @@ export default function ThanksLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <Navbar />
+    <div className="min-h-screen bg-background">
+      <CookieConsentBanner />
       {children}
-      <Footer />
-      <ConsentGateAds />
-    </>
+    </div>
   )
 }

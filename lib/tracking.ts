@@ -1,4 +1,10 @@
 // Typdefinitionen
+interface CookieConsents {
+  necessary: boolean
+  analytics: boolean
+  marketing: boolean
+}
+
 interface TrackingEvent {
   event: string
   category?: string
@@ -19,34 +25,50 @@ const getLocalStorageItem = (key: string): string | null => {
   }
 }
 
-// Prüft, ob Analytics-Consent gegeben wurde
+// Update the hasAnalyticsConsent function to check for the new consent structure
 export function hasAnalyticsConsent(): boolean {
   if (typeof window === "undefined") return false
 
   try {
-    const consentsString = getLocalStorageItem("rr_consent")
+    const consentsString = getLocalStorageItem("cookieConsents")
     if (!consentsString) return false
 
-    const consents = JSON.parse(consentsString) as { stat: boolean }
-    return consents.stat === true
+    const consents = JSON.parse(consentsString) as { analytics: boolean }
+    return consents.analytics === true
   } catch (error) {
     console.error("Error checking analytics consent:", error)
     return false
   }
 }
 
-// Prüft, ob Marketing-Consent gegeben wurde
+// Update the hasMarketingConsent function to check for the new consent structure
 export function hasMarketingConsent(): boolean {
   if (typeof window === "undefined") return false
 
   try {
-    const consentsString = getLocalStorageItem("rr_consent")
+    const consentsString = getLocalStorageItem("cookieConsents")
     if (!consentsString) return false
 
     const consents = JSON.parse(consentsString) as { marketing: boolean }
     return consents.marketing === true
   } catch (error) {
     console.error("Error checking marketing consent:", error)
+    return false
+  }
+}
+
+// Add a new function to check for social media consent
+export function hasSocialMediaConsent(): boolean {
+  if (typeof window === "undefined") return false
+
+  try {
+    const consentsString = getLocalStorageItem("cookieConsents")
+    if (!consentsString) return false
+
+    const consents = JSON.parse(consentsString) as { social: boolean }
+    return consents.social === true
+  } catch (error) {
+    console.error("Error checking social media consent:", error)
     return false
   }
 }
@@ -80,6 +102,56 @@ export function trackEvent(eventData: TrackingEvent): void {
     console.log("Event tracked successfully:", eventData)
   } catch (error) {
     console.error("Error tracking event:", error)
+  }
+}
+
+// Sendet ein Conversion-Event an Twitter/X Pixel, wenn Consent gegeben wurde
+export function trackTwitterConversion(eventName: string, params?: Record<string, any>): void {
+  if (typeof window === "undefined") return
+
+  // Prüfe, ob Marketing-Consent gegeben wurde
+  if (!hasMarketingConsent()) {
+    console.log("Twitter conversion not tracked (no consent):", eventName)
+    return
+  }
+
+  // Prüfe, ob twq verfügbar ist
+  if (typeof window.twq !== "function") {
+    console.error("Twitter Pixel not loaded, can't track conversion:", eventName)
+    return
+  }
+
+  // Sende Conversion an Twitter/X Pixel
+  try {
+    window.twq("track", eventName, params)
+    console.log("Twitter conversion tracked successfully:", eventName)
+  } catch (error) {
+    console.error("Error tracking Twitter conversion:", error)
+  }
+}
+
+// Sendet ein Conversion-Event an Facebook Pixel, wenn Consent gegeben wurde
+export function trackFacebookConversion(eventName: string, params?: Record<string, any>): void {
+  if (typeof window === "undefined") return
+
+  // Prüfe, ob Marketing-Consent gegeben wurde
+  if (!hasMarketingConsent()) {
+    console.log("Facebook conversion not tracked (no consent):", eventName)
+    return
+  }
+
+  // Prüfe, ob fbq verfügbar ist
+  if (typeof window.fbq !== "function") {
+    console.error("Facebook Pixel not loaded, can't track conversion:", eventName)
+    return
+  }
+
+  // Sende Conversion an Facebook Pixel
+  try {
+    window.fbq("track", eventName, params)
+    console.log("Facebook conversion tracked successfully:", eventName)
+  } catch (error) {
+    console.error("Error tracking Facebook conversion:", error)
   }
 }
 
@@ -125,6 +197,8 @@ export function initTracking(): void {
 
   // Definiere globale Tracking-Funktionen
   window.trackEvent = trackEvent
+  window.trackTwitterConversion = trackTwitterConversion
+  window.trackFacebookConversion = trackFacebookConversion
 
   // Initialisiere Scroll-Tracking
   trackScrollDepth()
@@ -137,6 +211,10 @@ declare global {
   interface Window {
     dataLayer: any[]
     gtag: (...args: any[]) => void
+    twq: any
+    fbq: any
     trackEvent: typeof trackEvent
+    trackTwitterConversion: typeof trackTwitterConversion
+    trackFacebookConversion: typeof trackFacebookConversion
   }
 }

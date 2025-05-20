@@ -5,6 +5,7 @@ import { Search, Zap, TrendingUp, ArrowRight } from "lucide-react"
 import { motion, useInView } from "framer-motion"
 import WaitlistButton from "./WaitlistButton"
 import CopyTradingDataFlowAnimation from "./CopyTradingDataFlowAnimation"
+import CopyTradingAnimation from "./CopyTradingAnimation"
 
 export default function CopyTradingSection() {
   const sectionRef = useRef(null)
@@ -27,6 +28,16 @@ export default function CopyTradingSection() {
       </div>
 
       <div className="container-custom relative z-10">
+        {/* Add the animated visualization at the top */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.7 }}
+          className="mb-16"
+        >
+          <CopyTradingAnimation />
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -155,19 +166,277 @@ export default function CopyTradingSection() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="mt-12 relative"
             >
-              <div className="aspect-video rounded-lg overflow-hidden border border-gray-700 bg-background-secondary relative">
-                <img
-                  src="/images/dashboard-preview.png"
-                  alt="Solana trading dashboard with advanced metrics and performance analytics"
-                  className="w-full h-auto object-cover opacity-100 transition-opacity"
-                  loading="eager"
-                />
-                <div className="absolute bottom-4 left-0 right-0 text-center">
-                  <span className="text-sm font-medium px-3 py-1 bg-primary/90 rounded-full text-white">
-                    Dashboard Preview
-                  </span>
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={
+                  isInView
+                    ? { scale: 1, opacity: 1, filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"] }
+                    : { scale: 0.8, opacity: 0 }
+                }
+                transition={{
+                  duration: 0.8,
+                  delay: 0.7,
+                  filter: {
+                    times: [0, 0.5, 1],
+                    duration: 2,
+                    repeat: 0,
+                    repeatType: "reverse",
+                  },
+                }}
+                className="w-full h-full flex items-center justify-center relative"
+              >
+                {/* Copy Trading Animation */}
+                <div className="w-full h-full relative">
+                  {/* Background elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-background-secondary via-background-secondary to-background-secondary/80 z-0"></div>
+
+                  {/* Connection lines */}
+                  <svg
+                    className="absolute inset-0 w-full h-full z-10"
+                    viewBox="0 0 400 200"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {/* Pro Trader to You connections */}
+                    <motion.path
+                      d="M 80,50 C 180,50 220,100 320,50"
+                      stroke="#8AE234"
+                      strokeWidth="1.5"
+                      fill="none"
+                      strokeDasharray="5,5"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 0.6 }}
+                      transition={{
+                        duration: 2,
+                        delay: 1,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "loop",
+                        repeatDelay: 3,
+                      }}
+                    />
+                    <motion.path
+                      d="M 80,100 C 180,100 220,100 320,100"
+                      stroke="#9B59D0"
+                      strokeWidth="1.5"
+                      fill="none"
+                      strokeDasharray="5,5"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 0.6 }}
+                      transition={{
+                        duration: 2,
+                        delay: 1.5,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "loop",
+                        repeatDelay: 3,
+                      }}
+                    />
+                    <motion.path
+                      d="M 80,150 C 180,150 220,100 320,150"
+                      stroke="#8AE234"
+                      strokeWidth="1.5"
+                      fill="none"
+                      strokeDasharray="5,5"
+                      initial={{ pathLength: 0, opacity: 0 }}
+                      animate={{ pathLength: 1, opacity: 0.6 }}
+                      transition={{
+                        duration: 2,
+                        delay: 2,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "loop",
+                        repeatDelay: 3,
+                      }}
+                    />
+
+                    {/* Animated trade packets */}
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="4"
+                      fill="#8AE234"
+                      initial={{ cx: 80, cy: 50, opacity: 0 }}
+                      animate={{
+                        cx: [80, 200, 320],
+                        cy: [50, 75, 50],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        delay: 1.2,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "loop",
+                        repeatDelay: 3,
+                        times: [0, 0.5, 1],
+                      }}
+                    />
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="4"
+                      fill="#9B59D0"
+                      initial={{ cx: 80, cy: 100, opacity: 0 }}
+                      animate={{
+                        cx: [80, 200, 320],
+                        cy: [100, 100, 100],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        delay: 1.7,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "loop",
+                        repeatDelay: 3,
+                        times: [0, 0.5, 1],
+                      }}
+                    />
+                    <motion.circle
+                      cx="0"
+                      cy="0"
+                      r="4"
+                      fill="#8AE234"
+                      initial={{ cx: 80, cy: 150, opacity: 0 }}
+                      animate={{
+                        cx: [80, 200, 320],
+                        cy: [150, 125, 150],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        delay: 2.2,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "loop",
+                        repeatDelay: 3,
+                        times: [0, 0.5, 1],
+                      }}
+                    />
+                  </svg>
+
+                  {/* Pro Traders */}
+                  <div className="absolute left-[15%] top-[20%] z-20">
+                    <motion.div
+                      className="bg-background-tertiary p-3 rounded-lg border border-solana-purple/30 shadow-lg"
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                      <div className="text-xs font-medium text-solana-purple mb-1">PRO TRADER</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-solana-purple"></div>
+                        <div className="text-sm font-medium">Wallet #1</div>
+                      </div>
+                      <div className="text-xs text-text-tertiary mt-1">+42.3% 7d</div>
+                    </motion.div>
+                  </div>
+
+                  <div className="absolute left-[15%] top-[45%] z-20">
+                    <motion.div
+                      className="bg-background-tertiary p-3 rounded-lg border border-primary/30 shadow-lg"
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.4 }}
+                    >
+                      <div className="text-xs font-medium text-primary mb-1">PRO TRADER</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary"></div>
+                        <div className="text-sm font-medium">Wallet #2</div>
+                      </div>
+                      <div className="text-xs text-text-tertiary mt-1">+28.7% 7d</div>
+                    </motion.div>
+                  </div>
+
+                  <div className="absolute left-[15%] top-[70%] z-20">
+                    <motion.div
+                      className="bg-background-tertiary p-3 rounded-lg border border-solana-green/30 shadow-lg"
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.6 }}
+                    >
+                      <div className="text-xs font-medium text-solana-green mb-1">PRO TRADER</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-solana-green"></div>
+                        <div className="text-sm font-medium">Wallet #3</div>
+                      </div>
+                      <div className="text-xs text-text-tertiary mt-1">+35.1% 7d</div>
+                    </motion.div>
+                  </div>
+
+                  {/* Your Wallet */}
+                  <div className="absolute right-[15%] top-[45%] z-20">
+                    <motion.div
+                      className="bg-background-tertiary p-4 rounded-lg border border-solana-green/30 shadow-lg"
+                      initial={{ x: 20, opacity: 0 }}
+                      animate={{
+                        x: 0,
+                        opacity: 1,
+                        boxShadow: [
+                          "0 0 0 rgba(138, 226, 52, 0)",
+                          "0 0 15px rgba(138, 226, 52, 0.3)",
+                          "0 0 0 rgba(138, 226, 52, 0)",
+                        ],
+                      }}
+                      transition={{
+                        duration: 0.5,
+                        delay: 0.8,
+                        boxShadow: {
+                          duration: 2,
+                          repeat: Number.POSITIVE_INFINITY,
+                          repeatType: "loop",
+                          repeatDelay: 1,
+                        },
+                      }}
+                    >
+                      <div className="text-xs font-medium text-solana-green mb-1">YOUR WALLET</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-solana-green"></div>
+                        <div className="text-sm font-medium">Auto-Copy</div>
+                      </div>
+                      <div className="text-xs text-solana-green mt-2">+35.4% 7d</div>
+                      <motion.div
+                        className="text-xs mt-2 bg-solana-green/10 text-solana-green px-2 py-1 rounded"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 1, 1, 0] }}
+                        transition={{
+                          duration: 3,
+                          delay: 3,
+                          repeat: Number.POSITIVE_INFINITY,
+                          repeatType: "loop",
+                          repeatDelay: 2,
+                          times: [0, 0.1, 0.9, 1],
+                        }}
+                      >
+                        Trade copied successfully
+                      </motion.div>
+                    </motion.div>
+                  </div>
+
+                  {/* Overlay text */}
+                  <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+                    <motion.div
+                      className="text-center"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.1 }}
+                    >
+                      <div className="text-sm font-medium text-text-secondary bg-background-secondary/80 px-3 py-1 rounded-full inline-block mb-2">
+                        Copy Trading in Action
+                      </div>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Add a subtle glow effect behind the image */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={isInView ? { opacity: [0, 0.7, 0.5] } : { opacity: 0 }}
+                transition={{
+                  duration: 2,
+                  times: [0, 0.5, 1],
+                  delay: 0.6,
+                  repeat: Number.POSITIVE_INFINITY,
+                  repeatType: "reverse",
+                }}
+                className="absolute -inset-4 bg-gradient-to-r from-solana-purple/20 via-primary/20 to-solana-green/20 rounded-xl blur-xl -z-10"
+                aria-hidden="true"
+              />
             </motion.div>
           </motion.div>
 
