@@ -14,6 +14,12 @@ interface TrackingEvent {
   [key: string]: any
 }
 
+// Import the trackConversion function from conversion-tracking.ts
+import { trackConversion } from "./conversion-tracking"
+
+// Re-export the trackConversion function
+export { trackConversion }
+
 // Sichere Wrapper-Funktionen für localStorage
 const getLocalStorageItem = (key: string): string | null => {
   if (typeof window === "undefined") return null
