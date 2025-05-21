@@ -3,8 +3,6 @@
     { "source": "/privacy", "destination": "/legal/privacy-policy", "permanent": true },
     { "source": "/legal/privacy", "destination": "/legal/privacy-policy", "permanent": true },
     { "source": "/legal/:file*.html", "destination": "/legal/privacy-policy", "permanent": true },
-    { "source": "/cookies", "destination": "/legal/cookies", "permanent": true },
-    { "source": "/terms", "destination": "/legal/terms", "permanent": true },
 
     { "source": "/favicon.ico", "destination": "/favicon-32x32.png", "permanent": true },
 
