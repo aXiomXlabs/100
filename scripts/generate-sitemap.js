@@ -6,7 +6,28 @@ const glob = require("glob")
 const BASE_URL = "https://rust-rocket.com"
 
 // Paths to exclude from the sitemap
-const EXCLUDED_PATHS = ["/landing/ads", "/landing/ads/*", "/admin", "/admin/*", "/api", "/api/*", "/_*", "/404", "/500"]
+const EXCLUDED_PATHS = [
+  "/landing/ads",
+  "/landing/ads/*",
+  "/admin",
+  "/admin/*",
+  "/api",
+  "/api/*",
+  "/_*",
+  "/404",
+  "/500",
+  "/arbitrage",
+  "/arbitrage/*",
+  "/pump-alerts",
+  "/pump-alerts/*",
+  "/hft.html",
+  "/scalping.html",
+  "/glossary",
+  "/glossary/*",
+  "/pricing.html",
+  "/blog",
+  "/blog/*",
+]
 
 // Function to check if a path should be excluded
 function shouldExclude(path) {

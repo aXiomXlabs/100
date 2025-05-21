@@ -1,0 +1,95 @@
+{
+  "redirects": [
+    { "source": "/privacy", "destination": "/legal/privacy-policy", "permanent": true },
+    { "source": "/legal/privacy", "destination": "/legal/privacy-policy", "permanent": true },
+    { "source": "/legal/:file*.html", "destination": "/legal/privacy-policy", "permanent": true },
+    { "source": "/cookies", "destination": "/legal/cookies", "permanent": true },
+    { "source": "/terms", "destination": "/legal/terms", "permanent": true },
+
+    { "source": "/favicon.ico", "destination": "/favicon-32x32.png", "permanent": true },
+
+    { "source": "/faq", "destination": "/#faq", "permanent": true },
+    { "source": "/roadmap", "destination": "/#roadmap", "permanent": true },
+    { "source": "/register", "destination": "/#waitlist", "permanent": true },
+    { "source": "/network", "destination": "/#network", "permanent": true },
+
+    { "source": "/join-waitlist", "destination": "/#waitlist", "permanent": true },
+
+    { "source": "/search", "destination": "/", "permanent": true },
+
+    { "source": "/arbitrage/:path*", "destination": "/", "permanent": false, "statusCode": 410 },
+    { "source": "/pump-alerts/:path*", "destination": "/", "permanent": false, "statusCode": 410 },
+    { "source": "/hft.html", "destination": "/", "permanent": false, "statusCode": 410 },
+    { "source": "/scalping.html", "destination": "/", "permanent": false, "statusCode": 410 },
+    { "source": "/glossary/:path*", "destination": "/", "permanent": false, "statusCode": 410 },
+    { "source": "/pricing.html", "destination": "/", "permanent": false, "statusCode": 410 },
+    { "source": "/blog/:path*", "destination": "/", "permanent": false, "statusCode": 410 },
+
+    { "source": "/:slug*.html", "destination": "/", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/arbitrage/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public,max-age=0,must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/pump-alerts/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public,max-age=0,must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/hft.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public,max-age=0,must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/scalping.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public,max-age=0,must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/glossary/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public,max-age=0,must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/pricing.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public,max-age=0,must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/blog/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public,max-age=0,must-revalidate"
+        }
+      ]
+    }
+  ]
+}

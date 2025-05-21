@@ -4,6 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { useConsent } from "@/hooks/useConsent"
+import Link from "next/link"
 
 export default function ConsentBanner() {
   const { consent, consentShown, updateConsent, acceptAll, rejectAll } = useConsent()
@@ -43,9 +44,9 @@ export default function ConsentBanner() {
           <p className="text-sm text-gray-300 mb-4">
             We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. By
             clicking "Accept All", you consent to our use of cookies as described in our{" "}
-            <a href="/privacy" className="text-primary hover:underline">
+            <Link href="/legal/privacy-policy" className="text-primary hover:underline">
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
 
@@ -79,22 +80,12 @@ export default function ConsentBanner() {
 
           <div className="flex flex-col sm:flex-row items-center gap-3 justify-between">
             <div className="flex items-center">
-              <a
-                href="/privacy"
-                className="text-xs text-primary hover:underline mr-4"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Link href="/legal/privacy-policy" className="text-xs text-primary hover:underline mr-4">
                 Privacy Policy
-              </a>
-              <a
-                href="/cookies"
-                className="text-xs text-primary hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              </Link>
+              <Link href="/legal/cookies" className="text-xs text-primary hover:underline">
                 Cookie Policy
-              </a>
+              </Link>
             </div>
             <div className="flex items-center gap-3">
               <button

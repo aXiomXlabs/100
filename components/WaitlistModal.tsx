@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 import { createClientSupabaseClient } from "@/lib/supabase"
+import Link from "next/link"
 
 interface WaitlistModalProps {
   isOpen: boolean
@@ -366,15 +366,15 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
             <div className="ml-3 text-sm">
               <label htmlFor="consent" className="text-gray-300">
                 I agree to receive updates about Rust Rocket and confirm I have read the{" "}
-                <a
-                  href="https://www.rust-rocket.com/privacy"
+                <Link
+                  href="/legal/privacy-policy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
                   data-tracking-id="privacy_policy_link"
                 >
                   Privacy Policy
-                </a>
+                </Link>
                 .
               </label>
             </div>

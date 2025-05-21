@@ -133,6 +133,14 @@ export default function Footer() {
             }),
           }}
         />
+        <a
+          href="/legal/privacy-policy"
+          className="text-xs text-primary hover:underline mr-4"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Privacy Policy
+        </a>
       </motion.div>
     </footer>
   )
