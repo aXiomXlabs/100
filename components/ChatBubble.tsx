@@ -709,11 +709,9 @@ export default function ChatBubble() {
     handleSubmit(new Event("submit") as unknown as React.FormEvent)
   }
 
-  const toggleChat = useCallback(() => {
-    console.log("toggleChat called, current isOpen:", isOpen)
-    setIsOpen((prevIsOpen) => !prevIsOpen)
-    console.log("Chat sollte jetzt umgeschaltet werden")
-  }, [])
+  const toggleChat = () => {
+    setIsOpen(!isOpen)
+  }
 
   // Funktion zum Rendern der Kategorie-Icons
   const getCategoryIcon = (category: InfoCategory) => {
@@ -742,7 +740,7 @@ export default function ChatBubble() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-[100]">
       {isOpen ? (
         <div className="bg-background-secondary border border-gray-800 rounded-lg shadow-xl w-80 sm:w-96 h-[500px] flex flex-col">
           {/* Chat header */}
@@ -762,7 +760,6 @@ export default function ChatBubble() {
             </div>
             <button
               onClick={() => {
-                console.log("Close button clicked, setting isOpen to false")
                 setIsOpen(false)
               }}
               className="text-gray-500 hover:text-text-primary transition-colors"
@@ -879,7 +876,7 @@ export default function ChatBubble() {
       ) : (
         <div className="relative" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
           <button
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-background-secondary border border-gray-800 shadow-lg hover:border-solana-purple/50 transition-all duration-300 hover:scale-105 group"
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-background-secondary border border-gray-800 shadow-lg hover:border-solana-purple/50 transition-all duration-300 hover:scale-105 group cursor-pointer"
             aria-label="Chat with Rust Rocket Assistant"
             onClick={toggleChat}
           >
