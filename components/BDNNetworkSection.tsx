@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import { Zap, Globe, Server, Network } from "lucide-react"
 import { motion, useInView } from "framer-motion"
 import Tooltip from "./Tooltip"
+// Füge den Import für die mobile Komponente hinzu
+import BDNNetworkMobile from "./BDNNetworkMobile"
 
 // Define gateway nodes with city names and coordinates
 const gatewayNodes = [
@@ -32,6 +34,7 @@ export default function BDNNetworkSection() {
   const [hoveredNode, setHoveredNode] = useState<number | null>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [showDescription, setShowDescription] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
@@ -49,70 +52,31 @@ export default function BDNNetworkSection() {
       const container = canvas.parentElement
       if (!container) return
 
-      canvas.width = container.clientWidth
-      canvas.height = container.clientHeight
+      // Setze die Canvas-Größe auf die tatsächliche Größe des Containers
+      const { width, height } = container.getBoundingClientRect()
+      canvas.width = width
+      canvas.height = height
+
+      // Skaliere die Knotenpositionen basierend auf der Bildschirmgröße
+      const isMobile = window.innerWidth < 768
+
+      // Zeichne die Karte neu
+      drawMap()
     }
-
-    window.addEventListener("resize", handleResize)
-    handleResize()
-
-    // Track mouse position for hover effects
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-      setMousePos({ x, y })
-
-      // Check if mouse is over any node
-      let hoveredNodeId = null
-      for (const node of gatewayNodes) {
-        const nodeX = node.x * canvas.width
-        const nodeY = node.y * canvas.height
-        const distance = Math.sqrt(Math.pow(x - nodeX, 2) + Math.pow(y - nodeY, 2))
-        if (distance < 15) {
-          hoveredNodeId = node.id
-          break
-        }
-      }
-      setHoveredNode(hoveredNodeId)
-    }
-
-    canvas.addEventListener("mousemove", handleMouseMove)
-
-    // Create data flow animations
-    const dataFlows: {
-      fromX: number
-      fromY: number
-      progress: number
-      speed: number
-      color: string
-      active: boolean
-      delay: number
-    }[] = []
-
-    // Initialize data flows
-    gatewayNodes.forEach((node) => {
-      for (let i = 0; i < 3; i++) {
-        dataFlows.push({
-          fromX: node.x,
-          fromY: node.y,
-          progress: 0,
-          speed: 0.005 + Math.random() * 0.01,
-          color: node.color,
-          active: false,
-          delay: Math.random() * 2000, // Random delay for staggered animation
-        })
-      }
-    })
-
-    // Create world map image
-    const worldMapImage = new Image()
-    worldMapImage.crossOrigin = "anonymous"
-    worldMapImage.src = "/images/world-map-dark.png"
 
     // Animation function
     let animationFrame: number
     let lastTime = 0
+
+    const getAdjustedNodePosition = (node, isMobile) => {
+      if (!isMobile) return { x: node.x, y: node.y }
+
+      // Zentriere die Karte mehr für mobile Geräte
+      const mobileX = (node.x - 0.5) * 0.8 + 0.5
+      const mobileY = (node.y - 0.45) * 0.8 + 0.45
+
+      return { x: mobileX, y: mobileY }
+    }
 
     const animate = (time: number) => {
       if (!ctx || !canvas) return
@@ -145,11 +109,17 @@ export default function BDNNetworkSection() {
       ctx.lineWidth = 0.5
       ctx.stroke()
 
-      // Draw connection lines
+      // Bestimme, ob es ein mobiles Gerät ist
+      const isMobile = canvas.width < 768
+
+      // Zeichne Verbindungslinien
       gatewayNodes.forEach((node) => {
+        const adjustedNode = getAdjustedNodePosition(node, isMobile)
+        const adjustedCentral = getAdjustedNodePosition(centralNode, isMobile)
+
         ctx.beginPath()
-        ctx.moveTo(node.x * canvas.width, node.y * canvas.height)
-        ctx.lineTo(centralNode.x * canvas.width, centralNode.y * canvas.height)
+        ctx.moveTo(adjustedNode.x * canvas.width, adjustedNode.y * canvas.height)
+        ctx.lineTo(adjustedCentral.x * canvas.width, adjustedCentral.y * canvas.height)
         ctx.strokeStyle = "rgba(100, 100, 100, 0.2)"
         ctx.lineWidth = 1
         ctx.stroke()
@@ -172,13 +142,16 @@ export default function BDNNetworkSection() {
             flow.speed = 0.005 + Math.random() * 0.01
           }
 
-          // Draw flow
-          const startX = flow.fromX * canvas.width
-          const startY = flow.fromY * canvas.height
-          const endX = centralNode.x * canvas.width
-          const endY = centralNode.y * canvas.height
+          // Hole angepasste Positionen
+          const isMobile = canvas.width < 768
+          const adjustedFrom = getAdjustedNodePosition({ x: flow.fromX, y: flow.fromY }, isMobile)
+          const adjustedCentral = getAdjustedNodePosition(centralNode, isMobile)
 
-          // Calculate current position
+          // Berechne aktuelle Position
+          const startX = adjustedFrom.x * canvas.width
+          const startY = adjustedFrom.y * canvas.height
+          const endX = adjustedCentral.x * canvas.width
+          const endY = adjustedCentral.y * canvas.height
           const currentX = startX + (endX - startX) * flow.progress
           const currentY = startY + (endY - startY) * flow.progress
 
@@ -271,8 +244,70 @@ export default function BDNNetworkSection() {
       animationFrame = requestAnimationFrame(animate)
     }
 
+    // Definiere drawMap VOR handleResize
+    const drawMap = () => {
+      animationFrame = requestAnimationFrame(animate)
+    }
+
+    window.addEventListener("resize", handleResize)
+    handleResize()
+
+    // Track mouse position for hover effects
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      setMousePos({ x, y })
+
+      // Check if mouse is over any node
+      let hoveredNodeId = null
+      for (const node of gatewayNodes) {
+        const nodeX = node.x * canvas.width
+        const nodeY = node.y * canvas.height
+        const distance = Math.sqrt(Math.pow(x - nodeX, 2) + Math.pow(y - nodeY, 2))
+        if (distance < 15) {
+          hoveredNodeId = node.id
+          break
+        }
+      }
+      setHoveredNode(hoveredNodeId)
+    }
+
+    canvas.addEventListener("mousemove", handleMouseMove)
+
+    // Create data flow animations
+    const dataFlows: {
+      fromX: number
+      fromY: number
+      progress: number
+      speed: number
+      color: string
+      active: boolean
+      delay: number
+    }[] = []
+
+    // Initialize data flows
+    gatewayNodes.forEach((node) => {
+      for (let i = 0; i < 3; i++) {
+        dataFlows.push({
+          fromX: node.x,
+          fromY: node.y,
+          progress: 0,
+          speed: 0.005 + Math.random() * 0.01,
+          color: node.color,
+          active: false,
+          delay: Math.random() * 2000, // Random delay for staggered animation
+        })
+      }
+    })
+
+    // Create world map image
+    const worldMapImage = new Image()
+    worldMapImage.crossOrigin = "anonymous"
+    worldMapImage.src = "/images/world-map-dark.png"
+
     // Start animation
-    animationFrame = requestAnimationFrame(animate)
+    drawMap()
 
     // Clean up
     return () => {
@@ -284,9 +319,24 @@ export default function BDNNetworkSection() {
     }
   }, [hoveredNode])
 
+  useEffect(() => {
+    const handleScreenResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    window.addEventListener("resize", handleScreenResize)
+    handleScreenResize() // Initial call
+
+    return () => {
+      window.removeEventListener("resize", handleScreenResize)
+    }
+  }, [])
+
+  // Füge die mobile Komponente vor dem return-Statement ein
   return (
     <section ref={sectionRef} className="py-24 relative overflow-hidden" id="bdn-network">
       <div className="container-custom">
+        {/* Titel und Beschreibung bleiben gleich */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -321,6 +371,7 @@ export default function BDNNetworkSection() {
           )}
         </motion.div>
 
+        {/* Grid für Desktop bleibt gleich */}
         <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
           {/* Same-Block Execution */}
           <motion.div
@@ -406,68 +457,90 @@ export default function BDNNetworkSection() {
           </motion.div>
         </div>
 
-        {/* Visual Element - Enhanced World Map with BDN Nodes */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6 }}
-          className="relative aspect-[2/1] rounded-xl overflow-hidden border border-gray-800 glass-card"
-        >
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 w-full h-full cursor-pointer"
-            style={{ touchAction: "none" }}
-          ></canvas>
+        {/* Mobile-spezifische Komponente einfügen */}
+        <BDNNetworkMobile />
 
-          {/* Map legend */}
-          <div className="absolute top-4 left-4 glass-effect rounded-lg p-3 border border-gray-800">
-            <h4 className="text-text-primary text-sm font-medium mb-2">Global BDN Network</h4>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-primary"></div>
-                <span className="text-text-secondary text-xs">Central Node</span>
+        {/* Visuelle Elemente - nur auf Desktop anzeigen */}
+        <div className="hidden md:block">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+            className="relative aspect-[2/1] rounded-xl overflow-hidden border border-gray-800 glass-card"
+          >
+            {isMobile && window.innerWidth < 360 ? (
+              <div className="w-full h-full flex items-center justify-center bg-background-secondary p-4 text-center">
+                <p className="text-text-secondary">
+                  Für die vollständige BDN-Netzwerkkarte bitte auf einem größeren Bildschirm anzeigen.
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-solana-purple"></div>
-                <span className="text-text-secondary text-xs">Primary Gateway</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-primary"></div>
-                <span className="text-text-secondary text-xs">Secondary Gateway</span>
-              </div>
-            </div>
-            <div className="mt-2 text-text-secondary text-xs">Hover over nodes to see locations</div>
-          </div>
+            ) : (
+              <canvas
+                ref={canvasRef}
+                className="absolute inset-0 w-full h-full cursor-pointer"
+                style={{ touchAction: "none" }}
+              ></canvas>
+            )}
 
-          {/* Comparison overlay */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-transparent p-6">
-            <div className="grid grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <div className="glass-effect p-4 border border-gray-800">
-                <h4 className="text-text-secondary font-medium mb-2 text-sm">Standard Transaction Path</h4>
-                <div className="flex items-center gap-2 text-red-400 text-sm">
-                  <span>Slow</span>
-                  <span>•</span>
-                  <span>Multiple Hops</span>
-                  <span>•</span>
-                  <span>Congested</span>
+            {/* Map legend - nur auf Desktop anzeigen */}
+            {!isMobile && (
+              <div className="absolute top-4 left-4 glass-effect rounded-lg p-3 border border-gray-800">
+                <h4 className="text-text-primary text-sm font-medium mb-2">Global BDN Network</h4>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                    <span className="text-text-secondary text-xs">Central Node</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-solana-purple"></div>
+                    <span className="text-text-secondary text-xs">Primary Gateway</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                    <span className="text-text-secondary text-xs">Secondary Gateway</span>
+                  </div>
+                </div>
+                <div className="mt-2 text-text-secondary text-xs">Hover over nodes to see locations</div>
+              </div>
+            )}
+
+            {/* Vereinfachte Legende für Mobilgeräte */}
+            {isMobile && (
+              <div className="absolute top-2 left-2 glass-effect rounded-lg p-2 border border-gray-800">
+                <h4 className="text-text-primary text-xs font-medium">BDN Network</h4>
+              </div>
+            )}
+
+            {/* Comparison overlay - anpassen für Mobilgeräte */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-transparent p-3 md:p-6">
+              <div className="grid grid-cols-2 gap-2 md:gap-6 max-w-3xl mx-auto">
+                <div className="glass-effect p-4 border border-gray-800">
+                  <h4 className="text-text-secondary font-medium mb-2 text-sm">Standard Transaction Path</h4>
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <span>Slow</span>
+                    <span>•</span>
+                    <span>Multiple Hops</span>
+                    <span>•</span>
+                    <span>Congested</span>
+                  </div>
+                </div>
+
+                <div className="glass-effect p-4 border border-primary/30">
+                  <h4 className="text-text-secondary font-medium mb-2 text-sm">Rust Rocket BDN Path</h4>
+                  <div className="flex items-center gap-2 text-primary text-sm">
+                    <span>Direct</span>
+                    <span>•</span>
+                    <span>Fast</span>
+                    <span>•</span>
+                    <span>Optimized</span>
+                  </div>
                 </div>
               </div>
-
-              <div className="glass-effect p-4 border border-primary/30">
-                <h4 className="text-text-secondary font-medium mb-2 text-sm">Rust Rocket BDN Path</h4>
-                <div className="flex items-center gap-2 text-primary text-sm">
-                  <span>Direct</span>
-                  <span>•</span>
-                  <span>Fast</span>
-                  <span>•</span>
-                  <span>Optimized</span>
-                </div>
-              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* Technical details */}
+        {/* Technische Details bleiben gleich */}
         <div className="grid md:grid-cols-3 gap-6 mt-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
