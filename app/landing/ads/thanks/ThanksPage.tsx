@@ -37,11 +37,12 @@ export default function ThanksPage() {
           <div className="max-w-md mx-auto text-center">
             <div className="mb-8 flex justify-center">
               <Image
-                src="/images/rust-rocket-logo.png"
+                src="/images/rust-rocket-logo.gif"
                 alt="Rust Rocket Logo"
-                width={100}
-                height={100}
-                className="rounded-full"
+                width={120}
+                height={120}
+                className="rounded-full border-2 border-primary"
+                priority
               />
             </div>
             <h1 className="text-3xl font-bold text-white mb-4">Thanks for Joining!</h1>
