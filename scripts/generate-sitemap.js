@@ -17,13 +17,12 @@ const EXCLUDED_PATHS = [
   "/404",
   "/500",
   "/gone",
-  "/legal/*",
   "/search",
   "*.html",
 ]
 
 // Function to check if a path should be excluded
-function shouldExclude(path: string): boolean {
+function shouldExclude(path) {
   return EXCLUDED_PATHS.some((pattern) => {
     if (pattern.endsWith("*")) {
       const prefix = pattern.slice(0, -1)
@@ -38,7 +37,7 @@ function shouldExclude(path: string): boolean {
 }
 
 // Get all pages from the app directory
-function getPages(): string[] {
+function getPages() {
   const appPages = glob.sync("app/**/page.{tsx,jsx,js,ts}", { ignore: ["app/**/node_modules/**"] })
 
   return appPages
@@ -62,7 +61,7 @@ function getPages(): string[] {
 }
 
 // Generate sitemap XML
-function generateSitemap(): void {
+function generateSitemap() {
   const pages = getPages()
   const today = new Date().toISOString().split("T")[0]
 
@@ -85,7 +84,7 @@ ${pages
 }
 
 // Generate robots.txt
-function generateRobotsTxt(): void {
+function generateRobotsTxt() {
   const robotsTxt = `# https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Disallow: /landing/ads

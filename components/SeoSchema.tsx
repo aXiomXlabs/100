@@ -5,25 +5,23 @@ import { usePathname } from "next/navigation"
 export default function SeoSchema() {
   const pathname = usePathname()
   const isHomePage = pathname === "/"
-  const currentYear = new Date().getFullYear()
 
-  // Basis-URL für alle Schema-Referenzen
-  const baseUrl = "https://rust-rocket.com"
-
-  // Organization Schema (nur auf der Homepage)
+  // Organization Schema with unique @id
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "https://rust-rocket.com/#organization",
     name: "Rust Rocket Labs",
-    url: baseUrl,
-    logo: `${baseUrl}/images/rust-rocket-logo.gif`,
-    sameAs: ["https://x.com/ax_rustrocket", "https://t.me/rustxrocket", "https://discord.gg/rustrocket"],
+    url: "https://rust-rocket.com/",
+    logo: "https://rust-rocket.com/images/rust-rocket-logo.gif",
+    sameAs: ["https://x.com/rustrocket", "https://t.me/rustrocket"],
   }
 
-  // FAQ Schema (nur auf der Homepage)
+  // FAQ Schema with unique @id
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    "@id": "https://rust-rocket.com/#faq",
     mainEntity: [
       {
         "@type": "Question",
@@ -54,16 +52,26 @@ export default function SeoSchema() {
         name: "When will Rust Rocket be available?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Rust Rocket's beta version launches on May 9, ${currentYear}. Join our waitlist now to get early access to our 25 ms Solana sniper bot.`,
+          text: "Rust Rocket's beta version launches on May 9, 2025. Join our waitlist now to get early access to our 25 ms Solana sniper bot.",
         },
       },
     ],
   }
 
-  // Review Schema (nur auf der Homepage) - korrekt formatiert mit itemReviewed und author
+  // Properly formatted Review Schema with itemReviewed and correct author type
   const reviewSchema = {
     "@context": "https://schema.org",
     "@type": "Review",
+    "@id": "https://rust-rocket.com/#review",
+    itemReviewed: {
+      "@type": "Product",
+      name: "Rust Rocket Copy-Trading",
+      description: "Solana trading bot with intelligent copy trading capabilities",
+    },
+    author: {
+      "@type": "Person",
+      name: "Alex K.",
+    },
     reviewBody:
       "Rust Rocket's copy-trading feature is a game-changer for Solana trading. I've been able to automatically mirror successful strategies with custom stop-loss conditions, which has significantly improved my returns.",
     reviewRating: {
@@ -71,22 +79,13 @@ export default function SeoSchema() {
       ratingValue: "5",
       bestRating: "5",
     },
-    author: {
-      "@type": "Person",
-      name: "Alex K.",
-    },
-    itemReviewed: {
-      "@type": "SoftwareApplication",
-      name: "Rust Rocket Solana Sniper Bot",
-      applicationCategory: "FinanceApplication",
-      operatingSystem: "Web",
-    },
   }
 
-  // Software Application Schema (nur auf der Homepage)
+  // Software Application Schema
   const softwareSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
+    "@id": "https://rust-rocket.com/#software",
     name: "Rust Rocket Solana Sniper Bot",
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web",
@@ -100,7 +99,7 @@ export default function SeoSchema() {
       "Dominate Solana meme coins with Rust Rocket - the fastest same-block execution bot with intelligent copy trading. Perfect for pump.fun sniping.",
   }
 
-  // Nur auf der Homepage alle Schemas anzeigen
+  // Only render schemas on appropriate pages
   if (isHomePage) {
     return (
       <>
@@ -112,6 +111,6 @@ export default function SeoSchema() {
     )
   }
 
-  // Für andere Seiten nur das Organization-Schema
+  // For non-homepage, just return organization schema
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
 }
