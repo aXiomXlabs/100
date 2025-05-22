@@ -9,7 +9,6 @@ import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import ConsentBanner from "@/components/ConsentBanner"
-import GoogleTagManager from "@/components/GoogleTagManager"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -188,12 +187,51 @@ export default function RootLayout({
             }),
           }}
         />
+
+        {/* Google Analytics 4 - Direkte Implementierung */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            
+            // Aktiviere Debug-Modus
+            gtag('config', '${process.env.NEXT_PUBLIC_GTM_ID}', {
+              debug_mode: true,
+              send_page_view: true,
+              cookie_flags: 'samesite=none;secure',
+              cookie_domain: 'auto',
+              cookie_expires: 63072000, // 2 Jahre in Sekunden
+              allow_google_signals: true,
+              allow_ad_personalization_signals: true
+            });
+            
+            // Sende ein Test-Event
+            gtag('event', 'page_view_test', {
+              'event_category': 'engagement',
+              'event_label': 'test_event',
+              'non_interaction': true
+            });
+          `}
+        </Script>
       </head>
       <body>
-        {/* Verbesserte Google Tag Manager-Komponente */}
-        <GoogleTagManager />
+        {/* Google Tag Manager - NoScript (für Nutzer ohne JavaScript) */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+            title="Google Tag Manager"
+          />
+        </noscript>
 
-        {/* Twitter Pixel - mit Consent-Mode */}
+        {/* Twitter Pixel */}
         <Script id="twitter-pixel" strategy="afterInteractive">
           {`
             !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
@@ -202,14 +240,11 @@ export default function RootLayout({
             
             // Twitter-Pixel mit ID initialisieren
             twq('config','pork0');
-            
-            // Standardmäßig Tracking aktivieren (für Testzwecke)
-            // In Produktionsumgebung sollte dies entfernt werden
-            twq('consent', 'grant');
+            twq('track', 'PageView');
           `}
         </Script>
 
-        {/* Facebook Pixel - mit Consent-Mode */}
+        {/* Facebook Pixel */}
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -223,10 +258,6 @@ export default function RootLayout({
             
             // FB-Pixel mit ID initialisieren
             fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
-            
-            // Standardmäßig Tracking aktivieren (für Testzwecke)
-            // In Produktionsumgebung sollte dies entfernt werden
-            fbq('consent', 'grant');
             fbq('track', 'PageView');
           `}
         </Script>
@@ -260,16 +291,6 @@ export default function RootLayout({
             });
           `}
         </Script>
-
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-            title="Google Tag Manager"
-          />
-        </noscript>
 
         <WaitlistModalProvider>
           <Suspense>{children}</Suspense>
