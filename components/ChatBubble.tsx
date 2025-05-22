@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Bot, X, Send } from "lucide-react"
+import { Bot, X, Send, Zap, Clock, Globe, Shield, Cpu, Repeat } from "lucide-react"
 
 // Define categories for detailed information
 type InfoCategory =
@@ -11,9 +11,66 @@ type InfoCategory =
   | "bdn-network"
   | "advantages"
   | "security"
-  | "pricing"
   | "technical"
   | "getting-started"
+
+// Predefined questions that users can click on
+const predefinedQuestions = [
+  {
+    id: "why-better",
+    text: "Why is Rust Rocket better than other bots?",
+    category: "advantages",
+    icon: <Zap className="h-4 w-4" />,
+  },
+  {
+    id: "same-block",
+    text: "How does Same-Block Execution work?",
+    category: "same-block",
+    icon: <Clock className="h-4 w-4" />,
+  },
+  {
+    id: "bdn-network",
+    text: "Tell me about the BDN Network",
+    category: "bdn-network",
+    icon: <Globe className="h-4 w-4" />,
+  },
+  {
+    id: "security",
+    text: "How secure is Rust Rocket?",
+    category: "security",
+    icon: <Shield className="h-4 w-4" />,
+  },
+  {
+    id: "tech-stack",
+    text: "What technology does Rust Rocket use?",
+    category: "technical",
+    icon: <Cpu className="h-4 w-4" />,
+  },
+  {
+    id: "copy-trading",
+    text: "How does Copy Trading work?",
+    category: "copy-trading",
+    icon: <Repeat className="h-4 w-4" />,
+  },
+]
+
+// Quick answers for common questions
+const quickAnswers = {
+  "why-better":
+    "Rust Rocket outperforms other trading bots through several decisive advantages: 1) Our Same-Block Execution guarantees execution in the same block - other bots are at least 1-2 blocks slower. 2) Our proprietary BDN network and Bloxroute integration offer unmatched speed. 3) Our AI-powered Copy Trading identifies the most profitable wallets in real-time with extensive customization options. 4) We offer the highest security standards without custody of your funds. 5) Our user interface is intuitive and user-friendly.",
+
+  "tech-stack":
+    "Rust Rocket is built with cutting-edge technology. Our backend is developed in Rust for maximum performance and minimal latency. We use the Solana Program Library (SPL) with custom optimizations for smart contracts. Our infrastructure includes bare-metal servers with Intel Xeon processors, 10 Gbit/s network connections, and NVMe SSDs in RAID configuration. We maintain direct connections to over 50 Solana validators and use proprietary pipelining technology for transaction processing.",
+
+  "how-works":
+    "Rust Rocket works by combining three key technologies: 1) Same-Block Execution - placing your transactions in exactly the same block as the target transaction, 2) Our proprietary BDN Network - a global network of strategically placed Solana gateways, and 3) Advanced AI algorithms for trader identification and risk assessment. This combination gives you an unprecedented speed advantage in the fast-paced Solana ecosystem.",
+
+  difference:
+    "The key difference between Rust Rocket and other trading bots is our Same-Block Execution technology. While other bots typically execute trades 1-2 blocks after the target transaction, Rust Rocket executes in the same block. On Solana, where blocks are generated every 400ms, this gives you a decisive time advantage. Additionally, our proprietary BDN Network and AI-powered Copy Trading system provide capabilities that no other bot can match.",
+
+  "success-rate":
+    "Rust Rocket achieves a >99.8% success rate for Same-Block Execution under normal network conditions. Our system can process transactions with high accuracy and reliability.",
+}
 
 // Detailed information by category
 const detailedInfo: Record<InfoCategory, string> = {
@@ -246,78 +303,6 @@ Security is our highest priority at Rust Rocket. Our comprehensive security meas
 
 Rust Rocket sets new standards for security in the field of trading bots and gives you the assurance that your capital and data are protected in the best possible way.`,
 
-  pricing: `# Pricing and Availability of Rust Rocket
-
-Rust Rocket offers flexible pricing plans tailored to various trading needs and budgets.
-
-## Current Plans
-
-### Starter Plan
-• **Price**: $99/month
-• **Features**:
-  - Same-Block Execution
-  - Basic Copy Trading (up to 3 wallets)
-  - Standard API limits
-  - Email support
-  - Daily trading reports
-
-### Pro Plan
-• **Price**: $249/month
-• **Features**:
-  - Everything in the Starter Plan
-  - Advanced Copy Trading (up to 10 wallets)
-  - Higher API limits
-  - Priority support
-  - Hourly trading reports
-  - Customizable trading strategies
-  - Telegram notifications
-
-### Enterprise Plan
-• **Price**: $499/month
-• **Features**:
-  - Everything in the Pro Plan
-  - Unlimited Copy Trading
-  - Highest API priority
-  - Dedicated account manager
-  - Real-time trading reports
-  - Custom integrations
-  - Phone support
-  - Advanced risk management tools
-
-## Payment Options
-
-• **Cryptocurrencies**: BTC, ETH, SOL, USDT, USDC
-• **Traditional Payment Methods**: Credit card, PayPal, bank transfer
-• **Discounts**: 20% discount for annual payment
-
-## Availability
-
-Rust Rocket is currently in the final testing phase. The official launch is planned for Q2 2023.
-
-### Waitlist Benefits
-
-By joining the waitlist, you'll receive:
-• **Early Access**: Access before the official release
-• **25% Discount**: On your first month
-• **Free Trial**: 14-day free trial
-• **Exclusive Tutorials**: Access to special training materials
-• **Priority Onboarding**: Personal setup assistance
-
-## Money-Back Guarantee
-
-We offer a 30-day money-back guarantee for all plans. If you're not satisfied with Rust Rocket, we'll refund the full amount.
-
-## Enterprise Solutions
-
-For institutional clients, we offer customized solutions with:
-• Dedicated infrastructure
-• Custom features
-• SLA guarantees
-• Compliance documentation
-• Integration support
-
-Contact our sales team for an individual quote.`,
-
   technical: `# Technical Details of Rust Rocket
 
 Rust Rocket is designed for maximum performance and reliability, with a highly optimized architecture.
@@ -455,6 +440,7 @@ export default function ChatBubble() {
     },
   ])
   const [input, setInput] = useState("")
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   const messagesEndRef = useRef(null)
 
@@ -474,14 +460,26 @@ export default function ChatBubble() {
           {
             role: "assistant",
             content:
-              "I can provide information on topics like Copy Trading, Bloxroute Technology, Same-Block Execution, and more. What interests you the most?",
+              "I can provide detailed information about our technology and features. What would you like to know about Rust Rocket?",
           },
         ])
+        setShowSuggestions(true)
       }, 1000)
 
       return () => clearTimeout(timer)
     }
   }, [isOpen, messages])
+
+  // Show suggestions after inactivity
+  useEffect(() => {
+    if (isOpen && messages.length > 1) {
+      const timer = setTimeout(() => {
+        setShowSuggestions(true)
+      }, 10000) // Show suggestions after 10 seconds of inactivity
+
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen, messages, input])
 
   // Simple function to toggle chat
   function handleChatToggle() {
@@ -493,6 +491,57 @@ export default function ChatBubble() {
     setIsOpen(false)
   }
 
+  // Function to handle predefined question clicks
+  function handlePredefinedQuestion(question) {
+    // Add user message
+    setMessages((prev) => [...prev, { role: "user", content: question.text }])
+
+    // Get the detailed information for this category
+    const detailedResponse = detailedInfo[question.category]
+
+    // Add bot response
+    setMessages((prev) => [...prev, { role: "assistant", content: detailedResponse }])
+
+    // Hide suggestions after selection
+    setShowSuggestions(false)
+  }
+
+  // Function to find a relevant answer based on user input
+  function findRelevantAnswer(userInput) {
+    const input = userInput.toLowerCase()
+
+    // Check for keywords and return appropriate answers
+    if (input.includes("better") || input.includes("advantage") || input.includes("why choose")) {
+      return quickAnswers["why-better"]
+    } else if (
+      input.includes("technology") ||
+      input.includes("tech stack") ||
+      input.includes("built with") ||
+      input.includes("programming")
+    ) {
+      return quickAnswers["tech-stack"]
+    } else if (input.includes("how") && (input.includes("work") || input.includes("function"))) {
+      return quickAnswers["how-works"]
+    } else if (input.includes("difference") || input.includes("compare") || input.includes("vs")) {
+      return quickAnswers.difference
+    } else if (input.includes("success") || input.includes("rate") || input.includes("accuracy")) {
+      return quickAnswers["success-rate"]
+    } else if (input.includes("same block") || input.includes("execution")) {
+      return detailedInfo["same-block"]
+    } else if (input.includes("copy") || input.includes("trading")) {
+      return detailedInfo["copy-trading"]
+    } else if (input.includes("bdn") || input.includes("network")) {
+      return detailedInfo["bdn-network"]
+    } else if (input.includes("security") || input.includes("secure") || input.includes("safe")) {
+      return detailedInfo.security
+    } else if (input.includes("technical") || input.includes("details") || input.includes("specs")) {
+      return detailedInfo.technical
+    }
+
+    // Default response if no keywords match
+    return "I'd be happy to tell you more about Rust Rocket's technology. We specialize in Same-Block Execution on Solana, which gives us a decisive speed advantage over other trading bots. Would you like to know more about our Same-Block technology, our BDN Network, or our Copy Trading features?"
+  }
+
   // Simple function to send a message
   function handleSendMessage(e) {
     e.preventDefault()
@@ -501,18 +550,22 @@ export default function ChatBubble() {
     // Add user message
     setMessages((prev) => [...prev, { role: "user", content: input }])
 
-    // Add bot response (simplified)
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "assistant",
-        content:
-          "I understand you're interested in Rust Rocket. Let me provide some information about our features. Is there something specific you'd like to know more about?",
-      },
-    ])
+    // Find relevant answer
+    const relevantAnswer = findRelevantAnswer(input)
+
+    // Add bot response
+    setMessages((prev) => [...prev, { role: "assistant", content: relevantAnswer }])
 
     // Reset input field
     setInput("")
+
+    // Hide suggestions after user sends a message
+    setShowSuggestions(false)
+
+    // Show suggestions again after a delay
+    setTimeout(() => {
+      setShowSuggestions(true)
+    }, 5000)
   }
 
   return (
@@ -521,9 +574,9 @@ export default function ChatBubble() {
         // Chat window
         <div className="bg-gray-900 border border-gray-800 rounded-lg shadow-xl w-80 sm:w-96 h-[500px] flex flex-col">
           {/* Chat header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-gradient-to-r from-purple-900/20 to-purple-600/20">
+          <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-gradient-to-r from-green-900/20 to-green-600/20">
             <div className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-purple-500" />
+              <Bot className="h-5 w-5 text-green-500" />
               <div>
                 <span className="font-medium text-white block">Rust Rocket Assistant</span>
                 <span className="text-xs text-gray-400">AI-powered • Always available</span>
@@ -544,13 +597,29 @@ export default function ChatBubble() {
               <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[90%] rounded-lg px-4 py-2 ${
-                    msg.role === "user" ? "bg-purple-900/10 text-white" : "bg-purple-600/10 text-white"
+                    msg.role === "user" ? "bg-green-900/10 text-white" : "bg-green-600/10 text-white"
                   }`}
                 >
                   {msg.content}
                 </div>
               </div>
             ))}
+
+            {/* Suggested questions */}
+            {showSuggestions && (
+              <div className="flex flex-wrap gap-2 justify-center">
+                {predefinedQuestions.map((question) => (
+                  <button
+                    key={question.id}
+                    onClick={() => handlePredefinedQuestion(question)}
+                    className="flex items-center gap-1 bg-green-900/20 hover:bg-green-700/30 text-green-400 px-3 py-1.5 rounded-full text-sm transition-colors"
+                  >
+                    {question.icon} {question.text}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
           </div>
 
@@ -561,12 +630,12 @@ export default function ChatBubble() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about Rust Rocket..."
-                className="flex-1 bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                placeholder="Ask about Rust Rocket technology..."
+                className="flex-1 bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-green-500"
               />
               <button
                 type="submit"
-                className="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 px-3 py-2 rounded-md transition-colors flex items-center justify-center"
+                className="bg-green-600/20 hover:bg-green-600/30 text-green-400 px-3 py-2 rounded-md transition-colors flex items-center justify-center"
                 aria-label="Send message"
               >
                 <Send className="h-4 w-4" />
@@ -578,11 +647,11 @@ export default function ChatBubble() {
         // Chat button
         <button
           onClick={handleChatToggle}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-gray-900 border border-gray-800 shadow-lg hover:border-purple-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-gray-900 border border-gray-800 shadow-lg hover:border-green-500/50 transition-all duration-300 hover:scale-105 cursor-pointer"
           aria-label="Chat with Rust Rocket Assistant"
         >
-          <Bot className="h-6 w-6 text-purple-500" />
-          <div className="absolute inset-0 rounded-full border-4 border-purple-500/30 animate-ping opacity-30"></div>
+          <Bot className="h-6 w-6 text-green-500" />
+          <div className="absolute inset-0 rounded-full border-4 border-green-500/30 animate-ping opacity-30"></div>
         </button>
       )}
     </div>

@@ -84,7 +84,7 @@ export default function Navbar() {
             onClick={() => trackNavClick("logo")}
           >
             <Image
-              src="/images/rust-rocket-logo.gif"
+              src="/images/RR_Logo_one_schrift.png"
               alt="Rust Rocket Logo"
               width={50}
               height={50}
