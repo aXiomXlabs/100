@@ -121,6 +121,30 @@ export async function addToWaitlist(
   }
 }
 
+// Fehlende Funktion hinzufügen, die in der alten Codebase verwendet wird
+export async function getWaitlistEntries(page = 1, pageSize = 10) {
+  try {
+    const supabase = createSupabaseClient()
+    const start = (page - 1) * pageSize
+
+    const { data, error, count } = await supabase
+      .from("waitlist")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(start, start + pageSize - 1)
+
+    if (error) {
+      console.error("Fehler beim Abrufen der Waitlist-Einträge:", error)
+      return { data: [], error, count: 0 }
+    }
+
+    return { data, error: null, count }
+  } catch (error) {
+    console.error("Unerwarteter Fehler beim Abrufen der Waitlist-Einträge:", error)
+    return { data: [], error, count: 0 }
+  }
+}
+
 // Track UTM parameters in localStorage
 export function trackUTMParameters(params: URLSearchParams) {
   if (typeof window === "undefined") return

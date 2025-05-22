@@ -3,6 +3,11 @@ import { createClient } from "@supabase/supabase-js"
 // Singleton-Instanz für den Client-seitigen Supabase-Client
 let supabaseClient: ReturnType<typeof createClient> | null = null
 
+// Diese Funktion wird von der alten Codebase verwendet
+export function createClientSupabaseClient() {
+  return createSupabaseClient()
+}
+
 export function createSupabaseClient() {
   if (supabaseClient) return supabaseClient
 

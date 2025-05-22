@@ -155,6 +155,21 @@ export function trackFacebookConversion(eventName: string, params?: Record<strin
   }
 }
 
+// Fehlende Funktion hinzufügen, die in der alten Codebase verwendet wird
+export function trackConversion(conversionName: string, data?: any): void {
+  // Implementiere eine einfache Weiterleitung an trackEvent
+  trackEvent({
+    event: conversionName,
+    category: "Conversion",
+    action: conversionName,
+    ...data,
+  })
+
+  // Auch an Facebook und Twitter senden
+  trackFacebookConversion(conversionName, data)
+  trackTwitterConversion(conversionName, data)
+}
+
 // Trackt die Scroll-Tiefe
 export function trackScrollDepth(): void {
   if (typeof window === "undefined") return
