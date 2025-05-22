@@ -114,25 +114,23 @@ export default function Footer() {
           </motion.div>
         </div>
 
+        {/* Legal links */}
+        <div className="mt-4 flex justify-center gap-6 text-sm text-gray-400">
+          <Link href="/legal/privacy" className="hover:text-white transition-colors">
+            Privacy Policy
+          </Link>
+          <Link href="/legal/terms" className="hover:text-white transition-colors">
+            Terms of Service
+          </Link>
+          <Link href="/#faq" className="hover:text-white transition-colors">
+            FAQ
+          </Link>
+        </div>
+
         {/* Copyright text in a separate row */}
         <div className="mt-1 text-center">
           <p className="text-gray-400 text-xs">© {currentYear} Rust Rocket. All rights reserved.</p>
         </div>
-
-        {/* Structured data for organization */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Rust Rocket",
-              url: "https://www.rust-rocket.com",
-              logo: "https://www.rust-rocket.com/images/rust-rocket-logo.gif",
-              sameAs: ["https://x.com/ax_rustrocket", "https://t.me/rustxrocket", "https://discord.gg/rustrocket"],
-            }),
-          }}
-        />
       </motion.div>
     </footer>
   )

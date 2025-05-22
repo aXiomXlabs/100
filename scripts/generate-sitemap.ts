@@ -1,26 +1,44 @@
-const fs = require("fs")
-const path = require("path")
-const glob = require("glob")
+import fs from "fs"
+import path from "path"
+import glob from "glob"
 
 // Base URL of the website
 const BASE_URL = "https://rust-rocket.com"
 
 // Paths to exclude from the sitemap
-const EXCLUDED_PATHS = ["/landing/ads", "/landing/ads/*", "/admin", "/admin/*", "/api", "/api/*", "/_*", "/404", "/500"]
+const EXCLUDED_PATHS = [
+  "/landing/ads",
+  "/landing/ads/*",
+  "/admin",
+  "/admin/*",
+  "/api",
+  "/api/*",
+  "/_*",
+  "/404",
+  "/500",
+  "/gone",
+  "/legal/*",
+  "/search",
+  "*.html",
+]
 
 // Function to check if a path should be excluded
-function shouldExclude(path) {
+function shouldExclude(path: string): boolean {
   return EXCLUDED_PATHS.some((pattern) => {
     if (pattern.endsWith("*")) {
       const prefix = pattern.slice(0, -1)
       return path.startsWith(prefix)
+    }
+    if (pattern.startsWith("*")) {
+      const suffix = pattern.slice(1)
+      return path.endsWith(suffix)
     }
     return path === pattern
   })
 }
 
 // Get all pages from the app directory
-function getPages() {
+function getPages(): string[] {
   const appPages = glob.sync("app/**/page.{tsx,jsx,js,ts}", { ignore: ["app/**/node_modules/**"] })
 
   return appPages
@@ -44,8 +62,9 @@ function getPages() {
 }
 
 // Generate sitemap XML
-function generateSitemap() {
+function generateSitemap(): void {
   const pages = getPages()
+  const today = new Date().toISOString().split("T")[0]
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -53,7 +72,7 @@ ${pages
   .map(
     (page) => `  <url>
     <loc>${BASE_URL}${page}</loc>
-    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
+    <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${page === "/" ? "1.0" : "0.8"}</priority>
   </url>`,
@@ -66,12 +85,10 @@ ${pages
 }
 
 // Generate robots.txt
-function generateRobotsTxt() {
+function generateRobotsTxt(): void {
   const robotsTxt = `# https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Disallow: /landing/ads
-Disallow: /admin
-Disallow: /api
 
 Sitemap: ${BASE_URL}/sitemap.xml`
 

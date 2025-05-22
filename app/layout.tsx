@@ -9,6 +9,7 @@ import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import ConsentBanner from "@/components/ConsentBanner"
+import SeoSchema from "@/components/SeoSchema"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -128,65 +129,8 @@ export default function RootLayout({
         {/* Canonical URL */}
         <link rel="canonical" href="https://rust-rocket.com/" />
 
-        {/* Single Organization Schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Rust Rocket Labs",
-              url: "https://rust-rocket.com/",
-              logo: "https://rust-rocket.com/images/rust-rocket-logo.gif",
-              sameAs: ["https://x.com/rustrocket", "https://t.me/rustrocket"],
-            }),
-          }}
-        />
-
-        {/* FAQ Schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: [
-                {
-                  "@type": "Question",
-                  name: "What is a Solana sniper bot?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "A Solana sniper bot is an automated trading tool that executes trades on the Solana blockchain with extremely low latency. Rust Rocket achieves 25 ms execution time and same-block execution.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "How does Rust Rocket's copy-trading feature work?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Rust Rocket's intelligent copy-trading automatically identifies and mirrors successful Solana traders' strategies with custom stop-loss and auto-sell conditions.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "What makes Rust Rocket faster than other Solana bots?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Rust Rocket achieves superior speed through 15 private BDN gateways providing direct, low-latency connections to Solana, delivering 25 ms execution time.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "When will Rust Rocket be available?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Rust Rocket's beta version launches on May 9, 2025. Join our waitlist now to get early access to our 25 ms Solana sniper bot.",
-                  },
-                },
-              ],
-            }),
-          }}
-        />
+        {/* Zentralisierte Schema-Komponente */}
+        <SeoSchema />
 
         {/* Google Analytics 4 - Direkte Implementierung */}
         <Script
