@@ -60,35 +60,8 @@ export default function AdsLandingPage() {
       page_location: window.location.href,
     })
 
-    // Redirect to homepage after a short delay
-    const timer = setTimeout(() => {
-      // Construct the redirect URL with UTM parameters
-      const utmSource = searchParams.get("utm_source") || ""
-      const utmMedium = searchParams.get("utm_medium") || ""
-      const utmCampaign = searchParams.get("utm_campaign") || ""
-      const utmContent = searchParams.get("utm_content") || ""
-      const utmTerm = searchParams.get("utm_term") || ""
-
-      let redirectUrl = "/"
-
-      // Add UTM parameters if they exist
-      const params = new URLSearchParams()
-      if (utmSource) params.append("utm_source", utmSource)
-      if (utmMedium) params.append("utm_medium", utmMedium)
-      if (utmCampaign) params.append("utm_campaign", utmCampaign)
-      if (utmContent) params.append("utm_content", utmContent)
-      if (utmTerm) params.append("utm_term", utmTerm)
-
-      // Add the parameters to the URL if there are any
-      const paramsString = params.toString()
-      if (paramsString) {
-        redirectUrl += `?${paramsString}`
-      }
-
-      router.push(redirectUrl)
-    }, 500)
-
-    return () => clearTimeout(timer)
+    // ENTFERNT: Die automatische Weiterleitung nach 500ms wurde entfernt
+    // Dieser Code war die Ursache für das Problem
   }, [router, searchParams])
 
   // Validate email format

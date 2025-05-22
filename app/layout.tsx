@@ -9,6 +9,7 @@ import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import ConsentBanner from "@/components/ConsentBanner"
+import GoogleTagManager from "@/components/GoogleTagManager"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -189,44 +190,26 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/* Google Tag Manager - with consent mode */}
-        <Script id="gtm-script" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            
-            // Default consent mode to denied
-            gtag('consent', 'default', {
-              'analytics_storage': 'denied',
-              'ad_storage': 'denied',
-              'wait_for_update': 500
-            });
-            
-            // Initialize GTM with environment variable
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
-          `}
-        </Script>
+        {/* Verbesserte Google Tag Manager-Komponente */}
+        <GoogleTagManager />
 
-        {/* Twitter Pixel - with consent mode */}
+        {/* Twitter Pixel - mit Consent-Mode */}
         <Script id="twitter-pixel" strategy="afterInteractive">
           {`
             !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
             },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
             a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
             
-            // Initialize Twitter pixel with consent denied by default
-            twq('config','pork0', {
-              use_cookies: false,
-              use_local_storage: false
-            });
+            // Twitter-Pixel mit ID initialisieren
+            twq('config','pork0');
+            
+            // Standardmäßig Tracking aktivieren (für Testzwecke)
+            // In Produktionsumgebung sollte dies entfernt werden
+            twq('consent', 'grant');
           `}
         </Script>
 
-        {/* Facebook Pixel - with consent mode */}
+        {/* Facebook Pixel - mit Consent-Mode */}
         <Script id="facebook-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -238,16 +221,17 @@ export default function RootLayout({
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             
-            // Initialize FB pixel with consent denied by default
-            fbq('dataProcessingOptions', ['LDU'], 0, 0);
-            fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}', {
-              external_id: false
-            });
-            fbq('consent', 'revoke');
+            // FB-Pixel mit ID initialisieren
+            fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
+            
+            // Standardmäßig Tracking aktivieren (für Testzwecke)
+            // In Produktionsumgebung sollte dies entfernt werden
+            fbq('consent', 'grant');
+            fbq('track', 'PageView');
           `}
         </Script>
 
-        {/* UTM Parameter Script */}
+        {/* UTM-Parameter-Script */}
         <Script id="utm-script" strategy="afterInteractive">
           {`
             document.addEventListener('DOMContentLoaded', function() {
@@ -257,16 +241,16 @@ export default function RootLayout({
               utmParams.forEach(param => {
                 const value = p.get(param);
                 if (value) {
-                  // Store in sessionStorage for cross-page persistence
+                  // In sessionStorage für seitenübergreifende Persistenz speichern
                   sessionStorage.setItem(param, value);
                   
-                  // Update any form fields
+                  // Formularfelder aktualisieren
                   const fields = document.querySelectorAll(\`[name="\${param}"]\`);
                   fields.forEach(field => {
                     field.value = value;
                   });
                 } else if (sessionStorage.getItem(param)) {
-                  // Use stored value if available
+                  // Gespeicherten Wert verwenden, falls verfügbar
                   const fields = document.querySelectorAll(\`[name="\${param}"]\`);
                   fields.forEach(field => {
                     field.value = sessionStorage.getItem(param);

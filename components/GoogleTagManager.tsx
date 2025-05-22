@@ -19,6 +19,58 @@ export default function GoogleTagManager() {
       site_type: "nextjs",
       site_version: "1.0.0",
     })
+
+    // Debug-Modus für GTM aktivieren (nur in Entwicklungsumgebung)
+    if (process.env.NODE_ENV === "development") {
+      window.dataLayer.push({
+        "gtm.start": new Date().getTime(),
+        event: "gtm.js",
+        debug_mode: true,
+      })
+    }
+
+    // Consent-Status überprüfen und setzen
+    const hasConsent = localStorage.getItem("cookieConsent") === "true"
+    const consentsString = localStorage.getItem("cookieConsents")
+
+    if (hasConsent && consentsString) {
+      try {
+        const consents = JSON.parse(consentsString)
+
+        // Consent-Status an GTM übermitteln
+        window.dataLayer.push({
+          event: "consent_update",
+          analytics_consent: consents.analytics ? "granted" : "denied",
+          marketing_consent: consents.marketing ? "granted" : "denied",
+          functional_consent: consents.functional ? "granted" : "denied",
+        })
+
+        // Consent-Status für Google direkt setzen
+        if (typeof window.gtag === "function") {
+          window.gtag("consent", "update", {
+            analytics_storage: consents.analytics ? "granted" : "denied",
+            ad_storage: consents.marketing ? "granted" : "denied",
+            functionality_storage: consents.functional ? "granted" : "denied",
+            personalization_storage: consents.marketing ? "granted" : "denied",
+            security_storage: "granted", // Immer erlaubt für Sicherheit
+          })
+        }
+      } catch (e) {
+        console.error("Error parsing consent data:", e)
+      }
+    } else {
+      // Standardmäßig Consent auf "granted" setzen für Testzwecke
+      // WICHTIG: In Produktionsumgebung sollte dies auf "denied" gesetzt werden
+      if (typeof window.gtag === "function") {
+        window.gtag("consent", "update", {
+          analytics_storage: "granted",
+          ad_storage: "granted",
+          functionality_storage: "granted",
+          personalization_storage: "granted",
+          security_storage: "granted",
+        })
+      }
+    }
   }, [])
 
   return (
