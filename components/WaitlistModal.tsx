@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
-import { createClientSupabaseClient } from "@/lib/supabase"
+import { addToWaitlist, getUTMParameters } from "@/lib/waitlist"
 
 interface WaitlistModalProps {
   isOpen: boolean
@@ -15,12 +15,15 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
   const [email, setEmail] = useState("")
   const [telegramUsername, setTelegramUsername] = useState("")
   const [consent, setConsent] = useState(false)
+  const [marketingConsent, setMarketingConsent] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formStatus, setFormStatus] = useState<{
     type: "success" | "error" | null
     message: string | null
+    details?: string
   }>({ type: null, message: null })
   const [emailError, setEmailError] = useState("")
+  const [debugMode, setDebugMode] = useState(true) // Debug-Modus standardmäßig aktiviert
 
   // Reset form when modal is opened
   useEffect(() => {
@@ -28,6 +31,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       setEmail("")
       setTelegramUsername("")
       setConsent(false)
+      setMarketingConsent(false)
       setFormStatus({ type: null, message: null })
       setEmailError("")
 
@@ -61,6 +65,19 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       document.body.style.overflow = "auto"
     }
   }, [isOpen])
+
+  // Enable debug mode with key combination
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Shift+D to toggle debug mode
+      if (e.ctrlKey && e.shiftKey && e.key === "D") {
+        setDebugMode((prev) => !prev)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   // Validate email format
   const validateEmail = (email: string) => {
@@ -134,107 +151,55 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     setIsSubmitting(true)
 
     try {
-      // Supabase integration
-      await handleSupabaseSubmit(email, telegramUsername)
+      // Get UTM parameters from localStorage
+      const utmParams = getUTMParameters()
 
-      // Track successful signup
-      trackEvent("beta_signup", "conversion", "waitlist_signup", 0)
-
-      // Show success message
-      setFormStatus({
-        type: "success",
-        message: "Thanks for joining! We'll be in touch soon.",
+      // Submit to Supabase
+      const result = await addToWaitlist(email, telegramUsername || null, utmParams, {
+        marketing: marketingConsent,
+        terms: consent,
       })
 
-      // Clear form
-      setEmail("")
-      setTelegramUsername("")
-      setConsent(false)
+      if (result.success) {
+        // Track successful signup
+        trackEvent("beta_signup", "conversion", "waitlist_signup", 0)
 
-      // Close modal after 3 seconds on success
-      setTimeout(() => {
-        onClose()
-      }, 3000)
-    } catch (error) {
-      console.error("Error submitting form:", error)
-
-      // Check if it's a duplicate email error
-      if (error instanceof Error && error.message.includes("already on our waitlist")) {
+        // Show success message
         setFormStatus({
-          type: "error",
-          message: "This email is already on our waitlist.",
+          type: "success",
+          message: "Thanks for joining! We'll be in touch soon.",
         })
-        trackEvent("waitlist_form_error", "form", "duplicate_email")
+
+        // Clear form
+        setEmail("")
+        setTelegramUsername("")
+        setConsent(false)
+        setMarketingConsent(false)
+
+        // Close modal after 3 seconds on success
+        setTimeout(() => {
+          onClose()
+        }, 3000)
       } else {
         setFormStatus({
           type: "error",
-          message: "Something went wrong. Please try again.",
+          message: result.message || "Something went wrong. Please try again.",
+          details: debugMode ? JSON.stringify(result.error, null, 2) : undefined,
         })
-        trackEvent("waitlist_form_error", "form", "server_error")
+        trackEvent("waitlist_form_error", "form", "submission_error")
       }
+    } catch (error) {
+      console.error("Error submitting form:", error)
+
+      setFormStatus({
+        type: "error",
+        message: "Something went wrong. Please try again.",
+        details: debugMode ? String(error) : undefined,
+      })
+      trackEvent("waitlist_form_error", "form", "server_error")
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  // Supabase submission
-  const handleSupabaseSubmit = async (email: string, telegramUsername: string) => {
-    const supabase = createClientSupabaseClient()
-
-    // Check if email already exists
-    const { data: existingUser, error: checkError } = await supabase
-      .from("waitlist")
-      .select("id")
-      .eq("email", email)
-      .maybeSingle()
-
-    if (checkError) {
-      console.error("Error checking existing user:", checkError)
-      throw new Error("Error checking database")
-    }
-
-    if (existingUser) {
-      throw new Error("This email is already on our waitlist")
-    }
-
-    // Get UTM parameters from hidden form fields or sessionStorage
-    const getUtmParam = (name: string) => {
-      const field = document.querySelector<HTMLInputElement>(`[name="${name}"]`)
-      if (field?.value) return field.value
-      return sessionStorage.getItem(name) || ""
-    }
-
-    const utmSource = getUtmParam("utm_source")
-    const utmMedium = getUtmParam("utm_medium")
-    const utmCampaign = getUtmParam("utm_campaign")
-    const utmContent = getUtmParam("utm_content")
-    const utmTerm = getUtmParam("utm_term")
-
-    // Construct referral source
-    let referralSource = utmSource || "direct"
-    if (utmMedium || utmCampaign) {
-      referralSource += ` (medium: ${utmMedium || "none"}, campaign: ${utmCampaign || "none"})`
-    }
-
-    // Insert new waitlist entry
-    const { error: insertError } = await supabase.from("waitlist").insert({
-      email,
-      telegram_username: telegramUsername || null,
-      referral_source: referralSource,
-      utm_source: utmSource,
-      utm_medium: utmMedium,
-      utm_campaign: utmCampaign,
-      utm_content: utmContent,
-      utm_term: utmTerm,
-      created_at: new Date().toISOString(),
-    })
-
-    if (insertError) {
-      console.error("Error inserting waitlist entry:", insertError)
-      throw insertError
-    }
-
-    return true
   }
 
   const handleModalClose = () => {
@@ -348,7 +313,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
           <input type="hidden" name="utm_content" />
           <input type="hidden" name="utm_term" />
 
-          {/* Consent checkbox */}
+          {/* Terms Consent checkbox */}
           <div className="flex items-start mt-4">
             <div className="flex items-center h-5">
               <input
@@ -365,7 +330,17 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
             </div>
             <div className="ml-3 text-sm">
               <label htmlFor="consent" className="text-gray-300">
-                I agree to receive updates about Rust Rocket and confirm I have read the{" "}
+                I agree to the{" "}
+                <a
+                  href="https://www.rust-rocket.com/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                  data-tracking-id="terms_link"
+                >
+                  Terms of Service
+                </a>{" "}
+                and{" "}
                 <a
                   href="https://www.rust-rocket.com/privacy"
                   target="_blank"
@@ -376,6 +351,27 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                   Privacy Policy
                 </a>
                 .
+              </label>
+            </div>
+          </div>
+
+          {/* Marketing Consent checkbox */}
+          <div className="flex items-start mt-2">
+            <div className="flex items-center h-5">
+              <input
+                id="marketing-consent"
+                name="marketing-consent"
+                type="checkbox"
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
+                className="w-4 h-4 bg-[#1A1A1A] border border-gray-700 rounded focus:ring-primary focus:ring-2"
+                aria-required="false"
+                data-tracking-id="waitlist_marketing_consent_checkbox"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label htmlFor="marketing-consent" className="text-gray-300">
+                I agree to receive marketing emails about Rust Rocket products and services.
               </label>
             </div>
           </div>
@@ -391,7 +387,10 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
               role="alert"
               aria-live="assertive"
             >
-              {formStatus.message}
+              <p>{formStatus.message}</p>
+              {formStatus.details && debugMode && (
+                <pre className="mt-2 text-xs overflow-auto max-h-32 p-2 bg-black/30 rounded">{formStatus.details}</pre>
+              )}
             </div>
           )}
 
@@ -431,6 +430,11 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
           <p className="text-xs text-gray-400 text-center mt-4">
             We respect your privacy and will never share your information with third parties.
           </p>
+
+          {/* Debug mode indicator */}
+          {debugMode && (
+            <div className="text-xs text-gray-500 text-center mt-2">Debug mode active (Ctrl+Shift+D to toggle)</div>
+          )}
         </form>
       </div>
     </div>

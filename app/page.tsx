@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import Navbar from "@/components/Navbar"
 import Hero from "@/components/Hero"
 import ProblemSection from "@/components/ProblemSection"
@@ -13,6 +14,7 @@ import Footer from "@/components/Footer"
 import ParticlesBackground from "@/components/ParticlesBackground"
 import SectionDivider from "@/components/SectionDivider"
 import ScrollToTop from "@/components/ScrollToTop"
+import UTMTracker from "@/components/UTMTracker"
 
 export default function Home() {
   return (
@@ -42,6 +44,9 @@ export default function Home() {
       </main>
       <Footer />
       <ScrollToTop />
+      <Suspense fallback={null}>
+        <UTMTracker />
+      </Suspense>
 
       {/* Google Tag Manager (noscript) */}
       <noscript>
