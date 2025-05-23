@@ -148,6 +148,17 @@ export default function RootLayout({
           }}
         />
 
+        {/* Google Ads Conversion Tracking - Neue Conversion ID */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=AW-17075854441" strategy="afterInteractive" />
+        <Script id="google-ads-conversion" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-17075854441');
+          `}
+        </Script>
+
         {/* Google Analytics 4 - Enhanced Configuration */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
@@ -217,15 +228,6 @@ export default function RootLayout({
                 'non_interaction': true
               });
             }, 30000);
-          `}
-        </Script>
-
-        {/* Google Ads Conversion Tracking */}
-        <Script id="google-ads-conversion" strategy="afterInteractive">
-          {`
-            gtag('config', 'AW-11335521273', {
-              'allow_enhanced_conversions': true
-            });
           `}
         </Script>
 
