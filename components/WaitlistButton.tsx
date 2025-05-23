@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { trackButtonClick } from "@/lib/tracking"
+import { useWaitlistModal } from "./WaitlistModalProvider"
 
 interface WaitlistButtonProps {
   className?: string
@@ -27,6 +28,7 @@ export default function WaitlistButton({
   disabled = false,
 }: WaitlistButtonProps) {
   const [mounted, setMounted] = useState(false)
+  const { openModal } = useWaitlistModal()
 
   useEffect(() => {
     setMounted(true)
@@ -61,8 +63,22 @@ export default function WaitlistButton({
   }
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+
     // Track button click with enhanced tracking
     trackButtonClick(id, String(children))
+
+    // Open the waitlist modal
+    try {
+      openModal()
+    } catch (error) {
+      console.error("Error opening waitlist modal:", error)
+      // Fallback: scroll to signup form if modal fails
+      const signupElement = document.getElementById("signup")
+      if (signupElement) {
+        signupElement.scrollIntoView({ behavior: "smooth" })
+      }
+    }
 
     // Call the original onClick handler if provided
     if (onClick) onClick()

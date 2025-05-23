@@ -4,11 +4,9 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import Link from "next/link"
 import { motion } from "framer-motion"
-import { ArrowRight, Check } from "lucide-react"
+import { Check } from "lucide-react"
 import Navbar from "@/components/Navbar"
-import WaitlistButton from "@/components/WaitlistButton"
 import ParticlesBackground from "@/components/ParticlesBackground"
 import Footer from "@/components/Footer"
 import ScrollToTop from "@/components/ScrollToTop"
@@ -285,21 +283,6 @@ export default function AdsLandingPage() {
                   Get exclusive beta access to the fastest Solana sniper bot. Dominate pump.fun launches with 25ms
                   execution speed, intelligent copy trading, and advanced MEV protection. Limited spots available.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  <WaitlistButton
-                    className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-lg text-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
-                    onClick={() => handleButtonClick("cta_primary", "Join Free Beta")}
-                  >
-                    Join Free Beta <ArrowRight className="h-5 w-5" />
-                  </WaitlistButton>
-                  <Link
-                    href="#signup"
-                    className="bg-background-secondary hover:bg-background-tertiary text-white px-6 py-3 rounded-lg text-lg font-medium transition-all duration-300 flex items-center justify-center border border-gray-700 hover:border-gray-500"
-                    onClick={() => handleButtonClick("cta_secondary", "Learn More")}
-                  >
-                    Learn More
-                  </Link>
-                </div>
                 <div className="flex items-center text-sm text-gray-400">
                   <Check className="h-4 w-4 text-primary mr-2" />
                   <span>Limited beta spots - Join 200+ traders already signed up</span>

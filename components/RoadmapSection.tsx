@@ -231,22 +231,6 @@ export default function RoadmapSection() {
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-center mt-12"
-        >
-          <a
-            href="#waitlist"
-            className="inline-flex items-center bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-medium py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-lg hover:shadow-primary/20"
-          >
-            Join the Waitlist
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </a>
-        </motion.div>
-
         {/* Detail Dialog */}
         <Dialog open={selectedPhase !== null} onOpenChange={() => setSelectedPhase(null)}>
           <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-background to-background-secondary border-none">
