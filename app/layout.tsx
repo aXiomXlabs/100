@@ -143,18 +143,16 @@ export default function RootLayout({
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             
-            // Aktiviere Debug-Modus
             gtag('config', '${process.env.NEXT_PUBLIC_GTM_ID}', {
               debug_mode: true,
               send_page_view: true,
               cookie_flags: 'samesite=none;secure',
               cookie_domain: 'auto',
-              cookie_expires: 63072000, // 2 Jahre in Sekunden
+              cookie_expires: 63072000,
               allow_google_signals: true,
               allow_ad_personalization_signals: true
             });
             
-            // Sende ein Test-Event
             gtag('event', 'page_view_test', {
               'event_category': 'engagement',
               'event_label': 'test_event',
@@ -162,9 +160,19 @@ export default function RootLayout({
             });
           `}
         </Script>
+
+        {/* Twitter conversion tracking base code */}
+        <Script id="twitter-conversion-base" strategy="afterInteractive">
+          {`
+            !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+            },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
+            a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+            twq('config','pork0');
+          `}
+        </Script>
       </head>
       <body>
-        {/* Google Tag Manager - NoScript (für Nutzer ohne JavaScript) */}
+        {/* Google Tag Manager - NoScript */}
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
@@ -178,13 +186,9 @@ export default function RootLayout({
         {/* Twitter Pixel */}
         <Script id="twitter-pixel" strategy="afterInteractive">
           {`
-            !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
-            },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
-            a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
-            
-            // Twitter-Pixel mit ID initialisieren
-            twq('config','pork0');
-            twq('track', 'PageView');
+            if (typeof twq !== 'undefined') {
+              twq('track', 'PageView');
+            }
           `}
         </Script>
 
@@ -200,7 +204,6 @@ export default function RootLayout({
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             
-            // FB-Pixel mit ID initialisieren
             fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
             fbq('track', 'PageView');
           `}
@@ -216,17 +219,14 @@ export default function RootLayout({
               utmParams.forEach(param => {
                 const value = p.get(param);
                 if (value) {
-                  // In sessionStorage für seitenübergreifende Persistenz speichern
                   sessionStorage.setItem(param, value);
                   
-                  // Formularfelder aktualisieren
-                  const fields = document.querySelectorAll(\`[name="\${param}"]\`);
+                  const fields = document.querySelectorAll('[name="' + param + '"]');
                   fields.forEach(field => {
                     field.value = value;
                   });
                 } else if (sessionStorage.getItem(param)) {
-                  // Gespeicherten Wert verwenden, falls verfügbar
-                  const fields = document.querySelectorAll(\`[name="\${param}"]\`);
+                  const fields = document.querySelectorAll('[name="' + param + '"]');
                   fields.forEach(field => {
                     field.value = sessionStorage.getItem(param);
                   });
