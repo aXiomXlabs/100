@@ -71,7 +71,7 @@ export default function Footer() {
             <div className="flex justify-center lg:justify-end gap-4">
               {/* Telegram */}
               <SocialLink
-                href="https://t.me/rustxrocket"
+                href="https://t.me/rust_rocket"
                 label="Telegram Channel"
                 id="footer-telegram-link"
                 trackingId="footer_telegram_click"

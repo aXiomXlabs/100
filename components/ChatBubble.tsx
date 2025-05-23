@@ -537,8 +537,8 @@ export default function ChatBubble() {
       return detailedInfo.security
     } else if (input.includes("technical") || input.includes("details") || input.includes("specs")) {
       return detailedInfo.technical
-    } else if (input.includes("discord") || input.includes("community")) {
-      return "Join our Discord community: https://discord.gg/9nVZAEWJfc"
+    } else if (input.includes("discord") || input.includes("community") || input.includes("telegram")) {
+      return "Join our community! Discord: https://discord.gg/9nVZAEWJfc | Telegram: https://t.me/rust_rocket"
     }
 
     // Default response if no keywords match

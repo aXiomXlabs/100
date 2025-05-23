@@ -3,12 +3,15 @@
 import { useRef, useState } from "react"
 import { Search, Zap, TrendingUp, Users, Target, Shield, Rocket } from "lucide-react"
 import { motion, useInView } from "framer-motion"
+import { useMobile } from "@/hooks/useMobile"
 
 export default function CopyTradingSection() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
   const [activeFeature, setActiveFeature] = useState(0)
   const [selectedTrade, setSelectedTrade] = useState<number | null>(null)
+
+  const isMobile = useMobile()
 
   const features = [
     {
@@ -77,9 +80,13 @@ export default function CopyTradingSection() {
     >
       {/* Enhanced Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-solana-green/10 to-primary/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-solana-purple/10 to-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/5 to-solana-green/5 rounded-full blur-2xl"></div>
+        <div
+          className={`absolute top-1/4 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-r from-solana-green/10 to-primary/10 rounded-full ${isMobile ? "blur-xl" : "blur-3xl"} ${isMobile ? "" : "animate-pulse"}`}
+        ></div>
+        <div
+          className={`absolute bottom-1/4 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-gradient-to-r from-solana-purple/10 to-blue-500/10 rounded-full ${isMobile ? "blur-xl" : "blur-3xl"} ${isMobile ? "" : "animate-pulse delay-1000"}`}
+        ></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 md:w-64 h-48 md:h-64 bg-gradient-to-r from-primary/5 to-solana-green/5 rounded-full blur-2xl"></div>
       </div>
 
       <div className="container-custom relative z-10">
@@ -141,8 +148,11 @@ export default function CopyTradingSection() {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                className={`relative group cursor-pointer transition-all duration-500 ${
+                transition={{
+                  duration: isMobile ? 0.4 : 0.6,
+                  delay: isMobile ? Math.min(0.2, 0.05 * index) : 0.1 * index,
+                }}
+                className={`relative group cursor-pointer transition-all duration-300 ${
                   activeFeature === index ? "scale-105" : "hover:scale-102"
                 }`}
                 onMouseEnter={() => setActiveFeature(index)}
@@ -301,7 +311,10 @@ export default function CopyTradingSection() {
                       key={index}
                       initial={{ opacity: 0, x: -20 }}
                       animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                      transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+                      transition={{
+                        duration: isMobile ? 0.3 : 0.5,
+                        delay: isMobile ? 0.3 + index * 0.05 : 0.6 + index * 0.1,
+                      }}
                       className={`
                         flex items-center justify-between p-4 rounded-xl border transition-all duration-300 cursor-pointer
                         ${
@@ -311,7 +324,7 @@ export default function CopyTradingSection() {
                         }
                       `}
                       onClick={() => setSelectedTrade(selectedTrade === index ? null : index)}
-                      whileHover={{ scale: 1.01 }}
+                      whileHover={isMobile ? {} : { scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                     >
                       <div className="flex items-center gap-4">
