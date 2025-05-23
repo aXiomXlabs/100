@@ -228,6 +228,21 @@ export default function Navbar() {
                   <ExternalLink className="h-4 w-4" aria-hidden="true" />
                 </a>
               </div>
+              <div className="pt-2 border-t border-gray-800 mt-2">
+                <a
+                  href="https://discord.gg/9nVZAEWJfc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  id="mobile-discord-link"
+                  data-tracking-id="mobile_discord_click"
+                  onClick={() => trackNavClick("discord")}
+                  className="flex items-center justify-between py-2 px-3 text-text-primary hover:text-primary hover:bg-background-tertiary rounded-md transition-colors"
+                  aria-label="Discord Channel (opens in a new tab)"
+                >
+                  <span>Discord Channel</span>
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                </a>
+              </div>
             </nav>
           </motion.div>
         )}

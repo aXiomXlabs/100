@@ -425,6 +425,7 @@ Follow this guide to get started with Rust Rocket and get the most out of our tr
 • **Video Tutorials**: Step-by-step guides on our YouTube channel
 • **Community Forum**: Exchange with other users and the team
 • **Support Team**: Reachable via email, chat, and phone (Enterprise Plan)
+• **Discord Community**: Join our Discord server: https://discord.gg/9nVZAEWJfc
 
 Start with Rust Rocket today and experience the difference that Same-Block Execution and advanced Copy Trading can make for your trading results.`,
 }
@@ -536,6 +537,8 @@ export default function ChatBubble() {
       return detailedInfo.security
     } else if (input.includes("technical") || input.includes("details") || input.includes("specs")) {
       return detailedInfo.technical
+    } else if (input.includes("discord") || input.includes("community")) {
+      return "Join our Discord community: https://discord.gg/9nVZAEWJfc"
     }
 
     // Default response if no keywords match

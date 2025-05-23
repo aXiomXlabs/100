@@ -99,7 +99,7 @@ export default function Footer() {
 
               {/* Discord */}
               <SocialLink
-                href="https://discord.gg/rustrocket"
+                href="https://discord.gg/9nVZAEWJfc"
                 label="Discord Server"
                 id="footer-discord-link"
                 trackingId="footer_discord_click"
