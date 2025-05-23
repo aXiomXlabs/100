@@ -8,40 +8,48 @@ import Script from "next/script"
 interface FAQItem {
   question: string
   answer: string
+  id: string
 }
 
 const faqs: FAQItem[] = [
   {
+    id: "what-is-rust-rocket",
     question: "What is Rust Rocket?",
     answer:
       "Rust Rocket is an advanced Solana trading bot that specializes in same-block execution and copy trading. With our proprietary BDN network (Block Dependent Network), we enable you to execute trades in the same block as the original event and automatically copy successful traders.",
   },
   {
+    id: "same-block-execution",
     question: "What does Same-Block Execution mean?",
     answer:
       "Same-Block Execution means that your trades are executed in exactly the same Solana block as the original event (e.g., a token launch or a trade by a successful trader). This is crucial for success when trading meme coins, as even fractions of a second can determine profit or loss.",
   },
   {
+    id: "copy-trading",
     question: "How does Copy Trading work?",
     answer:
       "Our system continuously identifies and tracks top-performing wallets on Solana. When these wallets execute a trade, our algorithm analyzes the transaction and automatically executes the same trade for you - with maximum speed and precision. You can decide which wallets to copy and set your risk parameters individually.",
   },
   {
+    id: "bdn-network",
     question: "What is the BDN Network?",
     answer:
       "The BDN (Block Dependent Network) is our global network of 15 proprietary, optimized Solana gateways. These are strategically distributed around the world and equipped with special hardware to route your transactions through the fastest and most reliable paths. Unlike public nodes, we bypass congestion and achieve a significantly higher success rate.",
   },
   {
+    id: "success-rates",
     question: "What are the success rates?",
     answer:
-      "Rust Rocket achieves a success rate of over 95% when executing trades in the same block. The average execution time is about 0.4 seconds, which is significantly faster than conventional bots or manual trades.",
+      "Rust Rocket achieves a success rate of over 95% when executing trades in the same block. The average execution time is about 25 milliseconds, which is significantly faster than conventional bots or manual trades.",
   },
   {
+    id: "how-to-use",
     question: "How can I use Rust Rocket?",
     answer:
       "Rust Rocket is provided via Telegram. After registration, you get access to our Telegram bot, through which you can control all functions. The setup is simple and intuitive, and we offer comprehensive documentation and support for all users.",
   },
   {
+    id: "launch-date",
     question: "When will Rust Rocket launch?",
     answer:
       "Rust Rocket is currently in the final testing phase and will officially launch next week. Join our waitlist to be notified first and receive exclusive benefits.",
@@ -163,13 +171,13 @@ export default function FAQSection() {
             "@context": "https://schema.org",
             "@type": "FAQPage",
             "@id": "https://rust-rocket.com/faq",
-            mainEntity: faqs.map((faq, index) => ({
+            mainEntity: faqs.map((faq) => ({
               "@type": "Question",
-              "@id": `https://rust-rocket.com/faq#question${index + 1}`,
+              "@id": `https://rust-rocket.com/faq#${faq.id}`,
               name: faq.question,
               acceptedAnswer: {
                 "@type": "Answer",
-                "@id": `https://rust-rocket.com/faq#answer${index + 1}`,
+                "@id": `https://rust-rocket.com/faq#${faq.id}-answer`,
                 text: faq.answer,
               },
             })),

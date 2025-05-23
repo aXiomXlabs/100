@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import Script from "next/script"
 
 export default function SeoSchema() {
   const pathname = usePathname()
@@ -17,6 +18,38 @@ export default function SeoSchema() {
     sameAs: ["https://x.com/rustrocket", "https://t.me/rustrocket"],
   }
 
+  // Product Schema with offers
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": "https://rust-rocket.com/#product",
+    name: "Rust Rocket Solana Sniper Bot",
+    description: "25 ms Solana Sniper Bot with Same-Block Execution and intelligent copy trading",
+    image: "https://rust-rocket.com/images/rust-rocket-logo.gif",
+    brand: {
+      "@type": "Brand",
+      name: "Rust Rocket",
+    },
+    offers: {
+      "@type": "Offer",
+      price: "0.00",
+      priceCurrency: "USD",
+      availability: "https://schema.org/PreOrder",
+    },
+    review: {
+      "@type": "Review",
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: "5",
+        bestRating: "5",
+      },
+      author: {
+        "@type": "Person",
+        name: "Alex K.",
+      },
+    },
+  }
+
   // FAQ Schema with unique @id
   const faqSchema = {
     "@context": "https://schema.org",
@@ -25,6 +58,7 @@ export default function SeoSchema() {
     mainEntity: [
       {
         "@type": "Question",
+        "@id": "https://rust-rocket.com/#question-what-is-solana-sniper-bot",
         name: "What is a Solana sniper bot?",
         acceptedAnswer: {
           "@type": "Answer",
@@ -33,6 +67,7 @@ export default function SeoSchema() {
       },
       {
         "@type": "Question",
+        "@id": "https://rust-rocket.com/#question-copy-trading",
         name: "How does Rust Rocket's copy-trading feature work?",
         acceptedAnswer: {
           "@type": "Answer",
@@ -41,6 +76,7 @@ export default function SeoSchema() {
       },
       {
         "@type": "Question",
+        "@id": "https://rust-rocket.com/#question-speed",
         name: "What makes Rust Rocket faster than other Solana bots?",
         acceptedAnswer: {
           "@type": "Answer",
@@ -49,6 +85,7 @@ export default function SeoSchema() {
       },
       {
         "@type": "Question",
+        "@id": "https://rust-rocket.com/#question-availability",
         name: "When will Rust Rocket be available?",
         acceptedAnswer: {
           "@type": "Answer",
@@ -56,29 +93,6 @@ export default function SeoSchema() {
         },
       },
     ],
-  }
-
-  // Properly formatted Review Schema with itemReviewed and correct author type
-  const reviewSchema = {
-    "@context": "https://schema.org",
-    "@type": "Review",
-    "@id": "https://rust-rocket.com/#review",
-    itemReviewed: {
-      "@type": "Product",
-      name: "Rust Rocket Copy-Trading",
-      description: "Solana trading bot with intelligent copy trading capabilities",
-    },
-    author: {
-      "@type": "Person",
-      name: "Alex K.",
-    },
-    reviewBody:
-      "Rust Rocket's copy-trading feature is a game-changer for Solana trading. I've been able to automatically mirror successful strategies with custom stop-loss conditions, which has significantly improved my returns.",
-    reviewRating: {
-      "@type": "Rating",
-      ratingValue: "5",
-      bestRating: "5",
-    },
   }
 
   // Software Application Schema
@@ -91,7 +105,7 @@ export default function SeoSchema() {
     operatingSystem: "Web",
     offers: {
       "@type": "Offer",
-      price: "0",
+      price: "0.00",
       priceCurrency: "USD",
       availability: "https://schema.org/ComingSoon",
     },
@@ -103,14 +117,31 @@ export default function SeoSchema() {
   if (isHomePage) {
     return (
       <>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }} />
+        <Script
+          id="organization-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <Script
+          id="product-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
+        <Script
+          id="software-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+        />
       </>
     )
   }
 
   // For non-homepage, just return organization schema
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+  return (
+    <Script
+      id="organization-schema"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+    />
+  )
 }
