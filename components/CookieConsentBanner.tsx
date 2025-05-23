@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
+import { motion, AnimatePresence } from "framer-motion"
 
 // Type definitions for better type safety
 interface CookieConsents {
@@ -70,9 +71,13 @@ export default function CookieConsentBanner() {
 
     if (hasConsent && savedConsents) {
       try {
-        setConsents(JSON.parse(savedConsents))
+        const parsedConsents = JSON.parse(savedConsents)
+        setConsents(parsedConsents)
+        // Apply saved consents immediately
+        applyConsents(parsedConsents)
       } catch (e) {
         console.error("Error parsing saved consents:", e)
+        setShowBanner(true)
       }
     } else {
       // Show banner after a short delay
@@ -85,10 +90,24 @@ export default function CookieConsentBanner() {
 
   const handleConsentToggle = (type: keyof CookieConsents) => {
     if (type === "necessary") return // Cannot toggle necessary cookies
-    setConsents((prev) => ({ ...prev, [type]: !prev[type] }))
+
+    // Create a new consents object with the toggled value
+    const newConsents = {
+      ...consents,
+      [type]: !consents[type],
+    }
+
+    // Update state with the new consents
+    setConsents(newConsents)
+
+    // Log for debugging
+    console.log(`Toggled ${type} to ${!consents[type]}`, newConsents)
   }
 
   const saveConsents = () => {
+    // Log current consents before saving
+    console.log("Saving consents:", consents)
+
     setLocalStorageItem("cookieConsent", "true")
     setLocalStorageItem("cookieConsents", JSON.stringify(consents))
     setLocalStorageItem("consentTimestamp", new Date().toISOString())
@@ -104,6 +123,10 @@ export default function CookieConsentBanner() {
       marketing: true,
       social: true,
     }
+
+    // Log for debugging
+    console.log("Accepting all cookies:", allConsents)
+
     setConsents(allConsents)
     setLocalStorageItem("cookieConsent", "true")
     setLocalStorageItem("cookieConsents", JSON.stringify(allConsents))
@@ -120,6 +143,10 @@ export default function CookieConsentBanner() {
       marketing: false,
       social: false,
     }
+
+    // Log for debugging
+    console.log("Rejecting non-essential cookies:", minimalConsents)
+
     setConsents(minimalConsents)
     setLocalStorageItem("cookieConsent", "minimal")
     setLocalStorageItem("cookieConsents", JSON.stringify(minimalConsents))
@@ -129,6 +156,9 @@ export default function CookieConsentBanner() {
   }
 
   const applyConsents = (appliedConsents = consents) => {
+    // Log for debugging
+    console.log("Applying consents:", appliedConsents)
+
     // Google Analytics / GTM Consent
     if (typeof window.dataLayer !== "undefined") {
       window.dataLayer.push({
@@ -220,6 +250,7 @@ export default function CookieConsentBanner() {
           <button
             onClick={() => setShowDetails(!showDetails)}
             className="text-gray-400 hover:text-white transition-colors flex items-center text-sm"
+            aria-expanded={showDetails}
           >
             {showDetails ? (
               <>
@@ -239,88 +270,108 @@ export default function CookieConsentBanner() {
           consent to our use of cookies and similar technologies as described in our Cookie Policy.
         </p>
 
-        {showDetails && (
-          <div className="mb-4 bg-gray-800 rounded-lg p-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-white">Necessary Cookies</h4>
-                  <p className="text-xs text-gray-400">
-                    These cookies are essential for the website to function properly.
-                  </p>
+        <AnimatePresence>
+          {showDetails && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mb-4 bg-gray-800 rounded-lg p-4 overflow-hidden"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-white">Necessary Cookies</h4>
+                    <p className="text-xs text-gray-400">
+                      These cookies are essential for the website to function properly.
+                    </p>
+                  </div>
+                  <div className="relative">
+                    <Switch checked={consents.necessary} disabled className="data-[state=checked]:bg-primary" />
+                  </div>
                 </div>
-                <Switch checked={consents.necessary} disabled className="data-[state=checked]:bg-primary" />
-              </div>
 
-              <Separator className="bg-gray-700" />
+                <Separator className="bg-gray-700" />
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-white">Functional Cookies</h4>
-                  <p className="text-xs text-gray-400">These cookies enable personalized features and functionality.</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-white">Functional Cookies</h4>
+                    <p className="text-xs text-gray-400">
+                      These cookies enable personalized features and functionality.
+                    </p>
+                  </div>
+                  <div className="relative">
+                    <Switch
+                      checked={consents.functional}
+                      onCheckedChange={() => handleConsentToggle("functional")}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                  </div>
                 </div>
-                <Switch
-                  checked={consents.functional}
-                  onCheckedChange={() => handleConsentToggle("functional")}
-                  className="data-[state=checked]:bg-primary"
-                />
-              </div>
 
-              <Separator className="bg-gray-700" />
+                <Separator className="bg-gray-700" />
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-white">Analytics Cookies</h4>
-                  <p className="text-xs text-gray-400">
-                    These cookies help us understand how visitors interact with our website.
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-white">Analytics Cookies</h4>
+                    <p className="text-xs text-gray-400">
+                      These cookies help us understand how visitors interact with our website.
+                    </p>
+                  </div>
+                  <div className="relative">
+                    <Switch
+                      checked={consents.analytics}
+                      onCheckedChange={() => handleConsentToggle("analytics")}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                  </div>
                 </div>
-                <Switch
-                  checked={consents.analytics}
-                  onCheckedChange={() => handleConsentToggle("analytics")}
-                  className="data-[state=checked]:bg-primary"
-                />
-              </div>
 
-              <Separator className="bg-gray-700" />
+                <Separator className="bg-gray-700" />
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-white">Marketing Cookies</h4>
-                  <p className="text-xs text-gray-400">
-                    These cookies are used to deliver advertisements more relevant to you and your interests.
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-white">Marketing Cookies</h4>
+                    <p className="text-xs text-gray-400">
+                      These cookies are used to deliver advertisements more relevant to you and your interests.
+                    </p>
+                  </div>
+                  <div className="relative">
+                    <Switch
+                      checked={consents.marketing}
+                      onCheckedChange={() => handleConsentToggle("marketing")}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                  </div>
                 </div>
-                <Switch
-                  checked={consents.marketing}
-                  onCheckedChange={() => handleConsentToggle("marketing")}
-                  className="data-[state=checked]:bg-primary"
-                />
-              </div>
 
-              <Separator className="bg-gray-700" />
+                <Separator className="bg-gray-700" />
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-white">Social Media Cookies</h4>
-                  <p className="text-xs text-gray-400">
-                    These cookies enable social sharing and integration with social platforms.
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-white">Social Media Cookies</h4>
+                    <p className="text-xs text-gray-400">
+                      These cookies enable social sharing and integration with social platforms.
+                    </p>
+                  </div>
+                  <div className="relative">
+                    <Switch
+                      checked={consents.social}
+                      onCheckedChange={() => handleConsentToggle("social")}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                  </div>
                 </div>
-                <Switch
-                  checked={consents.social}
-                  onCheckedChange={() => handleConsentToggle("social")}
-                  className="data-[state=checked]:bg-primary"
-                />
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 justify-between">
           <div className="flex items-center">
             <a
-              href="/privacy"
+              href="/legal/privacy"
               className="text-xs text-primary hover:underline mr-4"
               target="_blank"
               rel="noopener noreferrer"
@@ -328,7 +379,7 @@ export default function CookieConsentBanner() {
               Privacy Policy
             </a>
             <a
-              href="/cookies"
+              href="/legal/cookies"
               className="text-xs text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"

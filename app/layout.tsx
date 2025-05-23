@@ -8,7 +8,7 @@ import Script from "next/script"
 import { Suspense } from "react"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import ConsentBanner from "@/components/ConsentBanner"
+import CookieConsentBanner from "@/components/CookieConsentBanner"
 import SeoSchema from "@/components/SeoSchema"
 
 const inter = Inter({
@@ -233,7 +233,7 @@ export default function RootLayout({
           <ChatBubble />
           <Analytics />
           <SpeedInsights />
-          <ConsentBanner />
+          <CookieConsentBanner />
         </WaitlistModalProvider>
       </body>
     </html>

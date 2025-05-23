@@ -10,6 +10,8 @@ export default function CopyTradingSection() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
   const [showDescription, setShowDescription] = useState(false)
+  const [selectedTrade, setSelectedTrade] = useState<number | null>(null)
+  const [expandedCard, setExpandedCard] = useState<number | null>(null)
 
   return (
     <section
@@ -182,57 +184,115 @@ export default function CopyTradingSection() {
                         <p className="text-xs text-text-secondary">Real-time performance</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <motion.div
+                      className="flex items-center gap-2 px-2 py-1 rounded-full bg-background-secondary/80 border border-transparent hover:border-solana-green/30 cursor-pointer"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
                       <div className="w-2 h-2 rounded-full bg-solana-green animate-pulse"></div>
                       <span className="text-xs text-solana-green font-medium">Live</span>
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* Performance Cards */}
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     <motion.div
-                      className="bg-background-tertiary p-3 rounded-lg border border-solana-green/20"
+                      className={`bg-background-tertiary p-3 rounded-lg border border-solana-green/20 transition-all duration-300 cursor-pointer ${expandedCard === 0 ? "ring-2 ring-solana-green" : "hover:border-solana-green/50 hover:shadow-lg hover:shadow-solana-green/10"}`}
                       initial={{ y: 10, opacity: 0 }}
                       animate={isInView ? { y: 0, opacity: 1 } : { y: 10, opacity: 0 }}
                       transition={{ duration: 0.5, delay: 1 }}
+                      onClick={() => setExpandedCard(expandedCard === 0 ? null : 0)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <div className="text-xs text-text-secondary mb-1">Total Profit</div>
                       <div className="text-lg font-bold text-solana-green">+$12,847</div>
                       <div className="text-xs text-solana-green">+34.2%</div>
+                      {expandedCard === 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          className="mt-2 pt-2 border-t border-solana-green/20"
+                        >
+                          <div className="text-xs text-text-secondary">
+                            Last 24h: <span className="text-solana-green">+$1,240</span>
+                          </div>
+                          <div className="text-xs text-text-secondary">
+                            Last 7d: <span className="text-solana-green">+$5,632</span>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
 
                     <motion.div
-                      className="bg-background-tertiary p-3 rounded-lg border border-primary/20"
+                      className={`bg-background-tertiary p-3 rounded-lg border border-primary/20 transition-all duration-300 cursor-pointer ${expandedCard === 1 ? "ring-2 ring-primary" : "hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"}`}
                       initial={{ y: 10, opacity: 0 }}
                       animate={isInView ? { y: 0, opacity: 1 } : { y: 10, opacity: 0 }}
                       transition={{ duration: 0.5, delay: 1.2 }}
+                      onClick={() => setExpandedCard(expandedCard === 1 ? null : 1)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <div className="text-xs text-text-secondary mb-1">Active Copies</div>
                       <div className="text-lg font-bold text-primary">23</div>
                       <div className="text-xs text-text-secondary">Wallets</div>
+                      {expandedCard === 1 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          className="mt-2 pt-2 border-t border-primary/20"
+                        >
+                          <div className="text-xs text-text-secondary">
+                            Top Performer: <span className="text-primary">Wallet #8</span>
+                          </div>
+                          <div className="text-xs text-text-secondary">
+                            New Today: <span className="text-primary">+3</span>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
 
                     <motion.div
-                      className="bg-background-tertiary p-3 rounded-lg border border-solana-purple/20"
+                      className={`bg-background-tertiary p-3 rounded-lg border border-solana-purple/20 transition-all duration-300 cursor-pointer ${expandedCard === 2 ? "ring-2 ring-solana-purple" : "hover:border-solana-purple/50 hover:shadow-lg hover:shadow-solana-purple/10"}`}
                       initial={{ y: 10, opacity: 0 }}
                       animate={isInView ? { y: 0, opacity: 1 } : { y: 10, opacity: 0 }}
                       transition={{ duration: 0.5, delay: 1.4 }}
+                      onClick={() => setExpandedCard(expandedCard === 2 ? null : 2)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <div className="text-xs text-text-secondary mb-1">Win Rate</div>
                       <div className="text-lg font-bold text-solana-purple">87%</div>
                       <div className="text-xs text-text-secondary">Success</div>
+                      {expandedCard === 2 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          className="mt-2 pt-2 border-t border-solana-purple/20"
+                        >
+                          <div className="text-xs text-text-secondary">
+                            Trades: <span className="text-solana-purple">142 total</span>
+                          </div>
+                          <div className="text-xs text-text-secondary">
+                            Avg. Hold: <span className="text-solana-purple">3.2h</span>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
                   </div>
 
                   {/* Recent Trades */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 relative">
                     <div className="text-xs font-medium text-text-secondary mb-2">Recent Copy Trades</div>
 
                     <motion.div
-                      className="flex items-center justify-between p-2 bg-background-tertiary/50 rounded border border-solana-green/10"
+                      className={`flex items-center justify-between p-2 bg-background-tertiary/50 rounded border transition-all duration-300 cursor-pointer ${selectedTrade === 0 ? "border-solana-green ring-1 ring-solana-green" : "border-solana-green/10 hover:border-solana-green/30 hover:bg-background-tertiary"}`}
                       initial={{ x: -10, opacity: 0 }}
                       animate={isInView ? { x: 0, opacity: 1 } : { x: -10, opacity: 0 }}
                       transition={{ duration: 0.5, delay: 1.6 }}
+                      onClick={() => setSelectedTrade(selectedTrade === 0 ? null : 0)}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                     >
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-gradient-to-r from-solana-green to-primary flex items-center justify-center">
@@ -247,13 +307,41 @@ export default function CopyTradingSection() {
                         <div className="text-xs font-medium text-solana-green">+$247</div>
                         <div className="text-xs text-text-secondary">2m ago</div>
                       </div>
+                      {selectedTrade === 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          className="absolute left-0 right-0 top-full mt-1 p-2 bg-background-tertiary rounded-b border border-solana-green/20 z-10"
+                        >
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="text-text-secondary">
+                              Entry Price: <span className="text-text-primary">0.00000124 SOL</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Exit Price: <span className="text-text-primary">0.00000152 SOL</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Amount: <span className="text-text-primary">2,500,000 BONK</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Profit: <span className="text-solana-green">+22.58%</span>
+                            </div>
+                          </div>
+                          <div className="mt-1 pt-1 border-t border-solana-green/10 flex justify-end">
+                            <button className="text-xs text-solana-green hover:underline">View Transaction</button>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
 
                     <motion.div
-                      className="flex items-center justify-between p-2 bg-background-tertiary/50 rounded border border-primary/10"
+                      className={`flex items-center justify-between p-2 bg-background-tertiary/50 rounded border transition-all duration-300 cursor-pointer ${selectedTrade === 1 ? "border-primary ring-1 ring-primary" : "border-primary/10 hover:border-primary/30 hover:bg-background-tertiary"}`}
                       initial={{ x: -10, opacity: 0 }}
                       animate={isInView ? { x: 0, opacity: 1 } : { x: -10, opacity: 0 }}
                       transition={{ duration: 0.5, delay: 1.8 }}
+                      onClick={() => setSelectedTrade(selectedTrade === 1 ? null : 1)}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                     >
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-solana-purple flex items-center justify-center">
@@ -268,13 +356,41 @@ export default function CopyTradingSection() {
                         <div className="text-xs font-medium text-solana-green">+$156</div>
                         <div className="text-xs text-text-secondary">5m ago</div>
                       </div>
+                      {selectedTrade === 1 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          className="absolute left-0 right-0 top-full mt-1 p-2 bg-background-tertiary rounded-b border border-primary/20 z-10"
+                        >
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="text-text-secondary">
+                              Entry Price: <span className="text-text-primary">0.00000342 SOL</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Exit Price: <span className="text-text-primary">0.00000398 SOL</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Amount: <span className="text-text-primary">1,200,000 WIF</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Profit: <span className="text-solana-green">+16.37%</span>
+                            </div>
+                          </div>
+                          <div className="mt-1 pt-1 border-t border-primary/10 flex justify-end">
+                            <button className="text-xs text-primary hover:underline">View Transaction</button>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
 
                     <motion.div
-                      className="flex items-center justify-between p-2 bg-background-tertiary/50 rounded border border-solana-purple/10"
+                      className={`flex items-center justify-between p-2 bg-background-tertiary/50 rounded border transition-all duration-300 cursor-pointer ${selectedTrade === 2 ? "border-solana-purple ring-1 ring-solana-purple" : "border-solana-purple/10 hover:border-solana-purple/30 hover:bg-background-tertiary"}`}
                       initial={{ x: -10, opacity: 0 }}
                       animate={isInView ? { x: 0, opacity: 1 } : { x: -10, opacity: 0 }}
                       transition={{ duration: 0.5, delay: 2 }}
+                      onClick={() => setSelectedTrade(selectedTrade === 2 ? null : 2)}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                     >
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-gradient-to-r from-solana-purple to-solana-green flex items-center justify-center">
@@ -289,6 +405,31 @@ export default function CopyTradingSection() {
                         <div className="text-xs font-medium text-solana-green">+$89</div>
                         <div className="text-xs text-text-secondary">8m ago</div>
                       </div>
+                      {selectedTrade === 2 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          className="absolute left-0 right-0 top-full mt-1 p-2 bg-background-tertiary rounded-b border border-solana-purple/20 z-10"
+                        >
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="text-text-secondary">
+                              Entry Price: <span className="text-text-primary">0.00000089 SOL</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Exit Price: <span className="text-text-primary">0.00000102 SOL</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Amount: <span className="text-text-primary">3,800,000 PEPE</span>
+                            </div>
+                            <div className="text-text-secondary">
+                              Profit: <span className="text-solana-green">+14.61%</span>
+                            </div>
+                          </div>
+                          <div className="mt-1 pt-1 border-t border-solana-purple/10 flex justify-end">
+                            <button className="text-xs text-solana-purple hover:underline">View Transaction</button>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
                   </div>
                 </div>
@@ -342,8 +483,8 @@ export default function CopyTradingSection() {
           >
             <div className="space-y-4">
               <p className="text-text-primary text-lg">
-                Other bots like Maestro, Bonk Bot, or Trojan might offer sniping, but only Rust Rocket empowers you with
-                true Copy Trading – your definitive advantage.
+                While other trading bots focus solely on sniping, Rust Rocket empowers you with intelligent Copy Trading
+                – your definitive advantage in the market.
               </p>
 
               <p className="text-text-secondary">
@@ -362,9 +503,7 @@ export default function CopyTradingSection() {
               >
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-md bg-solana-purple/10 text-solana-purple">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* SVG content here */}
-                    </svg>
+                    <Search className="w-6 h-6" aria-hidden="true" />
                   </div>
                   <div>
                     <h4 className="font-medium text-text-primary">Feature Title</h4>
