@@ -122,6 +122,9 @@ export default function Footer() {
           <Link href="/legal/terms" className="hover:text-white transition-colors">
             Terms of Service
           </Link>
+          <Link href="/legal/imprint" className="hover:text-white transition-colors">
+            Legal Notice
+          </Link>
           <Link href="/#faq" className="hover:text-white transition-colors">
             FAQ
           </Link>
