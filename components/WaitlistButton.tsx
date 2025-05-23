@@ -1,58 +1,92 @@
 "use client"
 
-import type { ReactNode } from "react"
-import { useWaitlistModal } from "./WaitlistModalProvider"
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { trackButtonClick } from "@/lib/tracking"
 
 interface WaitlistButtonProps {
-  children?: ReactNode
   className?: string
+  onClick?: () => void
+  children?: React.ReactNode
   id?: string
-  "data-tracking-id"?: string
+  variant?: "primary" | "secondary" | "outline" | "ghost"
+  size?: "sm" | "md" | "lg"
+  fullWidth?: boolean
+  disabled?: boolean
 }
 
 export default function WaitlistButton({
+  className = "",
+  onClick,
   children = "Join Waitlist",
-  className = "bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-md",
-  id,
-  "data-tracking-id": trackingId,
-  ...props
+  id = "waitlist-button",
+  variant = "primary",
+  size = "md",
+  fullWidth = false,
+  disabled = false,
 }: WaitlistButtonProps) {
-  const { openModal } = useWaitlistModal()
+  const [mounted, setMounted] = useState(false)
 
-  const handleClick = () => {
-    // Debugging log
-    console.log("Waitlist button clicked - opening modal")
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-    // Track button click
-    if (typeof window !== "undefined" && "gtag" in window && trackingId) {
-      // @ts-ignore - gtag is not typed
-      window.gtag("event", "waitlist_button_click", {
-        event_category: "engagement",
-        event_label: trackingId,
-      })
+  const getVariantClasses = () => {
+    switch (variant) {
+      case "primary":
+        return "bg-primary hover:bg-primary-hover text-white"
+      case "secondary":
+        return "bg-secondary hover:bg-secondary-hover text-white"
+      case "outline":
+        return "bg-transparent border border-primary text-primary hover:bg-primary/10"
+      case "ghost":
+        return "bg-transparent text-primary hover:bg-primary/10"
+      default:
+        return "bg-primary hover:bg-primary-hover text-white"
     }
-
-    openModal()
   }
 
+  const getSizeClasses = () => {
+    switch (size) {
+      case "sm":
+        return "py-1.5 px-3 text-sm"
+      case "md":
+        return "py-2.5 px-5 text-base"
+      case "lg":
+        return "py-3 px-6 text-lg"
+      default:
+        return "py-2.5 px-5 text-base"
+    }
+  }
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Track button click with enhanced tracking
+    trackButtonClick(id, String(children))
+
+    // Call the original onClick handler if provided
+    if (onClick) onClick()
+  }
+
+  if (!mounted) return null
+
   return (
-    <div
-      onClick={handleClick}
-      className={`open-waitlist-modal ${className} cursor-pointer`}
+    <button
       id={id}
-      data-tracking-id={trackingId}
-      role="button"
-      aria-haspopup="dialog"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault()
-          handleClick()
-        }
-      }}
-      {...props}
+      onClick={handleClick}
+      disabled={disabled}
+      className={`
+        ${getVariantClasses()} 
+        ${getSizeClasses()} 
+        ${fullWidth ? "w-full" : ""} 
+        font-medium rounded-lg transition-all duration-200 
+        focus:outline-none focus:ring-2 focus:ring-primary/50 
+        disabled:opacity-50 disabled:cursor-not-allowed
+        ${className}
+      `}
+      data-tracking-id={id}
     >
       {children}
-    </div>
+    </button>
   )
 }

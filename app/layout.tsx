@@ -10,6 +10,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import CookieConsentBanner from "@/components/CookieConsentBanner"
 import SeoSchema from "@/components/SeoSchema"
+import AudienceTracker from "@/components/AudienceTracker"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -222,7 +223,7 @@ export default function RootLayout({
         {/* Google Ads Conversion Tracking */}
         <Script id="google-ads-conversion" strategy="afterInteractive">
           {`
-            gtag('config', 'AW-CONVERSION_ID', {
+            gtag('config', 'AW-11335521273', {
               'allow_enhanced_conversions': true
             });
           `}
@@ -280,6 +281,7 @@ export default function RootLayout({
           <Analytics />
           <SpeedInsights />
           <CookieConsentBanner />
+          <AudienceTracker />
         </WaitlistModalProvider>
       </body>
     </html>

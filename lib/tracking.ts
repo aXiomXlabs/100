@@ -19,8 +19,20 @@ interface TrackingEvent {
   [key: string]: any
 }
 
+// Google Ads Conversion IDs - REPLACE WITH YOUR ACTUAL IDs
+const GOOGLE_ADS_CONFIG = {
+  ACCOUNT_ID: "AW-11335521273", // Hauptkonto-ID
+  CONVERSIONS: {
+    WAITLIST_SIGNUP: "Rl-yCJXS9OQYEPnLtdsp", // Waitlist Anmeldung
+    PAGE_VIEW: "eBVJCLnS9OQYEPnLtdsp", // Seitenaufruf
+    BUTTON_CLICK: "Rl-yCJXS9OQYEPnLtdsp", // Button-Klick
+    SCROLL_DEPTH: "eBVJCLnS9OQYEPnLtdsp", // Scroll-Tiefe
+    FORM_SUBMIT: "Rl-yCJXS9OQYEPnLtdsp", // Formular-Absendung
+  },
+}
+
 interface ConversionData {
-  conversion_id: string
+  conversion_id?: string // Optional, falls nicht angegeben wird ACCOUNT_ID verwendet
   conversion_label: string
   value?: number
   currency?: string
@@ -163,16 +175,22 @@ export function trackGoogleAdsConversion(conversionData: ConversionData): void {
   }
 
   try {
+    // Verwende die Konto-ID aus der Konfiguration, falls keine spezifische ID angegeben wurde
+    const conversion_id = conversionData.conversion_id || GOOGLE_ADS_CONFIG.ACCOUNT_ID
+
     // Enhanced conversion tracking with user data
     window.gtag("event", "conversion", {
-      send_to: `AW-${conversionData.conversion_id}/${conversionData.conversion_label}`,
+      send_to: `${conversion_id}/${conversionData.conversion_label}`,
       value: conversionData.value || 0,
       currency: conversionData.currency || "USD",
-      transaction_id: conversionData.transaction_id,
+      transaction_id: conversionData.transaction_id || `trans_${Date.now()}`,
       user_data: conversionData.user_data,
     })
 
-    console.log("Google Ads conversion tracked successfully:", conversionData)
+    console.log("Google Ads conversion tracked successfully:", {
+      send_to: `${conversion_id}/${conversionData.conversion_label}`,
+      value: conversionData.value || 0,
+    })
   } catch (error) {
     console.error("Error tracking Google Ads conversion:", error)
   }
@@ -192,8 +210,7 @@ export function trackWaitlistSignup(email: string, source?: string): void {
 
   // Track as Google Ads conversion
   trackGoogleAdsConversion({
-    conversion_id: "CONVERSION_ID", // Replace with actual conversion ID
-    conversion_label: "waitlist_signup",
+    conversion_label: GOOGLE_ADS_CONFIG.CONVERSIONS.WAITLIST_SIGNUP,
     value: 1,
     currency: "USD",
     transaction_id: `waitlist_${Date.now()}`,
@@ -219,6 +236,45 @@ export function trackWaitlistSignup(email: string, source?: string): void {
       currency: "USD",
     })
   }
+}
+
+// Track button click as conversion
+export function trackButtonClick(buttonId: string, buttonText: string): void {
+  // Track as Google Analytics event
+  trackEvent({
+    event: "button_click",
+    category: "engagement",
+    action: "click",
+    label: buttonId || buttonText,
+    value: 1,
+  })
+
+  // Track as Google Ads conversion for important buttons
+  if (buttonId.includes("waitlist") || buttonId.includes("signup") || buttonId.includes("join")) {
+    trackGoogleAdsConversion({
+      conversion_label: GOOGLE_ADS_CONFIG.CONVERSIONS.BUTTON_CLICK,
+      value: 0.5, // Geringerer Wert als vollständige Conversion
+    })
+  }
+}
+
+// Track form submission
+export function trackFormSubmission(formId: string, formData?: any): void {
+  // Track as Google Analytics event
+  trackEvent({
+    event: "form_submit",
+    category: "conversion",
+    action: "submit",
+    label: formId,
+    value: 1,
+    form_data: formData ? JSON.stringify(formData) : undefined,
+  })
+
+  // Track as Google Ads conversion
+  trackGoogleAdsConversion({
+    conversion_label: GOOGLE_ADS_CONFIG.CONVERSIONS.FORM_SUBMIT,
+    value: 1,
+  })
 }
 
 // Page View Tracking with Enhanced Data
@@ -253,6 +309,14 @@ export function trackPageView(pagePath?: string, pageTitle?: string): void {
       content_group1: getContentGroup(path),
       content_group2: getTrafficSource(),
     })
+
+    // Track important page views as conversions
+    if (path.includes("/thanks") || path.includes("/landing/ads/thanks")) {
+      trackGoogleAdsConversion({
+        conversion_label: GOOGLE_ADS_CONFIG.CONVERSIONS.PAGE_VIEW,
+        value: 1,
+      })
+    }
 
     console.log("Page view tracked:", { path, title })
   } catch (error) {
@@ -315,6 +379,14 @@ export function initEnhancedTracking(): void {
           value: depth,
           non_interaction: true,
         })
+
+        // Track deep scrolls as conversions
+        if (depth >= 75) {
+          trackGoogleAdsConversion({
+            conversion_label: GOOGLE_ADS_CONFIG.CONVERSIONS.SCROLL_DEPTH,
+            value: 0.5, // Geringerer Wert als vollständige Conversion
+          })
+        }
       }
     })
   })
@@ -336,7 +408,7 @@ export function initEnhancedTracking(): void {
     }, interval * 1000)
   })
 
-  console.log("Enhanced tracking initialized")
+  console.log("Enhanced tracking initialized with Google Ads Conversion IDs")
 }
 
 // Extend window interface
@@ -349,6 +421,8 @@ declare global {
     trackEvent: typeof trackEvent
     trackWaitlistSignup: typeof trackWaitlistSignup
     trackPageView: typeof trackPageView
+    trackButtonClick: typeof trackButtonClick
+    trackFormSubmission: typeof trackFormSubmission
   }
 }
 
@@ -357,4 +431,6 @@ if (typeof window !== "undefined") {
   window.trackEvent = trackEvent
   window.trackWaitlistSignup = trackWaitlistSignup
   window.trackPageView = trackPageView
+  window.trackButtonClick = trackButtonClick
+  window.trackFormSubmission = trackFormSubmission
 }

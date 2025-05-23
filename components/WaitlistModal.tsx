@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 import { addToWaitlist, getUTMParameters } from "@/lib/waitlist"
+import { trackEvent, trackWaitlistSignup, trackButtonClick, trackFormSubmission } from "@/lib/tracking"
 
 interface WaitlistModalProps {
   isOpen: boolean
@@ -36,7 +37,12 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       setEmailError("")
 
       // Track modal open event with consent check
-      trackEvent("waitlist_modal_open", "engagement", "waitlist_modal")
+      trackEvent({
+        event: "waitlist_modal_open",
+        category: "engagement",
+        action: "modal_open",
+        label: "waitlist_modal",
+      })
     }
   }, [isOpen])
 
@@ -45,7 +51,12 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
         onClose()
-        trackEvent("waitlist_modal_close", "engagement", "escape_key")
+        trackEvent({
+          event: "waitlist_modal_close",
+          category: "engagement",
+          action: "modal_close",
+          label: "escape_key",
+        })
       }
     }
 
@@ -85,47 +96,12 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     return re.test(email)
   }
 
-  // Safe tracking function that respects consent
-  const trackEvent = (event: string, category?: string, label?: string, value?: number) => {
-    // Check if we have consent for analytics
-    const consentData = localStorage.getItem("userConsent")
-    if (!consentData) return
-
-    try {
-      const { consent } = JSON.parse(consentData)
-
-      // Google Analytics tracking (requires statistics consent)
-      if (consent.statistics && typeof window.gtag === "function") {
-        window.gtag("event", event, {
-          event_category: category,
-          event_label: label,
-          value: value,
-        })
-      }
-
-      // Conversion tracking for successful signup (requires marketing consent)
-      if (event === "beta_signup" && consent.marketing) {
-        // Twitter conversion
-        if (typeof window.twq === "function") {
-          window.twq("event", "tw-ooo", {
-            currency: "EUR",
-            value: 0,
-          })
-        }
-
-        // Facebook conversion
-        if (typeof window.fbq === "function") {
-          window.fbq("track", "Lead")
-        }
-      }
-    } catch (error) {
-      console.error("Error tracking event:", error)
-    }
-  }
-
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Track form submission attempt
+    trackFormSubmission("waitlist_form", { email_provided: !!email, telegram_provided: !!telegramUsername })
 
     // Reset errors
     setEmailError("")
@@ -134,7 +110,12 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     // Validate email
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address")
-      trackEvent("waitlist_form_error", "form", "invalid_email")
+      trackEvent({
+        event: "waitlist_form_error",
+        category: "form",
+        action: "validation_error",
+        label: "invalid_email",
+      })
       return
     }
 
@@ -144,7 +125,12 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
         type: "error",
         message: "Please agree to the privacy policy to continue",
       })
-      trackEvent("waitlist_form_error", "form", "consent_missing")
+      trackEvent({
+        event: "waitlist_form_error",
+        category: "form",
+        action: "validation_error",
+        label: "consent_missing",
+      })
       return
     }
 
@@ -161,8 +147,8 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
       })
 
       if (result.success) {
-        // Track successful signup
-        trackEvent("beta_signup", "conversion", "waitlist_signup", 0)
+        // Track successful signup with enhanced tracking
+        trackWaitlistSignup(email, window.location.pathname)
 
         // Show success message
         setFormStatus({
@@ -186,7 +172,12 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
           message: result.message || "Something went wrong. Please try again.",
           details: debugMode ? JSON.stringify(result.error, null, 2) : undefined,
         })
-        trackEvent("waitlist_form_error", "form", "submission_error")
+        trackEvent({
+          event: "waitlist_form_error",
+          category: "form",
+          action: "submission_error",
+          label: result.message || "unknown_error",
+        })
       }
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -196,14 +187,24 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
         message: "Something went wrong. Please try again.",
         details: debugMode ? String(error) : undefined,
       })
-      trackEvent("waitlist_form_error", "form", "server_error")
+      trackEvent({
+        event: "waitlist_form_error",
+        category: "form",
+        action: "server_error",
+        label: String(error).substring(0, 100),
+      })
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const handleModalClose = () => {
-    trackEvent("waitlist_modal_close", "engagement", "close_button")
+    trackEvent({
+      event: "waitlist_modal_close",
+      category: "engagement",
+      action: "modal_close",
+      label: "close_button",
+    })
     onClose()
   }
 
@@ -332,21 +333,23 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
               <label htmlFor="consent" className="text-gray-300">
                 I agree to the{" "}
                 <a
-                  href="https://www.rust-rocket.com/terms"
+                  href="/legal/terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
                   data-tracking-id="terms_link"
+                  onClick={() => trackButtonClick("terms_link", "Terms of Service")}
                 >
                   Terms of Service
                 </a>{" "}
                 and{" "}
                 <a
-                  href="https://www.rust-rocket.com/privacy"
+                  href="/legal/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:underline"
                   data-tracking-id="privacy_policy_link"
+                  onClick={() => trackButtonClick("privacy_policy_link", "Privacy Policy")}
                 >
                   Privacy Policy
                 </a>
@@ -401,6 +404,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
             className="w-full py-3 px-4 bg-primary hover:bg-primary-hover text-white font-medium rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
             id="waitlist-submit-button"
             data-tracking-id="waitlist_submit_button"
+            onClick={() => !isSubmitting && trackButtonClick("waitlist_submit_button", "Secure My Spot!")}
           >
             {isSubmitting ? (
               <>
