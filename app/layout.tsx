@@ -132,6 +132,17 @@ export default function RootLayout({
         {/* Zentralisierte Schema-Komponente */}
         <SeoSchema />
 
+        {/* Twitter conversion tracking base code */}
+        <Script id="twitter-pixel" strategy="afterInteractive">
+          {`
+            !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+            },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
+            a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+            twq('config','pork0');
+            twq('track','PageView');
+          `}
+        </Script>
+
         {/* Google Analytics 4 - Direkte Implementierung */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
@@ -160,16 +171,6 @@ export default function RootLayout({
             });
           `}
         </Script>
-
-        {/* Twitter conversion tracking base code */}
-        <Script id="twitter-conversion-base" strategy="afterInteractive">
-          {`
-            !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
-            },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
-            a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
-            twq('config','pork0');
-          `}
-        </Script>
       </head>
       <body>
         {/* Google Tag Manager - NoScript */}
@@ -182,15 +183,6 @@ export default function RootLayout({
             title="Google Tag Manager"
           />
         </noscript>
-
-        {/* Twitter Pixel */}
-        <Script id="twitter-pixel" strategy="afterInteractive">
-          {`
-            if (typeof twq !== 'undefined') {
-              twq('track', 'PageView');
-            }
-          `}
-        </Script>
 
         {/* Facebook Pixel */}
         <Script id="facebook-pixel" strategy="afterInteractive">
