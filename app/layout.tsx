@@ -132,7 +132,103 @@ export default function RootLayout({
         {/* Zentralisierte Schema-Komponente */}
         <SeoSchema />
 
-        {/* Twitter conversion tracking base code */}
+        {/* Google Tag Manager - Muss vor allen anderen Tracking-Codes stehen */}
+        <Script
+          id="gtm-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
+            `,
+          }}
+        />
+
+        {/* Google Analytics 4 - Enhanced Configuration */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            
+            // Consent Mode - Muss vor gtag('config') stehen
+            gtag('consent', 'default', {
+              'analytics_storage': 'denied',
+              'ad_storage': 'denied',
+              'functionality_storage': 'denied',
+              'personalization_storage': 'denied',
+              'security_storage': 'granted',
+              'wait_for_update': 500,
+            });
+            
+            gtag('js', new Date());
+            
+            // Enhanced Ecommerce und Conversion Tracking
+            gtag('config', '${process.env.NEXT_PUBLIC_GTM_ID}', {
+              page_title: document.title,
+              page_location: window.location.href,
+              send_page_view: true,
+              cookie_flags: 'samesite=none;secure',
+              cookie_domain: 'auto',
+              cookie_expires: 63072000,
+              allow_google_signals: true,
+              allow_ad_personalization_signals: true,
+              enhanced_conversions: true,
+              linker: {
+                domains: ['rust-rocket.com', 'www.rust-rocket.com']
+              }
+            });
+            
+            // Custom Events für besseres Tracking
+            gtag('event', 'page_view', {
+              'event_category': 'engagement',
+              'event_label': 'initial_page_view',
+              'page_title': document.title,
+              'page_location': window.location.href,
+              'page_path': window.location.pathname
+            });
+            
+            // Scroll Tracking
+            let scrollTracked = false;
+            window.addEventListener('scroll', function() {
+              if (!scrollTracked && window.scrollY > 100) {
+                scrollTracked = true;
+                gtag('event', 'scroll', {
+                  'event_category': 'engagement',
+                  'event_label': 'scroll_100px',
+                  'non_interaction': true
+                });
+              }
+            });
+            
+            // Time on Page Tracking
+            setTimeout(function() {
+              gtag('event', 'time_on_page', {
+                'event_category': 'engagement',
+                'event_label': '30_seconds',
+                'value': 30,
+                'non_interaction': true
+              });
+            }, 30000);
+          `}
+        </Script>
+
+        {/* Google Ads Conversion Tracking */}
+        <Script id="google-ads-conversion" strategy="afterInteractive">
+          {`
+            gtag('config', 'AW-CONVERSION_ID', {
+              'allow_enhanced_conversions': true
+            });
+          `}
+        </Script>
+
+        {/* Twitter conversion tracking */}
         <Script id="twitter-pixel" strategy="afterInteractive">
           {`
             !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
@@ -143,31 +239,25 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Google Analytics 4 - Direkte Implementierung */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
+        {/* Facebook Pixel - Enhanced */}
+        <Script id="facebook-pixel" strategy="afterInteractive">
           {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
             
-            gtag('config', '${process.env.NEXT_PUBLIC_GTM_ID}', {
-              debug_mode: true,
-              send_page_view: true,
-              cookie_flags: 'samesite=none;secure',
-              cookie_domain: 'auto',
-              cookie_expires: 63072000,
-              allow_google_signals: true,
-              allow_ad_personalization_signals: true
-            });
+            fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
+            fbq('track', 'PageView');
             
-            gtag('event', 'page_view_test', {
-              'event_category': 'engagement',
-              'event_label': 'test_event',
-              'non_interaction': true
+            // Enhanced Conversions für Facebook
+            fbq('track', 'ViewContent', {
+              content_type: 'product',
+              content_category: 'trading_bot'
             });
           `}
         </Script>
@@ -183,50 +273,6 @@ export default function RootLayout({
             title="Google Tag Manager"
           />
         </noscript>
-
-        {/* Facebook Pixel */}
-        <Script id="facebook-pixel" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            
-            fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-
-        {/* UTM-Parameter-Script */}
-        <Script id="utm-script" strategy="afterInteractive">
-          {`
-            document.addEventListener('DOMContentLoaded', function() {
-              const p = new URLSearchParams(window.location.search);
-              const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
-              
-              utmParams.forEach(param => {
-                const value = p.get(param);
-                if (value) {
-                  sessionStorage.setItem(param, value);
-                  
-                  const fields = document.querySelectorAll('[name="' + param + '"]');
-                  fields.forEach(field => {
-                    field.value = value;
-                  });
-                } else if (sessionStorage.getItem(param)) {
-                  const fields = document.querySelectorAll('[name="' + param + '"]');
-                  fields.forEach(field => {
-                    field.value = sessionStorage.getItem(param);
-                  });
-                }
-              });
-            });
-          `}
-        </Script>
 
         <WaitlistModalProvider>
           <Suspense>{children}</Suspense>
