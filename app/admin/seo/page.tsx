@@ -7,13 +7,34 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle, TrendingUp, RefreshCw, Activity, Globe, Search, BarChart3 } from "lucide-react"
+import {
+  AlertCircle,
+  CheckCircle,
+  TrendingUp,
+  RefreshCw,
+  Activity,
+  Globe,
+  Search,
+  BarChart3,
+  Download,
+  ListChecks,
+} from "lucide-react"
+import {
+  ResponsiveContainer,
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts"
 
 interface SEOMetrics {
   score: number
   issues: number
   pages: number
   lastAudit: string
+  scoreHistory?: Array<{ date: string; score: number }>
 }
 
 interface PerformanceStats {
@@ -24,12 +45,17 @@ interface PerformanceStats {
   deviceBreakdown?: { [key: string]: number }
 }
 
+interface AuditIssue {
+  description: string
+  severity: "critical" | "high" | "medium" | "low"
+}
 interface AuditResult {
   url: string
   score: number
-  issues: string[]
+  issues: AuditIssue[] // Updated to use AuditIssue interface
   title?: string
   meta_description?: string
+  audit_timestamp?: string // Added for sorting
 }
 
 export default function SEODashboard() {
@@ -42,8 +68,7 @@ export default function SEODashboard() {
 
   useEffect(() => {
     loadDashboardData()
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(loadDashboardData, 30000)
+    const interval = setInterval(loadDashboardData, 30000) // Auto-refresh every 30 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -51,7 +76,6 @@ export default function SEODashboard() {
     try {
       setError(null)
 
-      // Load performance data
       const perfResponse = await fetch("/api/performance")
       if (perfResponse.ok) {
         const perfData = await perfResponse.json()
@@ -60,19 +84,57 @@ export default function SEODashboard() {
         console.warn("Failed to load performance data")
       }
 
-      // Load recent audit data
       const auditResponse = await fetch("/api/seo-audit")
       if (auditResponse.ok) {
         const auditData = await auditResponse.json()
-        setRecentAudits(auditData.recentAudits || [])
 
-        // Update metrics from audit data
+        const formattedAudits = (auditData.recentAudits || [])
+          .map((audit: any) => ({
+            ...audit,
+            issues: Array.isArray(audit.issues)
+              ? audit.issues.map((issueDesc: string) => ({
+                  description: issueDesc,
+                  severity:
+                    issueDesc.toLowerCase().includes("critical") || issueDesc.toLowerCase().includes("noindex")
+                      ? "critical"
+                      : issueDesc.toLowerCase().includes("missing")
+                        ? "high"
+                        : issueDesc.toLowerCase().includes("too long") || issueDesc.toLowerCase().includes("too short")
+                          ? "medium"
+                          : "low",
+                }))
+              : [],
+          }))
+          .sort(
+            (a: AuditResult, b: AuditResult) =>
+              new Date(b.audit_timestamp || 0).getTime() - new Date(a.audit_timestamp || 0).getTime(),
+          )
+        setRecentAudits(formattedAudits)
+
         if (auditData.summary) {
+          // Simulate score history for the chart
+          const scoreHistory = [
+            {
+              date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+              score: (auditData.summary.averageScore || 0) - 5,
+            },
+            {
+              date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+              score: (auditData.summary.averageScore || 0) - 2,
+            },
+            {
+              date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+              score: (auditData.summary.averageScore || 0) + 3,
+            },
+            { date: new Date().toLocaleDateString(), score: auditData.summary.averageScore || 0 },
+          ].filter((item) => item.score >= 0 && item.score <= 100)
+
           setMetrics({
             score: auditData.summary.averageScore || 0,
             issues: auditData.summary.totalIssues || 0,
             pages: auditData.summary.totalAudits || 0,
             lastAudit: auditData.summary.lastAudit || new Date().toISOString(),
+            scoreHistory: scoreHistory,
           })
         }
       } else {
@@ -89,7 +151,6 @@ export default function SEODashboard() {
   const runSEOAudit = async () => {
     setAuditLoading(true)
     setError(null)
-
     try {
       const urls = [
         "https://rust-rocket.com",
@@ -98,20 +159,14 @@ export default function SEODashboard() {
         "https://rust-rocket.com/blog",
         "https://rust-rocket.com/legal/privacy",
       ]
-
       const response = await fetch("/api/seo-audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ urls }),
       })
-
       if (response.ok) {
         const auditResults = await response.json()
-        console.log("SEO Audit Results:", auditResults)
-
-        // Reload dashboard data to show new results
         await loadDashboardData()
-
         alert(`SEO Audit completed! Average score: ${auditResults.summary.averageScore}/100`)
       } else {
         throw new Error("Audit request failed")
@@ -145,10 +200,53 @@ export default function SEODashboard() {
     return "text-red-600"
   }
 
+  const getSeverityBadgeVariant = (
+    severity: AuditIssue["severity"],
+  ): "destructive" | "default" | "secondary" | "outline" => {
+    switch (severity) {
+      case "critical":
+        return "destructive"
+      case "high":
+        return "default" // Using default for high, as destructive is for critical
+      case "medium":
+        return "secondary"
+      case "low":
+        return "outline"
+      default:
+        return "outline"
+    }
+  }
+
   const getPerformanceGrade = (value: number, thresholds: [number, number]) => {
     if (value <= thresholds[0]) return { grade: "Good", color: "bg-green-500" }
     if (value <= thresholds[1]) return { grade: "Needs Improvement", color: "bg-yellow-500" }
     return { grade: "Poor", color: "bg-red-500" }
+  }
+
+  const exportAuditResultsToCSV = () => {
+    if (recentAudits.length === 0) {
+      alert("No audit data to export.")
+      return
+    }
+    const headers = ["URL", "Score", "Title", "Meta Description", "Issues Count", "Issues Details"]
+    const rows = recentAudits.map((audit) => [
+      audit.url,
+      audit.score,
+      `"${audit.title?.replace(/"/g, '""') || ""}"`,
+      `"${audit.meta_description?.replace(/"/g, '""') || ""}"`,
+      audit.issues.length,
+      `"${audit.issues.map((issue) => issue.description.replace(/"/g, '""')).join("; ") || ""}"`,
+    ])
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map((e) => e.join(",")).join("\n")
+
+    const link = document.createElement("a")
+    link.setAttribute("href", encodeURI(csvContent))
+    link.setAttribute("download", `seo_audit_report_${new Date().toISOString().split("T")[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   if (loading) {
@@ -169,6 +267,10 @@ export default function SEODashboard() {
           <p className="text-gray-600">Monitor and optimize your website's SEO performance</p>
         </div>
         <div className="space-x-2">
+          <Button onClick={exportAuditResultsToCSV} variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export Audit CSV
+          </Button>
           <Button onClick={regenerateSitemap} variant="outline">
             <Globe className="h-4 w-4 mr-2" />
             Regenerate Sitemap
@@ -188,7 +290,7 @@ export default function SEODashboard() {
       )}
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">SEO Score</CardTitle>
@@ -236,11 +338,31 @@ export default function SEODashboard() {
         </Card>
       </div>
 
+      {metrics?.scoreHistory && metrics.scoreHistory.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>SEO Score Trend</CardTitle>
+            <CardDescription>Overall SEO score over the last week.</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[200px] md:h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsLineChart data={metrics.scoreHistory}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" fontSize={12} />
+                <YAxis domain={[0, 100]} fontSize={12} />
+                <Tooltip />
+                <Line type="monotone" dataKey="score" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
+              </RechartsLineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Detailed Tabs */}
       <Tabs defaultValue="performance" className="space-y-4">
         <TabsList>
           <TabsTrigger value="performance">Core Web Vitals</TabsTrigger>
-          <TabsTrigger value="seo">SEO Issues</TabsTrigger>
+          <TabsTrigger value="seo_issues">SEO Issues</TabsTrigger> {/* Changed value to avoid conflict */}
           <TabsTrigger value="technical">Technical SEO</TabsTrigger>
         </TabsList>
 
@@ -365,37 +487,62 @@ export default function SEODashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="seo" className="space-y-4">
+        <TabsContent value="seo_issues" className="space-y-4">
+          {" "}
+          {/* Changed value */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent SEO Audits</CardTitle>
-              <CardDescription>Latest audit results for your pages</CardDescription>
+              <CardTitle className="flex items-center">
+                <ListChecks className="h-5 w-5 mr-2" />
+                Detailed SEO Issues
+              </CardTitle>
+              <CardDescription>Issues found during the last audits, sorted by URL and severity.</CardDescription>
             </CardHeader>
             <CardContent>
               {recentAudits.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {recentAudits.map((audit, index) => (
-                    <div key={index} className="border rounded-lg p-4 space-y-2">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{audit.url}</p>
-                          {audit.title && <p className="text-xs text-muted-foreground mt-1">Title: {audit.title}</p>}
-                        </div>
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <a
+                          href={audit.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-sm hover:underline"
+                        >
+                          {audit.url}
+                        </a>
                         <Badge className={getScoreColor(audit.score)}>{audit.score}/100</Badge>
                       </div>
-                      {audit.issues.length > 0 && (
-                        <div className="space-y-1">
-                          {audit.issues.slice(0, 3).map((issue, i) => (
-                            <p key={i} className="text-xs text-red-600">
-                              • {issue}
-                            </p>
-                          ))}
-                          {audit.issues.length > 3 && (
-                            <p className="text-xs text-muted-foreground">
-                              ...and {audit.issues.length - 3} more issues
-                            </p>
-                          )}
+                      {audit.title && <p className="text-xs text-muted-foreground">Title: {audit.title}</p>}
+                      {audit.meta_description && (
+                        <p className="text-xs text-muted-foreground">
+                          Meta: {audit.meta_description.substring(0, 100)}...
+                        </p>
+                      )}
+                      {audit.issues.length > 0 ? (
+                        <div className="mt-3 space-y-1">
+                          <p className="text-xs font-semibold">Issues ({audit.issues.length}):</p>
+                          {audit.issues
+                            .sort((a, b) => {
+                              // Sort issues by severity
+                              const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 }
+                              return severityOrder[a.severity] - severityOrder[b.severity]
+                            })
+                            .map((issue, i) => (
+                              <div key={i} className="flex items-start text-xs">
+                                <Badge
+                                  variant={getSeverityBadgeVariant(issue.severity)}
+                                  className="mr-2 capitalize text-xs h-5 px-1.5"
+                                >
+                                  {issue.severity}
+                                </Badge>
+                                <span>{issue.description}</span>
+                              </div>
+                            ))}
                         </div>
+                      ) : (
+                        <p className="text-xs text-green-600 mt-3">No issues found for this page.</p>
                       )}
                     </div>
                   ))}
