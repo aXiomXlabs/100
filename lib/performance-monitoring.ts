@@ -10,27 +10,37 @@ interface PerformanceMetrics {
   timestamp: number
   userAgent: string
   connection?: string
+  sessionId: string
 }
 
 class PerformanceMonitor {
-  private metrics: PerformanceMetrics = {
-    url: typeof window !== "undefined" ? window.location.href : "",
-    timestamp: Date.now(),
-    userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
-  }
+  private metrics: PerformanceMetrics
+  private sessionId: string
 
   constructor() {
     if (typeof window === "undefined") return
+
+    this.sessionId = this.generateSessionId()
+    this.metrics = {
+      url: window.location.href,
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent,
+      sessionId: this.sessionId,
+    }
 
     this.initializeObservers()
     this.measureTTFB()
     this.measureFCP()
   }
 
+  private generateSessionId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  }
+
   private initializeObservers() {
-    // Largest Contentful Paint (LCP)
     if ("PerformanceObserver" in window) {
       try {
+        // Largest Contentful Paint (LCP)
         const lcpObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries()
           const lastEntry = entries[entries.length - 1] as any
@@ -42,13 +52,14 @@ class PerformanceMonitor {
         console.warn("LCP observer not supported")
       }
 
-      // First Input Delay (FID)
       try {
+        // First Input Delay (FID)
         const fidObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries()
           entries.forEach((entry: any) => {
-            this.metrics.fid = entry.processingStart - entry.startTime
-            this.reportMetric("fid", entry.processingStart - entry.startTime)
+            const fidValue = entry.processingStart - entry.startTime
+            this.metrics.fid = fidValue
+            this.reportMetric("fid", fidValue)
           })
         })
         fidObserver.observe({ entryTypes: ["first-input"] })
@@ -56,8 +67,8 @@ class PerformanceMonitor {
         console.warn("FID observer not supported")
       }
 
-      // Cumulative Layout Shift (CLS)
       try {
+        // Cumulative Layout Shift (CLS)
         let clsValue = 0
         const clsObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries()
@@ -82,8 +93,9 @@ class PerformanceMonitor {
     try {
       const navigation = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming
       if (navigation) {
-        this.metrics.ttfb = navigation.responseStart - navigation.requestStart
-        this.reportMetric("ttfb", this.metrics.ttfb)
+        const ttfb = navigation.responseStart - navigation.requestStart
+        this.metrics.ttfb = ttfb
+        this.reportMetric("ttfb", ttfb)
       }
     } catch (e) {
       console.warn("TTFB measurement failed")
@@ -105,7 +117,7 @@ class PerformanceMonitor {
   }
 
   private reportMetric(name: string, value: number) {
-    // Report to analytics
+    // Report to Google Analytics
     if (typeof window !== "undefined" && (window as any).gtag) {
       ;(window as any).gtag("event", "web_vitals", {
         event_category: "Performance",
@@ -118,33 +130,39 @@ class PerformanceMonitor {
       })
     }
 
-    // Report to console in development
+    // Development logging
     if (process.env.NODE_ENV === "development") {
       console.log(`🚀 Performance Metric - ${name.toUpperCase()}: ${Math.round(value)}ms`)
     }
 
-    // Send to monitoring endpoint
-    this.sendToMonitoring(name, value)
+    // Send to our API
+    this.sendToAPI(name, value)
   }
 
-  private async sendToMonitoring(name: string, value: number) {
+  private async sendToAPI(metricName: string, value: number) {
     try {
+      const payload = {
+        metric_name: metricName,
+        metric_value: value,
+        url: this.metrics.url,
+        user_agent: this.metrics.userAgent,
+        connection_type: (navigator as any)?.connection?.effectiveType || "unknown",
+        session_id: this.sessionId,
+        page_load_time: performance.now(),
+      }
+
       await fetch("/api/performance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          metric: name,
-          value,
-          url: this.metrics.url,
-          timestamp: this.metrics.timestamp,
-          userAgent: this.metrics.userAgent,
-          connection: (navigator as any)?.connection?.effectiveType || "unknown",
-        }),
+        body: JSON.stringify(payload),
       })
     } catch (e) {
       // Silently fail - don't impact user experience
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Failed to send performance data:", e)
+      }
     }
   }
 

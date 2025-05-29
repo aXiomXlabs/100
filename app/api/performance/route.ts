@@ -1,35 +1,47 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 interface PerformanceData {
-  metric: string
-  value: number
+  metric_name: string
+  metric_value: number
   url: string
-  timestamp: number
-  userAgent: string
-  connection: string
+  user_agent?: string
+  connection_type?: string
+  device_type?: string
+  session_id?: string
+  page_load_time?: number
 }
-
-// In-memory storage for demo (use database in production)
-const performanceData: PerformanceData[] = []
 
 export async function POST(request: NextRequest) {
   try {
     const data: PerformanceData = await request.json()
 
     // Validate data
-    if (!data.metric || typeof data.value !== "number") {
+    if (!data.metric_name || typeof data.metric_value !== "number") {
       return NextResponse.json({ error: "Invalid data" }, { status: 400 })
     }
 
-    // Store performance data
-    performanceData.push({
-      ...data,
-      timestamp: Date.now(),
+    // Detect device type from user agent
+    const userAgent = data.user_agent || ""
+    const deviceType = /Mobile|Android|iPhone|iPad/.test(userAgent) ? "mobile" : "desktop"
+
+    // Store performance data in Supabase
+    const { error } = await supabase.from("performance_metrics").insert({
+      metric_name: data.metric_name,
+      metric_value: data.metric_value,
+      url: data.url,
+      user_agent: data.user_agent,
+      connection_type: data.connection_type || "unknown",
+      device_type: deviceType,
+      session_id: data.session_id,
+      page_load_time: data.page_load_time,
     })
 
-    // Keep only last 1000 entries
-    if (performanceData.length > 1000) {
-      performanceData.splice(0, performanceData.length - 1000)
+    if (error) {
+      console.error("Supabase error:", error)
+      return NextResponse.json({ error: "Database error" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
@@ -40,31 +52,86 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const metric = searchParams.get("metric")
-  const hours = Number.parseInt(searchParams.get("hours") || "24")
+  try {
+    const { searchParams } = new URL(request.url)
+    const metric = searchParams.get("metric")
+    const hours = Number.parseInt(searchParams.get("hours") || "24")
+    const url = searchParams.get("url")
 
-  const cutoff = Date.now() - hours * 60 * 60 * 1000
-  let filteredData = performanceData.filter((d) => d.timestamp > cutoff)
+    // Calculate time cutoff
+    const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString()
 
-  if (metric) {
-    filteredData = filteredData.filter((d) => d.metric === metric)
+    // Build query
+    let query = supabase
+      .from("performance_metrics")
+      .select("*")
+      .gte("timestamp", cutoff)
+      .order("timestamp", { ascending: false })
+
+    if (metric) {
+      query = query.eq("metric_name", metric)
+    }
+
+    if (url) {
+      query = query.eq("url", url)
+    }
+
+    const { data: performanceData, error } = await query
+
+    if (error) {
+      console.error("Supabase query error:", error)
+      return NextResponse.json({ error: "Database error" }, { status: 500 })
+    }
+
+    // Calculate statistics for each metric
+    const metrics = ["lcp", "fid", "cls", "fcp", "ttfb"]
+    const stats: any = {
+      count: performanceData?.length || 0,
+      timeRange: `${hours}h`,
+      lastUpdated: new Date().toISOString(),
+    }
+
+    for (const metricName of metrics) {
+      const metricData = performanceData?.filter((d) => d.metric_name === metricName) || []
+
+      if (metricData.length > 0) {
+        const values = metricData.map((d) => d.metric_value).sort((a, b) => a - b)
+
+        stats[metricName] = {
+          count: values.length,
+          average: values.reduce((sum, val) => sum + val, 0) / values.length,
+          median: values[Math.floor(values.length / 2)] || 0,
+          p75: values[Math.floor(values.length * 0.75)] || 0,
+          p95: values[Math.floor(values.length * 0.95)] || 0,
+          min: values[0] || 0,
+          max: values[values.length - 1] || 0,
+        }
+      } else {
+        stats[metricName] = {
+          count: 0,
+          average: 0,
+          median: 0,
+          p75: 0,
+          p95: 0,
+          min: 0,
+          max: 0,
+        }
+      }
+    }
+
+    // Add device breakdown
+    const deviceBreakdown =
+      performanceData?.reduce((acc: any, item) => {
+        const device = item.device_type || "unknown"
+        acc[device] = (acc[device] || 0) + 1
+        return acc
+      }, {}) || {}
+
+    stats.deviceBreakdown = deviceBreakdown
+
+    return NextResponse.json(stats)
+  } catch (error) {
+    console.error("Performance API error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-
-  // Calculate statistics
-  const stats = {
-    count: filteredData.length,
-    average: filteredData.length > 0 ? filteredData.reduce((sum, d) => sum + d.value, 0) / filteredData.length : 0,
-    median:
-      filteredData.length > 0
-        ? filteredData.sort((a, b) => a.value - b.value)[Math.floor(filteredData.length / 2)]?.value || 0
-        : 0,
-    p95:
-      filteredData.length > 0
-        ? filteredData.sort((a, b) => a.value - b.value)[Math.floor(filteredData.length * 0.95)]?.value || 0
-        : 0,
-    data: filteredData.slice(-100), // Last 100 entries
-  }
-
-  return NextResponse.json(stats)
 }
