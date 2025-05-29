@@ -58,10 +58,28 @@ interface AuditResult {
   audit_timestamp?: string // Added for sorting
 }
 
+interface IssueCategory {
+  name: string
+  count: number
+  severity: "critical" | "high" | "medium" | "low"
+  color: string
+}
+
+interface IssueSummary {
+  totalIssues: number
+  criticalIssues: number
+  highIssues: number
+  mediumIssues: number
+  lowIssues: number
+  categories: IssueCategory[]
+  topIssues: Array<{ description: string; count: number; severity: string }>
+}
+
 export default function SEODashboard() {
   const [metrics, setMetrics] = useState<SEOMetrics | null>(null)
   const [performance, setPerformance] = useState<PerformanceStats | null>(null)
   const [recentAudits, setRecentAudits] = useState<AuditResult[]>([])
+  const [issueSummary, setIssueSummary] = useState<IssueSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [auditLoading, setAuditLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -110,6 +128,79 @@ export default function SEODashboard() {
               new Date(b.audit_timestamp || 0).getTime() - new Date(a.audit_timestamp || 0).getTime(),
           )
         setRecentAudits(formattedAudits)
+
+        // Analyze issues for summary
+        if (formattedAudits.length > 0) {
+          const allIssues = formattedAudits.flatMap((audit) => audit.issues)
+          const issueCategories: { [key: string]: IssueCategory } = {}
+          const issueFrequency: { [key: string]: number } = {}
+
+          allIssues.forEach((issue) => {
+            // Count issue frequency
+            issueFrequency[issue.description] = (issueFrequency[issue.description] || 0) + 1
+
+            // Categorize issues
+            let category = "Technical"
+            if (
+              issue.description.toLowerCase().includes("title") ||
+              issue.description.toLowerCase().includes("description") ||
+              issue.description.toLowerCase().includes("h1")
+            ) {
+              category = "Content"
+            } else if (
+              issue.description.toLowerCase().includes("image") ||
+              issue.description.toLowerCase().includes("alt")
+            ) {
+              category = "Accessibility"
+            } else if (
+              issue.description.toLowerCase().includes("response time") ||
+              issue.description.toLowerCase().includes("size")
+            ) {
+              category = "Performance"
+            }
+
+            if (!issueCategories[category]) {
+              issueCategories[category] = {
+                name: category,
+                count: 0,
+                severity: "medium",
+                color:
+                  category === "Content"
+                    ? "bg-blue-500"
+                    : category === "Accessibility"
+                      ? "bg-purple-500"
+                      : category === "Performance"
+                        ? "bg-orange-500"
+                        : "bg-gray-500",
+              }
+            }
+            issueCategories[category].count++
+
+            // Update severity based on worst issue in category
+            if (issue.severity === "critical") issueCategories[category].severity = "critical"
+            else if (issue.severity === "high" && issueCategories[category].severity !== "critical") {
+              issueCategories[category].severity = "high"
+            }
+          })
+
+          const topIssues = Object.entries(issueFrequency)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10)
+            .map(([description, count]) => {
+              const issue = allIssues.find((i) => i.description === description)
+              return { description, count, severity: issue?.severity || "medium" }
+            })
+
+          setIssueSummary({
+            totalIssues: allIssues.length,
+            criticalIssues: allIssues.filter((i) => i.severity === "critical").length,
+            highIssues: allIssues.filter((i) => i.severity === "high").length,
+            mediumIssues: allIssues.filter((i) => i.severity === "medium").length,
+            lowIssues: allIssues.filter((i) => i.severity === "low").length,
+            categories: Object.values(issueCategories),
+            topIssues,
+          })
+        }
 
         if (auditData.summary) {
           // Simulate score history for the chart
@@ -247,6 +338,42 @@ export default function SEODashboard() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const getQuickFixButton = (issueDescription: string) => {
+    if (issueDescription.toLowerCase().includes("missing title")) {
+      return (
+        <Button size="sm" variant="outline" className="text-xs h-6">
+          Add Title
+        </Button>
+      )
+    }
+    if (issueDescription.toLowerCase().includes("missing meta description")) {
+      return (
+        <Button size="sm" variant="outline" className="text-xs h-6">
+          Add Meta
+        </Button>
+      )
+    }
+    if (issueDescription.toLowerCase().includes("missing alt")) {
+      return (
+        <Button size="sm" variant="outline" className="text-xs h-6">
+          Add Alt Text
+        </Button>
+      )
+    }
+    return null
+  }
+
+  const getRecommendationIcon = (issueDescription: string) => {
+    if (
+      issueDescription.toLowerCase().includes("missing") ||
+      issueDescription.toLowerCase().includes("too short") ||
+      issueDescription.toLowerCase().includes("too long")
+    ) {
+      return <AlertCircle className="h-3 w-3 text-orange-500 ml-1" />
+    }
+    return null
   }
 
   if (loading) {
@@ -488,15 +615,110 @@ export default function SEODashboard() {
         </TabsContent>
 
         <TabsContent value="seo_issues" className="space-y-4">
-          {" "}
-          {/* Changed value */}
+          {/* Issue Summary Cards */}
+          {issueSummary && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Critical Issues</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600">{issueSummary.criticalIssues}</div>
+                  <p className="text-xs text-muted-foreground">Immediate attention required</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">High Priority</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-orange-600">{issueSummary.highIssues}</div>
+                  <p className="text-xs text-muted-foreground">Should be fixed soon</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Medium Priority</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">{issueSummary.mediumIssues}</div>
+                  <p className="text-xs text-muted-foreground">Plan to address</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Low Priority</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{issueSummary.lowIssues}</div>
+                  <p className="text-xs text-muted-foreground">Nice to have fixes</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Issue Categories */}
+          {issueSummary && issueSummary.categories.length > 0 && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Issues by Category</CardTitle>
+                <CardDescription>Distribution of SEO issues across different categories</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {issueSummary.categories.map((category, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <div className={`w-4 h-4 rounded ${category.color}`}></div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium">{category.name}</span>
+                          <Badge variant={getSeverityBadgeVariant(category.severity)}>{category.count}</Badge>
+                        </div>
+                        <Progress value={(category.count / issueSummary.totalIssues) * 100} className="h-2 mt-1" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Top Issues */}
+          {issueSummary && issueSummary.topIssues.length > 0 && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Most Common Issues</CardTitle>
+                <CardDescription>Issues that appear most frequently across your pages</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {issueSummary.topIssues.slice(0, 5).map((issue, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <Badge variant={getSeverityBadgeVariant(issue.severity as any)} className="text-xs">
+                          {issue.severity}
+                        </Badge>
+                        <span className="text-sm">{issue.description}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline">{issue.count} pages</Badge>
+                        {getQuickFixButton(issue.description)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Detailed Issues by Page */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <ListChecks className="h-5 w-5 mr-2" />
-                Detailed SEO Issues
+                Detailed Issues by Page
               </CardTitle>
-              <CardDescription>Issues found during the last audits, sorted by URL and severity.</CardDescription>
+              <CardDescription>Complete breakdown of SEO issues found during audits</CardDescription>
             </CardHeader>
             <CardContent>
               {recentAudits.length > 0 ? (
@@ -512,7 +734,11 @@ export default function SEODashboard() {
                         >
                           {audit.url}
                         </a>
-                        <Badge className={getScoreColor(audit.score)}>{audit.score}/100</Badge>
+                        <div className="flex items-center space-x-2">
+                          <Badge className={getScoreColor(audit.score)}>{audit.score}/100</Badge>
+                          {audit.score >= 90 && <CheckCircle className="h-4 w-4 text-green-500" />}
+                          {audit.score < 50 && <AlertCircle className="h-4 w-4 text-red-500" />}
+                        </div>
                       </div>
                       {audit.title && <p className="text-xs text-muted-foreground">Title: {audit.title}</p>}
                       {audit.meta_description && (
@@ -525,7 +751,6 @@ export default function SEODashboard() {
                           <p className="text-xs font-semibold">Issues ({audit.issues.length}):</p>
                           {audit.issues
                             .sort((a, b) => {
-                              // Sort issues by severity
                               const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 }
                               return severityOrder[a.severity] - severityOrder[b.severity]
                             })
@@ -537,12 +762,16 @@ export default function SEODashboard() {
                                 >
                                   {issue.severity}
                                 </Badge>
-                                <span>{issue.description}</span>
+                                <span className="flex-1">{issue.description}</span>
+                                {getRecommendationIcon(issue.description)}
                               </div>
                             ))}
                         </div>
                       ) : (
-                        <p className="text-xs text-green-600 mt-3">No issues found for this page.</p>
+                        <p className="text-xs text-green-600 mt-3 flex items-center">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          No issues found for this page.
+                        </p>
                       )}
                     </div>
                   ))}
