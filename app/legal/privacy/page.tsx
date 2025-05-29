@@ -4,7 +4,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Privacy Policy & Data Protection | Rust Rocket",
   description:
-    "Learn how Rust Rocket protects your trading data and privacy when using our advanced Solana sniper bot platform.",
+    "Learn how Rust Rocket protects your personal trading data and privacy when using our advanced Solana sniper bot platform with comprehensive security measures.",
 }
 
 export default function PrivacyPolicy() {

@@ -20,7 +20,7 @@ import UTMTracker from "@/components/UTMTracker"
 export const metadata: Metadata = {
   title: "Solana Sniper Bot with Same-Block Execution | Rust Rocket",
   description:
-    "Dominate Solana meme coins with Rust Rocket's 25ms sniper bot featuring intelligent copy trading and same-block execution.",
+    "Dominate Solana meme coins with Rust Rocket's lightning-fast 25ms sniper bot featuring intelligent copy trading and guaranteed same-block execution technology.",
 }
 
 export default function Home() {
