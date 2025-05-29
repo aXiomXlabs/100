@@ -21,6 +21,8 @@ const EXCLUDED_PATHS = [
   "/gone",
   "/search",
   "/test-*",
+  "/debug",
+  "/debug/*",
   "*.html",
 ]
 
@@ -85,7 +87,10 @@ function getChangeFreq(urlPath) {
 function getLastModified(filePath) {
   try {
     // Try to get last commit date for the file
-    const gitDate = execSync(`git log -1 --format=%cI -- ${filePath}`, { encoding: "utf8" }).trim()
+    const gitDate = execSync(`git log -1 --format=%cI -- ${filePath}`, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"], // Suppress stderr
+    }).trim()
     if (gitDate) {
       return new Date(gitDate).toISOString().split("T")[0]
     }
@@ -103,34 +108,88 @@ function getLastModified(filePath) {
 }
 
 function getPages() {
-  const appPages = glob.sync("app/**/page.{tsx,jsx,js,ts}", {
-    ignore: ["app/**/node_modules/**"],
-  })
-
-  return appPages
-    .map((page) => {
-      // Convert file path to URL path
-      let urlPath = page
-        .replace("app/", "/")
-        .replace(/\/page\.(tsx|jsx|js|ts)$/, "")
-        .replace(/\/$$[^)]+$$\//g, "/") // Remove Next.js route groups like (auth)
-        .replace(/\[\.{3}(.*?)\]/g, ":$1") // Handle catch-all routes [...param]
-        .replace(/\[(.*?)\]/g, ":$1") // Handle dynamic routes [param]
-
-      // Handle index routes
-      if (urlPath === "/index" || urlPath === "") {
-        urlPath = "/"
-      }
-
-      return {
-        url: urlPath,
-        filePath: page,
-        lastModified: getLastModified(page),
-        priority: getPriority(urlPath),
-        changefreq: getChangeFreq(urlPath),
-      }
+  try {
+    console.log("🔍 Searching for page files...")
+    const appPages = glob.sync("app/**/page.{tsx,jsx,js,ts}", {
+      ignore: ["app/**/node_modules/**"],
     })
-    .filter((page) => !shouldExclude(page.url))
+
+    console.log(`📁 Found ${appPages.length} page files:`)
+    appPages.forEach((page) => console.log(`   - ${page}`))
+
+    if (appPages.length === 0) {
+      console.warn("⚠️ No page files found! This might indicate a problem with the glob pattern.")
+      // Fallback: Add at least the home page
+      return [
+        {
+          url: "/",
+          filePath: "app/page.tsx",
+          lastModified: new Date().toISOString().split("T")[0],
+          priority: "1.0",
+          changefreq: "daily",
+        },
+      ]
+    }
+
+    const pages = appPages
+      .map((page) => {
+        let urlPath = page
+          .replace("app/", "/")
+          .replace(/\/page\.(tsx|jsx|js|ts)$/, "")
+          .replace(/\/$$[^)]+$$\//g, "/") // Remove Next.js route groups like (auth)
+          .replace(/\[\.{3}(.*?)\]/g, ":$1") // Handle catch-all routes [...param]
+          .replace(/\[(.*?)\]/g, ":$1") // Handle dynamic routes [param]
+
+        // Handle index routes
+        if (urlPath === "/index" || urlPath === "") {
+          urlPath = "/"
+        }
+
+        // Remove trailing slash except for root
+        if (urlPath !== "/" && urlPath.endsWith("/")) {
+          urlPath = urlPath.slice(0, -1)
+        }
+
+        return {
+          url: urlPath,
+          filePath: page,
+          lastModified: getLastModified(page),
+          priority: getPriority(urlPath),
+          changefreq: getChangeFreq(urlPath),
+        }
+      })
+      .filter((page) => !shouldExclude(page.url))
+
+    console.log(`✅ Processed ${pages.length} pages after filtering`)
+    return pages
+  } catch (error) {
+    console.error("❌ Error in getPages function:", error)
+    // Return at least the home page as fallback
+    return [
+      {
+        url: "/",
+        filePath: "app/page.tsx",
+        lastModified: new Date().toISOString().split("T")[0],
+        priority: "1.0",
+        changefreq: "daily",
+      },
+    ]
+  }
+}
+
+function ensurePublicDirectory() {
+  const publicDir = path.join(process.cwd(), "public")
+  try {
+    if (!fs.existsSync(publicDir)) {
+      console.log("📁 Creating public directory...")
+      fs.mkdirSync(publicDir, { recursive: true })
+    }
+    console.log(`📁 Public directory confirmed at: ${publicDir}`)
+    return true
+  } catch (error) {
+    console.error("❌ Error creating public directory:", error)
+    return false
+  }
 }
 
 function generateSitemap(pages, index = 0) {
@@ -156,8 +215,24 @@ ${pageSlice
 </urlset>`
 
   const filename = index === 0 ? "sitemap.xml" : `sitemap-${index + 1}.xml`
-  fs.writeFileSync(path.join(process.cwd(), "public", filename), sitemap)
-  console.log(`📄 Sitemap generated: ${filename} (${pageSlice.length} URLs)`)
+  const outputPath = path.join(process.cwd(), "public", filename)
+
+  try {
+    fs.writeFileSync(outputPath, sitemap)
+    console.log(`📄 Sitemap generated: ${filename} (${pageSlice.length} URLs)`)
+    console.log(`📍 Written to: ${outputPath}`)
+
+    // Verify the file was written
+    if (fs.existsSync(outputPath)) {
+      const stats = fs.statSync(outputPath)
+      console.log(`✅ File verified: ${stats.size} bytes`)
+    } else {
+      console.error(`❌ File verification failed: ${outputPath} does not exist after writing`)
+    }
+  } catch (error) {
+    console.error(`❌ Error writing sitemap to ${outputPath}:`, error)
+    throw error // Re-throw to fail the build if sitemap generation fails
+  }
 
   return filename
 }
@@ -177,8 +252,14 @@ ${sitemapFiles
   .join("\n")}
 </sitemapindex>`
 
-  fs.writeFileSync(path.join(process.cwd(), "public", "sitemap-index.xml"), sitemapIndex)
-  console.log(`📑 Sitemap index generated with ${sitemapFiles.length} sitemaps`)
+  const outputPath = path.join(process.cwd(), "public", "sitemap-index.xml")
+  try {
+    fs.writeFileSync(outputPath, sitemapIndex)
+    console.log(`📑 Sitemap index generated with ${sitemapFiles.length} sitemaps`)
+  } catch (error) {
+    console.error("❌ Error writing sitemap index:", error)
+    throw error
+  }
 }
 
 function generateRobotsTxt() {
@@ -191,6 +272,7 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /_next/
 Disallow: /landing/ads/
+Disallow: /debug/
 
 # Block query parameters
 Disallow: /*?*
@@ -209,35 +291,64 @@ Crawl-delay: 1
 Sitemap: ${BASE_URL}/sitemap.xml
 Sitemap: ${BASE_URL}/sitemap-index.xml`
 
-  fs.writeFileSync(path.join(process.cwd(), "public", "robots.txt"), robotsTxt)
-  console.log("🤖 robots.txt generated successfully!")
+  const outputPath = path.join(process.cwd(), "public", "robots.txt")
+  try {
+    fs.writeFileSync(outputPath, robotsTxt)
+    console.log("🤖 robots.txt generated successfully!")
+  } catch (error) {
+    console.error("❌ Error writing robots.txt:", error)
+    throw error
+  }
 }
 
 // Main execution
 function main() {
-  console.log("🚀 Generating enhanced sitemap and robots.txt...")
+  try {
+    console.log("🚀 Generating enhanced sitemap and robots.txt...")
+    console.log(`📍 Working directory: ${process.cwd()}`)
 
-  const pages = getPages()
-  console.log(`📊 Found ${pages.length} pages to include in sitemap`)
+    // Ensure public directory exists
+    if (!ensurePublicDirectory()) {
+      throw new Error("Failed to create or access public directory")
+    }
 
-  // Generate sitemaps (split if necessary)
-  const sitemapFiles = []
-  const numSitemaps = Math.ceil(pages.length / MAX_URLS_PER_SITEMAP)
+    const pages = getPages()
+    console.log(`📊 Found ${pages.length} pages to include in sitemap`)
 
-  for (let i = 0; i < numSitemaps; i++) {
-    const filename = generateSitemap(pages, i)
-    sitemapFiles.push(filename)
+    if (pages.length === 0) {
+      console.warn("⚠️ No pages found! Generating minimal sitemap with home page only.")
+    }
+
+    // Generate sitemaps (split if necessary)
+    const sitemapFiles = []
+    const numSitemaps = Math.ceil(pages.length / MAX_URLS_PER_SITEMAP)
+
+    for (let i = 0; i < numSitemaps; i++) {
+      const filename = generateSitemap(pages, i)
+      sitemapFiles.push(filename)
+    }
+
+    // Generate sitemap index if multiple sitemaps
+    if (sitemapFiles.length > 1) {
+      generateSitemapIndex(sitemapFiles)
+    }
+
+    // Generate robots.txt
+    generateRobotsTxt()
+
+    console.log("✅ Sitemap generation completed successfully!")
+
+    // Final verification
+    const mainSitemapPath = path.join(process.cwd(), "public", "sitemap.xml")
+    if (fs.existsSync(mainSitemapPath)) {
+      console.log("🎉 Main sitemap.xml verified and ready!")
+    } else {
+      throw new Error("Main sitemap.xml was not created successfully")
+    }
+  } catch (error) {
+    console.error("💥 Fatal error during sitemap generation:", error)
+    process.exit(1) // Fail the build if sitemap generation fails
   }
-
-  // Generate sitemap index if multiple sitemaps
-  if (sitemapFiles.length > 1) {
-    generateSitemapIndex(sitemapFiles)
-  }
-
-  // Generate robots.txt
-  generateRobotsTxt()
-
-  console.log("✅ Sitemap generation completed!")
 }
 
 main()

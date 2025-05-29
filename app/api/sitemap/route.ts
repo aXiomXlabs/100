@@ -1,52 +1,109 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import fs from "fs" // Node.js built-in
-import path from "path" // Node.js built-in
-import { execSync } from "child_process" // Import execSync direkt
+import fs from "fs"
+import path from "path"
+import { execSync } from "child_process"
 
-// Stelle sicher, dass die Umgebungsvariablen hier verfügbar sind,
-// obwohl sie primär für die Client-Seite relevant sind,
-// könnte ein Fehler hier die Initialisierung der Route stören.
+// Supabase client setup with error handling
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-if (!supabaseUrl || !supabaseServiceRoleKey) {
-  console.error("Sitemap API: Supabase URL or Service Role Key is missing in environment variables.")
-  // Du könntest hier entscheiden, nicht zu initialisieren oder einen Fehler zu werfen,
-  // aber für einen 404 ist das unwahrscheinlich die Ursache, es sei denn, es führt zu einem Crash beim Laden der Route.
+let supabase: any = null
+if (supabaseUrl && supabaseServiceRoleKey) {
+  supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
+} else {
+  console.warn("Sitemap API: Supabase credentials missing, database logging disabled")
 }
 
-const supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!)
+// Fallback sitemap generation function
+function generateFallbackSitemap() {
+  const baseUrl = "https://rust-rocket.com"
+  const currentDate = new Date().toISOString().split("T")[0]
+
+  // Basic pages that should always exist
+  const basicPages = [
+    { url: "/", priority: "1.0", changefreq: "daily" },
+    { url: "/solana-sniper-bot", priority: "0.9", changefreq: "weekly" },
+    { url: "/blog", priority: "0.8", changefreq: "weekly" },
+    { url: "/faq", priority: "0.6", changefreq: "monthly" },
+    { url: "/legal/privacy", priority: "0.3", changefreq: "yearly" },
+    { url: "/legal/terms", priority: "0.3", changefreq: "yearly" },
+    { url: "/legal/imprint", priority: "0.3", changefreq: "yearly" },
+  ]
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+${basicPages
+  .map(
+    (page) => `  <url>
+    <loc>${baseUrl}${page.url}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`,
+  )
+  .join("\n")}
+</urlset>`
+}
 
 export async function GET() {
-  console.log("Sitemap API: GET request received") // Hinzugefügt für Debugging
+  console.log("Sitemap API: GET request received")
+
   try {
     const sitemapPath = path.join(process.cwd(), "public", "sitemap.xml")
-    console.log("Sitemap API: Attempting to read sitemap from:", sitemapPath) // Hinzugefügt
+    console.log("Sitemap API: Looking for sitemap at:", sitemapPath)
 
-    if (!fs.existsSync(sitemapPath)) {
-      console.error("Sitemap API: sitemap.xml not found at", sitemapPath) // Hinzugefügt
-      return NextResponse.json({ error: "Sitemap not found" }, { status: 404 })
+    let sitemap: string
+    let urlCount: number
+    let fileSize: number
+
+    if (fs.existsSync(sitemapPath)) {
+      console.log("Sitemap API: Found existing sitemap.xml")
+      sitemap = fs.readFileSync(sitemapPath, "utf8")
+      const stats = fs.statSync(sitemapPath)
+      fileSize = stats.size
+      urlCount = (sitemap.match(/<loc>/g) || []).length
+      console.log(`Sitemap API: Loaded sitemap with ${urlCount} URLs, ${fileSize} bytes`)
+    } else {
+      console.log("Sitemap API: sitemap.xml not found, generating fallback")
+      sitemap = generateFallbackSitemap()
+      urlCount = (sitemap.match(/<loc>/g) || []).length
+      fileSize = Buffer.byteLength(sitemap, "utf8")
+      console.log(`Sitemap API: Generated fallback sitemap with ${urlCount} URLs`)
+
+      // Try to write the fallback sitemap for future use
+      try {
+        const publicDir = path.dirname(sitemapPath)
+        if (!fs.existsSync(publicDir)) {
+          fs.mkdirSync(publicDir, { recursive: true })
+        }
+        fs.writeFileSync(sitemapPath, sitemap)
+        console.log("Sitemap API: Fallback sitemap written to disk")
+      } catch (writeError) {
+        console.warn("Sitemap API: Could not write fallback sitemap to disk:", writeError)
+      }
     }
 
-    const sitemap = fs.readFileSync(sitemapPath, "utf8")
-    const stats = fs.statSync(sitemapPath)
-    console.log("Sitemap API: sitemap.xml read successfully. Size:", stats.size) // Hinzugefügt
-
-    const urlCount = (sitemap.match(/<loc>/g) || []).length
-
-    // Optional: Fehlerbehandlung für Supabase-Insert verbessern
-    const { error: dbError } = await supabase.from("sitemap_status").insert({
-      total_urls: urlCount,
-      file_size_bytes: stats.size,
-      last_generated: stats.mtime.toISOString(),
-      status: "active",
-    })
-    if (dbError) {
-      console.error("Sitemap API: Supabase insert error (GET):", dbError)
-      // Entscheide, ob du hier trotz DB-Fehler die Sitemap zurückgeben willst
-    } else {
-      console.log("Sitemap API: Supabase sitemap_status updated (GET).")
+    // Log to database if available
+    if (supabase) {
+      try {
+        const { error: dbError } = await supabase.from("sitemap_status").insert({
+          total_urls: urlCount,
+          file_size_bytes: fileSize,
+          last_generated: new Date().toISOString(),
+          status: "active",
+        })
+        if (dbError) {
+          console.error("Sitemap API: Database logging error:", dbError)
+        } else {
+          console.log("Sitemap API: Successfully logged to database")
+        }
+      } catch (dbError) {
+        console.error("Sitemap API: Database connection error:", dbError)
+      }
     }
 
     return new NextResponse(sitemap, {
@@ -54,45 +111,74 @@ export async function GET() {
         "Content-Type": "application/xml",
         "Cache-Control": "public, max-age=86400, s-maxage=86400",
         "X-Sitemap-URLs": urlCount.toString(),
-        "X-Sitemap-Size": stats.size.toString(),
+        "X-Sitemap-Size": fileSize.toString(),
+        "X-Sitemap-Source": fs.existsSync(sitemapPath) ? "file" : "fallback",
       },
     })
   } catch (error) {
     console.error("Sitemap API GET error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+
+    // Even if there's an error, try to return a basic fallback
+    try {
+      const fallbackSitemap = generateFallbackSitemap()
+      return new NextResponse(fallbackSitemap, {
+        headers: {
+          "Content-Type": "application/xml",
+          "X-Sitemap-Source": "emergency-fallback",
+        },
+      })
+    } catch (fallbackError) {
+      console.error("Sitemap API: Even fallback generation failed:", fallbackError)
+      return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    }
   }
 }
 
 export async function POST() {
-  console.log("Sitemap API: POST request received") // Hinzugefügt für Debugging
+  console.log("Sitemap API: POST request received - regenerating sitemap")
+
   try {
     const startTime = Date.now()
-    console.log("Sitemap API: Attempting to regenerate sitemap via script...") // Hinzugefügt
 
     // Trigger sitemap regeneration
-    // const { execSync } = require("child_process") // Bereits oben importiert
-    execSync("node scripts/generate-sitemap.js", { cwd: process.cwd(), stdio: "inherit" }) // stdio: 'inherit' für Logs
-    console.log("Sitemap API: generate-sitemap.js script executed.") // Hinzugefügt
+    console.log("Sitemap API: Executing generate-sitemap.js script...")
+    execSync("node scripts/generate-sitemap.js", {
+      cwd: process.cwd(),
+      stdio: "inherit",
+      timeout: 30000, // 30 second timeout
+    })
+    console.log("Sitemap API: Script execution completed")
 
     const generationTime = Date.now() - startTime
 
+    // Check if sitemap was generated
     const sitemapPath = path.join(process.cwd(), "public", "sitemap.xml")
     const stats = fs.existsSync(sitemapPath) ? fs.statSync(sitemapPath) : null
-    const sitemap = stats ? fs.readFileSync(sitemapPath, "utf8") : ""
+
+    if (!stats) {
+      throw new Error("Sitemap generation script completed but sitemap.xml was not created")
+    }
+
+    const sitemap = fs.readFileSync(sitemapPath, "utf8")
     const urlCount = (sitemap.match(/<loc>/g) || []).length
-    console.log("Sitemap API: Sitemap regenerated. URLs:", urlCount, "Size:", stats?.size) // Hinzugefügt
 
-    const { error: dbError } = await supabase.from("sitemap_status").insert({
-      total_urls: urlCount,
-      generation_time_ms: generationTime,
-      file_size_bytes: stats?.size || 0,
-      status: "active",
-    })
+    console.log(`Sitemap API: Successfully regenerated sitemap with ${urlCount} URLs in ${generationTime}ms`)
 
-    if (dbError) {
-      console.error("Sitemap API: Supabase insert error (POST):", dbError)
-    } else {
-      console.log("Sitemap API: Supabase sitemap_status updated (POST).")
+    // Log to database if available
+    if (supabase) {
+      try {
+        const { error: dbError } = await supabase.from("sitemap_status").insert({
+          total_urls: urlCount,
+          generation_time_ms: generationTime,
+          file_size_bytes: stats.size,
+          status: "active",
+        })
+        if (dbError) {
+          console.error("Sitemap API: Database logging error:", dbError)
+        }
+      } catch (dbError) {
+        console.error("Sitemap API: Database connection error:", dbError)
+      }
     }
 
     return NextResponse.json({
@@ -102,23 +188,31 @@ export async function POST() {
       stats: {
         totalUrls: urlCount,
         generationTimeMs: generationTime,
-        fileSizeBytes: stats?.size || 0,
+        fileSizeBytes: stats.size,
       },
     })
   } catch (error) {
     console.error("Sitemap API POST error:", error)
 
-    await supabase
-      .from("sitemap_status")
-      .insert({
-        total_urls: 0,
-        status: "error",
-        errors: [{ message: error instanceof Error ? error.message : "Unknown error" }],
-      })
-      .catch((dbInsertError) => {
-        console.error("Sitemap API: Failed to log error to Supabase:", dbInsertError)
-      })
+    // Log error to database if available
+    if (supabase) {
+      try {
+        await supabase.from("sitemap_status").insert({
+          total_urls: 0,
+          status: "error",
+          errors: [{ message: error instanceof Error ? error.message : "Unknown error" }],
+        })
+      } catch (dbError) {
+        console.error("Sitemap API: Failed to log error to database:", dbError)
+      }
+    }
 
-    return NextResponse.json({ error: "Failed to regenerate sitemap" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to regenerate sitemap",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
