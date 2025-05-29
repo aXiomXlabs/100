@@ -114,7 +114,7 @@ export default function Hero() {
               className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6"
               itemProp="headline"
             >
-              Solana Sniper Bot <span className="sr-only">–</span>
+              Solana Sniper Bot with 25ms Same-Block Execution <span className="sr-only">–</span>
               <span className="text-gradient font-extrabold">Rust Rocket</span>
             </h1>
 

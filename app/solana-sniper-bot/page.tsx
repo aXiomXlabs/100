@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import SolanaSniperBotClientPage from "./SolanaSniperBotClientPage"
 
 export const metadata: Metadata = {
-  title: "Solana Sniper Bot | 25ms Execution Time & Same-Block Execution",
+  title: "Solana Sniper Bot with 25ms Execution | Rust Rocket",
   description:
-    "The ultimate Solana Sniper Bot with 25ms latency, same-block execution and advanced copy-trading for Pump.fun and Raydium. Maximize your profits on meme coin launches.",
+    "The ultimate Solana sniper bot with 25ms latency, same-block execution and advanced copy trading for Pump.fun and Raydium.",
   keywords: [
     "Solana Sniper Bot",
     "Pump.fun Sniper",

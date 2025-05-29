@@ -4,6 +4,13 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import Script from "next/script"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Solana Trading Insights & Bot Strategies | Rust Rocket",
+  description:
+    "Discover expert insights on Solana trading, meme coin strategies, and copy trading techniques with Rust Rocket's advanced bot.",
+}
 
 // Beispiel-Blogposts
 const blogPosts = [
@@ -46,8 +53,11 @@ export default function BlogPage() {
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-text-primary">
-              Rust Rocket <span className="text-primary">Blog</span>
+              Solana Sniper Bot Insights & Trading Strategies
             </h1>
+            <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-text-secondary">
+              Rust Rocket <span className="text-primary">Blog</span>
+            </h2>
             <p className="text-text-secondary text-lg max-w-2xl mx-auto">
               Entdecke die neuesten Einblicke, Strategien und Updates rund um Solana Trading, Meme Coins und die Rust
               Rocket Plattform.

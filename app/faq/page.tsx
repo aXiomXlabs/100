@@ -3,7 +3,8 @@ import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions | Rust Rocket",
-  description: "Get answers to common questions about Rust Rocket's Solana sniper bot and copy trading features.",
+  description:
+    "Get answers to common questions about Rust Rocket's 25ms Solana sniper bot, copy trading features, and same-block execution.",
 }
 
 export default function FAQPage() {

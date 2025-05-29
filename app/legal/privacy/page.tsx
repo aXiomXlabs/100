@@ -2,15 +2,15 @@ import Link from "next/link"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Rust Rocket",
+  title: "Privacy Policy & Data Protection | Rust Rocket",
   description:
-    "Learn how Rust Rocket protects your privacy and handles your data when using our Solana trading bot and services.",
+    "Learn how Rust Rocket protects your trading data and privacy when using our advanced Solana sniper bot platform.",
 }
 
 export default function PrivacyPolicy() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="text-4xl font-bold mb-8 text-green-500">Privacy Policy</h1>
+      <h1 className="text-4xl font-bold mb-8 text-green-500">Privacy & Data Protection at Rust Rocket</h1>
 
       <div className="prose prose-lg max-w-none prose-invert">
         <p className="text-gray-400">
