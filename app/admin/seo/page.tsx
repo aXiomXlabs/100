@@ -843,7 +843,7 @@ export default function SEODashboard() {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => window.open("/sitemap.xml", "_blank")}
+                onClick={() => window.open("/api/sitemap", "_blank")}
               >
                 <Globe className="h-4 w-4 mr-2" />
                 View Sitemap
