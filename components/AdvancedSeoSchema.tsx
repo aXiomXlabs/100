@@ -42,7 +42,7 @@ export default function AdvancedSeoSchema({
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
-      availableLanguage: ["English", "German"],
+      availableLanguage: ["English"],
     },
     foundingDate: "2024",
     numberOfEmployees: "2-10",

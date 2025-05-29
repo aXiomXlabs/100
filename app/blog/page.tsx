@@ -9,7 +9,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "Solana Trading Insights & Bot Strategies | Rust Rocket",
   description:
-    "Discover expert insights on Solana trading, proven meme coin strategies, and advanced copy trading techniques with Rust Rocket's high-performance sniper bot platform.",
+    "Expert insights on Solana trading, meme coin strategies, & copy trading with Rust Rocket's high-performance bot. Stay ahead in the crypto market.", // (151 chars)
 }
 
 // Beispiel-Blogposts

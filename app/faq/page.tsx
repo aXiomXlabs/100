@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "FAQ - Rust Rocket Solana Sniper Bot",
   description:
-    "Get comprehensive answers to common questions about Rust Rocket's lightning-fast 25ms Solana sniper bot, advanced copy trading features, and same-block execution technology.",
+    "Answers to questions about Rust Rocket's 25ms Solana sniper bot, copy trading, & same-block execution. Get the info you need for optimal trading.", // (150 chars)
 }
 
 const FAQPage = () => {
