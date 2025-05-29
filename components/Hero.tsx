@@ -232,25 +232,26 @@ export default function Hero() {
             </motion.div>
 
             {/* SEO-optimized H1 with enhanced keywords */}
-            <motion.h1
-              id="hero-heading"
-              className="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight"
-              itemProp="headline"
-              variants={itemVariants}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              <span className="block bg-gradient-to-r from-white via-solana-green to-solana-purple bg-clip-text text-transparent">
-                Solana Sniper Bot with 25ms Same-Block Execution
-              </span>
-              <motion.span
-                className="block text-2xl md:text-3xl lg:text-4xl mt-2 bg-gradient-to-r from-primary to-solana-green bg-clip-text text-transparent font-extrabold"
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+            <motion.div variants={itemVariants}>
+              <h1
+                id="hero-heading"
+                className="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight"
+                itemProp="headline"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
               >
-                Rust Rocket
-              </motion.span>
-            </motion.h1>
+                <span className="block bg-gradient-to-r from-white via-solana-green to-solana-purple bg-clip-text text-transparent">
+                  Solana Sniper Bot with 25ms Same-Block Execution
+                </span>
+                <motion.span
+                  className="block text-2xl md:text-3xl lg:text-4xl mt-2 bg-gradient-to-r from-primary to-solana-green bg-clip-text text-transparent font-extrabold"
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  Rust Rocket
+                </motion.span>
+              </h1>
+            </motion.div>
 
             {/* SEO-enhanced subtitle with additional keywords */}
             <motion.div variants={itemVariants} className="space-y-2">
