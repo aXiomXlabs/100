@@ -1,5 +1,3 @@
-import { getAllRedirects } from './lib/redirects.js'
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -15,35 +13,37 @@ const nextConfig = {
   // Enhanced redirect configuration
   async redirects() {
     return [
-      // Import redirects from redirect management system
-      ...getAllRedirects(),
-      
-      // WWW to non-WWW redirect (canonical domain)
+      // Legacy redirects
       {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.rust-rocket.com',
-          },
-        ],
-        destination: 'https://rust-rocket.com/:path*',
+        source: '/privacy',
+        destination: '/legal/privacy',
         permanent: true,
       },
-      
-      // HTTP to HTTPS redirect
       {
-        source: '/:path*',
-        has: [
-          {
-            type: 'header',
-            key: 'x-forwarded-proto',
-            value: 'http',
-          },
-        ],
-        destination: 'https://rust-rocket.com/:path*',
+        source: '/terms',
+        destination: '/legal/terms',
         permanent: true,
-      }
+      },
+      {
+        source: '/roadmap',
+        destination: '/#roadmap',
+        permanent: true,
+      },
+      {
+        source: '/faq.html',
+        destination: '/faq',
+        permanent: true,
+      },
+      {
+        source: '/privacy.html',
+        destination: '/legal/privacy',
+        permanent: true,
+      },
+      {
+        source: '/terms.html',
+        destination: '/legal/terms',
+        permanent: true,
+      },
     ]
   },
   
@@ -98,11 +98,6 @@ const nextConfig = {
   
   // Trailing slash configuration
   trailingSlash: false,
-  
-  // Experimental features for better SEO
-  experimental: {
-    optimizeCss: true,
-  }
 }
 
 export default nextConfig

@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Block admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /test-*
+
+# Block query parameters
+Disallow: /*?*
+
+# Allow important files
+Allow: /api/sitemap
+Allow: /sitemap.xml
+
+# Sitemap location
+Sitemap: https://rust-rocket.com/sitemap.xml
+
+# Crawl delay for bots
+Crawl-delay: 1

@@ -42,25 +42,6 @@ export default function NotFound() {
             </div>
           </div>
         </div>
-
-        {/* SEO-friendly structured data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebPage",
-              name: "404 - Page Not Found",
-              description: "The requested page could not be found on Rust Rocket website.",
-              url: "https://rust-rocket.com/404",
-              mainEntity: {
-                "@type": "Organization",
-                name: "Rust Rocket",
-                url: "https://rust-rocket.com",
-              },
-            }),
-          }}
-        />
       </div>
     </div>
   )
