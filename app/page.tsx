@@ -63,6 +63,10 @@ export default function Home() {
       <ParticlesBackground />
       <Navbar />
       <main id="main-content" role="main">
+        {/* New H1 tag for the homepage */}
+        <h1 className="text-4xl font-bold tracking-tight text-white text-center py-8 px-4">
+          Rust Rocket – 25 ms Solana Sniper Bot
+        </h1>
         <Hero />
         <SectionDivider />
         <ProblemSection />

@@ -2,7 +2,7 @@
 
 import React from "react"
 import { useEffect, useRef, useState } from "react"
-import { Rocket, Target, Clock, Users } from "lucide-react"
+import { Target, Clock, Users } from "lucide-react"
 import { motion, useAnimation, useInView } from "framer-motion"
 import Image from "next/image"
 
@@ -224,13 +224,6 @@ export default function Hero() {
         >
           {/* Left column - Enhanced text content with SEO optimization */}
           <article className="flex flex-col items-start text-left space-y-8">
-            <motion.div variants={itemVariants}>
-              <span className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-solana-green/20 to-solana-purple/20 border border-solana-green/30 text-solana-green text-sm font-medium backdrop-blur-sm">
-                <Rocket className="w-4 h-4 mr-2 animate-pulse" aria-hidden="true" />
-                Launching Soon – Beta Live Since May 9th
-              </span>
-            </motion.div>
-
             {/* SEO-optimized H1 with enhanced keywords */}
             <motion.div variants={itemVariants}>
               <h1
