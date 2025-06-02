@@ -1,4 +1,4 @@
-"\"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 
@@ -8,7 +8,7 @@ export default function CountdownTimer() {
 
   useEffect(() => {
     // Simuliere eine Startanzahl zwischen 580 und 620
-    const initialCount = Math.floor(Math.random() * 40) + 580
+    const initialCount = Math.floor(Math.random() * 41) + 580 // (0 to 40) + 580 = 580 to 620
     setRegisteredUsers(initialCount)
 
     // Simuliere gelegentliche neue Anmeldungen
@@ -20,21 +20,26 @@ export default function CountdownTimer() {
     }, 5000) // Alle 5 Sekunden prüfen
 
     return () => clearInterval(interval)
-  }, [])
+  }, [maxUsers]) // Added maxUsers to dependency array as it's used in the effect
 
   // Berechne den Fortschritt in Prozent
   const progressPercentage = (registeredUsers / maxUsers) * 100
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center p-4 rounded-lg shadow-md bg-background-secondary">
       <div className="text-text-secondary mb-2">Bereits angemeldet:</div>
       <div className="text-3xl font-bold text-primary mb-3">{registeredUsers}</div>
 
       {/* Fortschrittsbalken */}
-      <div className="w-full bg-background-tertiary rounded-full h-4 mb-2">
+      <div className="w-full bg-background-tertiary rounded-full h-4 mb-2 overflow-hidden">
         <div
           className="bg-primary h-4 rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${progressPercentage}%` }}
+          role="progressbar"
+          aria-valuenow={progressPercentage}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Fortschritt der Anmeldungen"
         ></div>
       </div>
 
@@ -45,10 +50,8 @@ export default function CountdownTimer() {
 
       {/* Zusätzliche Informationen */}
       <div className="mt-4 text-center text-sm text-text-secondary">
-        <p>Sei einer der ersten 1000 Nutzer und sichere dir exklusive Vorteile!</p>
+        <p>Sei einer der ersten {maxUsers} Nutzer und sichere dir exklusive Vorteile!</p>
       </div>
     </div>
   )
 }
-"\
-\
