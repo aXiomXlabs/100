@@ -2,7 +2,7 @@
 
 import React from "react"
 import { useEffect, useRef, useState } from "react"
-import { Target, Clock, Users } from "lucide-react"
+import { Target, Clock, Users } from "lucide-react" // Rocket was removed in a previous step
 import { motion, useAnimation, useInView } from "framer-motion"
 import Image from "next/image"
 
@@ -175,9 +175,9 @@ export default function Hero() {
     <section
       ref={heroRef}
       className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900"
-      id="hero"
-      aria-labelledby="hero-heading"
-      role="banner"
+      id="hero-visual-section" // Changed id to be more specific if needed
+      aria-labelledby="hero-visual-heading" // Changed aria-labelledby
+      role="region" // Changed role from banner to region as it's not the primary banner anymore
       itemScope
       itemType="http://schema.org/WebPageElement"
     >
@@ -224,12 +224,12 @@ export default function Hero() {
         >
           {/* Left column - Enhanced text content with SEO optimization */}
           <article className="flex flex-col items-start text-left space-y-8">
-            {/* SEO-optimized H1 with enhanced keywords */}
+            {/* Changed H1 to H2, kept original styling classes for visual consistency */}
             <motion.div variants={itemVariants}>
-              <h1
-                id="hero-heading"
+              <h2
+                id="hero-visual-heading" // Kept id for potential specific styling/linking
                 className="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight"
-                itemProp="headline"
+                // itemProp="headline" removed as it's not the primary page headline
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
@@ -243,14 +243,14 @@ export default function Hero() {
                 >
                   Rust Rocket
                 </motion.span>
-              </h1>
+              </h2>
             </motion.div>
 
-            {/* SEO-enhanced subtitle with additional keywords */}
+            {/* This H2 is now an H3 as the above is H2 */}
             <motion.div variants={itemVariants} className="space-y-2">
-              <h2 className="text-lg md:text-xl text-gray-300 font-medium">
+              <h3 className="text-lg md:text-xl text-gray-300 font-medium">
                 Dominate Meme Coin Trading with Automated Trading Platform
-              </h2>
+              </h3>
               <p className="text-base text-gray-400">Lightning-fast • Copy Trading • DeFi Trading • 95% Success Rate</p>
             </motion.div>
 
@@ -285,8 +285,6 @@ export default function Hero() {
                   </motion.div>
                 ))}
               </div>
-
-              {/* SEO-optimized CTAs with descriptive text */}
             </motion.div>
           </article>
 
